@@ -37,7 +37,7 @@ class AuthController extends Controller
 
         if (!Auth::attempt($request->only('email', 'password'))) { //cambiar email por name para entrega se inicia con usuario
             return response()->json([
-                'message' => 'Invalid login details'
+                'message' => 'Credenciales incorrectas'
             ], 401);
         }
 
@@ -72,11 +72,11 @@ class AuthController extends Controller
             $user->save();
 
             return response()->json([
-            'new password' => $password
+            'Mensaje' => $password
         ]);
         }else{
             return response()->json([
-                'message' => 'Not find email in database'
+                'Mensaje' => 'No se encunetra el usuario en el sistema'
             ], 404);
         }
     }
