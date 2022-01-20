@@ -3,25 +3,27 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Models\User;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     public function register(Request $request){
 
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'bail|required|string|max:255',
+            'email' => 'bail|required|string|email|max:255|unique:users',
+            'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/',
+            'genre' => 'required|in:Hombre,Mujer,Otro',
             'surname' => 'required|string|max:255',
-            'image' => 'string|max:255|nullable',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/',
-            'genre' => 'required|in:Hombre,Mujer,Otro'
+            'image' => 'string|max:255|nullable'
         ]);
 
         $user = User::create([
             'name' => $validatedData['name'],
             'surname' => $validatedData['surname'],
-            'image' => $validatedData['surname'],
+            'image' => $validatedData['image'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'genre' => $validatedData['genre']
