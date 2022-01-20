@@ -13,7 +13,7 @@ class CreateCourtsTable extends Migration
      */
     public function up()
     {
-        Schema::create('court', function (Blueprint $table) {
+        Schema::create('courts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('club_id')->constrained()->nullable();
             $table->string('name');

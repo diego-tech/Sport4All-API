@@ -16,7 +16,8 @@ class CreateReservesTable extends Migration
         Schema::create('reserves', function (Blueprint $table) {
             $table->id();
             $table->string('QR')->nullable();
-            $table->foreignId('user_id')->constrained()->nullable;
+            $table->foreignId('user_id')->constrained()->nullable();
+            $table->foreignId('court_id')->constrained()->nullable();
             $table->dateTime('start_dateTime');
             $table->dateTime('end_dateTime');
             $table->timestamps();
