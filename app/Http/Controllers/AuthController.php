@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Models\User;
 
 class AuthController extends Controller
 {
@@ -20,7 +21,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $validatedData['name'],
             'surname' => $validatedData['surname'],
-            'image' => $validatedData['surname']
+            'image' => $validatedData['surname'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'genre' => $validatedData['genre']
