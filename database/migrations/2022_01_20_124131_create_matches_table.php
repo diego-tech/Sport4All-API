@@ -19,7 +19,6 @@ class CreateMatchesTable extends Migration
             $table->foreignId('user_id')->constrained()->nullable();
             $table->string('QR')->nullable();
             $table->double('price_people');
-            $table->string('exchange');
             $table->dateTime('start_dateTime');
             $table->dateTime('end_dateTime');
             $table->timestamps();

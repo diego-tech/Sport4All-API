@@ -18,10 +18,9 @@ class CreateEventsTable extends Migration
             $table->foreignId('club_id')->constrained()->nullable();
             $table->string('name');
             $table->enum('visibility', ['Publico', 'Privado', 'Oculto']);
-            $table->int('people_left');
+            $table->integer('people_left');
             $table->string('type');
             $table->double('price');
-            $table->string('exchange');
             $table->timestamps();
         });
     }

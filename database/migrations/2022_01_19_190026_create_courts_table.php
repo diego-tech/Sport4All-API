@@ -20,7 +20,6 @@ class CreatePistasTable extends Migration
             $table->enum('type',['Indoor','Outdoor']);
             $table->boolean('lights');
             $table->double('price');
-            $table->stinrg('exchange');
             $table->timestamps();
         });
     }
