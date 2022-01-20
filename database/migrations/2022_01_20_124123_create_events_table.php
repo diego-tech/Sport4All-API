@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePistasTable extends Migration
+class CreateEventsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,15 @@ class CreatePistasTable extends Migration
      */
     public function up()
     {
-        Schema::create('court', function (Blueprint $table) {
+        Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('club_id')->constrained()->nullable();
             $table->string('name');
-            $table->enum('type',['Indoor','Outdoor']);
-            $table->boolean('lights');
+            $table->enum('visibility', ['Publico', 'Privado', 'Oculto']);
+            $table->int('people_left');
+            $table->string('type');
             $table->double('price');
-            $table->stinrg('exchange');
+            $table->string('exchange');
             $table->timestamps();
         });
     }
@@ -32,6 +33,6 @@ class CreatePistasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pistas');
+        Schema::dropIfExists('events');
     }
 }
