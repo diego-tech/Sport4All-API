@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMatchesTable extends Migration
+class CreateMatchsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,9 +15,8 @@ class CreateMatchesTable extends Migration
     {
         Schema::create('matches', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('court_id')->constrained()->nullable();
-            $table->foreignId('user_id')->constrained()->nullable();
             $table->string('QR')->nullable();
+            $table->foreignId('user_id')->constrained()->nullable();
             $table->double('price_people');
             $table->dateTime('start_dateTime');
             $table->dateTime('end_dateTime');
@@ -32,6 +31,6 @@ class CreateMatchesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('matches');
+        Schema::dropIfExists('matchs');
     }
 }
