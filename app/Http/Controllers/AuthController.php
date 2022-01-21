@@ -36,7 +36,6 @@ class AuthController extends Controller
 
         if ($validatedData->fails()) {
             return $this->sendError('Usuario no registrado', $validatedData->errors()->all(),406);
-            //return response()->json($validatedData->messages(), 406 );
         }else{
             try{
             $user = User::create([
@@ -53,8 +52,6 @@ class AuthController extends Controller
             return $this->sendError('Usuario no registrado', $e->getMessage(),406); 
             }
         }
-
-        //$token = $user->createToken('auth_token')->plainTextToken;
     }
 
     public function login(Request $request){
