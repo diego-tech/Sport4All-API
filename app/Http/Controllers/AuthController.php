@@ -56,22 +56,18 @@ class AuthController extends Controller
 
     public function login(Request $request){
 
-        if (!Auth::attempt($request->only('email', 'password'))) { //cambiar email por name para entrega se inicia con usuario
-            return response()->json([
-                'message' => 'Credenciales incorrectas'
-            ], 401);
+        if (!Auth::attempt($request->only('email', 'password'))) { 
+            return $this->sendError('Credenciales incorrectas','Email o password incorrectos', 401);
         }
 
-        $user = User::where('email',$request['email'])->firstOrFail(); //cambiar email por name para entrega se inicia con usuario
+        $user = User::where('email',$request['email'])->firstOrFail(); 
 
         $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'access_Token' => $token,
-            'token_type' => 'Bearer'
-        ]);
+        return $this->sendResponse(['access_Token' => $token,
+            'token_type' => 'Bearer'], 'Sesion iniciada correctamente');
     }
 
     public function infouser(Request $request){
