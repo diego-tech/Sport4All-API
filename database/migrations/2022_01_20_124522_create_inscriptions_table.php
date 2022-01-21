@@ -15,7 +15,12 @@ class CreateInscriptionsTable extends Migration
     {
         Schema::create('inscriptions', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
+            $table->string('surname')->nullable();
+            $table->string('email')->nullable();
+            $table->enum('genre', ['Hombre','Mujer','Otro'])->nullable();
             $table->foreignId('event_id')->constrained()->nullable();
+            $table->foreignId('user_id')->constrained()->nullable();
             $table->timestamps();
         });
     }
