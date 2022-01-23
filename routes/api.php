@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ClubsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,3 +23,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/userinfo', [AuthController::class, 'infouser'])->middleware('auth:sanctum');
+
+// CLUBS
+Route::post('/registerclub', [ClubsController::class, 'register']);
+
+Route::middleware(['auth:sanctum'])->group(function () {
+     // Preguntar si esto es otra manera de señalar que va a pasar por el middleware
+});
+Route::get('/listclubs', [ClubsController::class, 'listClubs'])/*->middleware('auth:sanctum')*/;
