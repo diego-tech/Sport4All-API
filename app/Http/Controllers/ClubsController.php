@@ -53,7 +53,6 @@ class ClubsController extends Controller
                 $token = $club->createToken('auth_token')->plainTextToken; // En otro vídeo aquí ponen el mismo nombre que la variable $token (en su caso accessToken)
 
                 return response()->json([
-                    //'club' => $club, // Creo que no es necesario
                     'access_Token' => $token,
                     'token_type' => 'Bearer'
                 ]);
@@ -61,7 +60,8 @@ class ClubsController extends Controller
             }catch(\Exception $e){
                 //return $this->sendError('Usuario no registrado', $e->getMessage(),406); 
                 return response()->json([
-                    'message' => 'Error al registrar el club'
+                    'message' => 'Error al registrar el club',
+                    'error' => $e
                 ], 401); 
             }
         }
