@@ -15,7 +15,7 @@ class ClubsController extends Controller
     public function register(Request $request){
 
         $validatedData = Validator::make($request->all(),[
-            'name' => 'bail|required|string|max:255', // Bail: stop running validation rules on an attribute after the first validation failure
+            'name' => 'bail|required|string|max:255',
             'club_img' => 'string|max:255|nullable',
             'club_banner' => 'string|max:255|nullable',
             'direction' => 'required|string|max:255',
@@ -50,7 +50,7 @@ class ClubsController extends Controller
                 'email' => $request->input('email')
                 ]);
 
-                $token = $club->createToken('auth_token')->plainTextToken; // En otro vídeo aquí ponen el mismo nombre que la variable $token (en su caso accessToken)
+                $token = $club->createToken('auth_token')->plainTextToken;
 
                 return response()->json([
                     'access_Token' => $token,
@@ -58,7 +58,6 @@ class ClubsController extends Controller
                 ]);
 
             }catch(\Exception $e){
-                //return $this->sendError('Usuario no registrado', $e->getMessage(),406); 
                 return response()->json([
                     'message' => 'Error al registrar el club',
                     'error' => $e
