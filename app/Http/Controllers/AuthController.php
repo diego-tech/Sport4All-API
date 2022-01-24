@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -95,6 +96,28 @@ class AuthController extends Controller
             return response()->json([
                 'Mensaje' => 'No se encunetra el usuario en el sistema'
             ], 404);
+        }
+    }
+
+    public function modifyUser(Request $request){
+        $user = $request->user();
+        if(isset($request->name)){
+            $user->name = $request->name;
+        }
+        if(isset($request->email)){
+
+        }
+        if(isset($request->password)){
+
+        }
+        if(isset($request->surname)){
+
+        }
+        if(isset($request->image)){
+
+        }
+        if(isset($request->genre)){
+
         }
     }
 

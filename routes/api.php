@@ -22,3 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/userinfo', [AuthController::class, 'infouser'])->middleware('auth:sanctum');
+Route::get('/recoverpass', [AuthController::class, 'recoverPass']);
+Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
