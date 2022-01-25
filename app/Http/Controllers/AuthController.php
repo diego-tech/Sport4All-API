@@ -100,25 +100,58 @@ class AuthController extends Controller
     }
 
     public function modifyUser(Request $request){
-        $user = $request->user();
-        if(isset($request->name)){
-            $user->name = $request->name;
-        }
-        if(isset($request->email)){
 
-        }
-        if(isset($request->password)){
+        $validatedData = Validator::make($request->all(),[
+            'name' => 'bail|string|max:255|nullable',
+            'email' => 'bail|string|email|max:255|unique:users|nullable',
+            'password' => 'bail|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/|nullable',
+            'genre' => 'in:Hombre,Mujer,Otro|nullable',
+            'surname' => 'string|max:255|nullable',
+            'image' => 'string|max:255|nullable'
+        ],
+        [
+            'name.required' => 'Introduce tu nombre',
+            'name.string' => 'El nombre debe ser un String',
+            'name.max' => 'El nombre no puede superar 255 caracteres',
+            'email.required' => 'Introduce un email correcto',
+            'email.string' => 'El email debe ser un string',
+            'email.email' => 'Introduce formato valido de email',
+            'email.unique' => 'Este email ya esta registrado',
+            'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
+            'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
+            'surname.required' => 'Introduce tu apellido'
+        ]);
 
-        }
-        if(isset($request->surname)){
+        if ($validatedData->fails()) {
+            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(),400);
+        }else{
+            try{
+                $user = $request->user();
+                if(isset($request->name)){
+                    $user->name = $request->name;
+                }
+                if(isset($request->email)){
+                    $user->email = $request->email;
+                }
+                if(isset($request->surname)){
+                    $user->surname = $request->surname;
+                }
+                if(isset($request->image)){
+                    $user->image = $request->image;
+                }
+                if(isset($request->genre)){
+                    $user->genre = $request->genre;
+                }
 
-        }
-        if(isset($request->image)){
+                $user->save();
 
+                return $this->sendResponse(['info' => 'Peticion aceptada'],'Usuario modificado correctamenre');
+            }catch(\Exception $e){
+                return $this->sendError('No se puede modificar el usuario', $e->getMessage(),406);
+            }
+            
         }
-        if(isset($request->genre)){
-
-        }
+        
     }
 
 
