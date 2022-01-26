@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Club;
+use App\Models\ClubFav;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ClubsController extends Controller
 {
@@ -70,9 +72,57 @@ class ClubsController extends Controller
     /**
      * Función para listar todos los clubs
      */
-    public function listClubs(Request $request){
+    public function listClubs(){
         $clubs = Club::all();
         return $clubs;
+    }
+
+    /**
+     * Función para registrar clubs favoritos
+     */
+    public function registerFavClub(Request $request){
+        $answer = ['status' => 1, 'msg' => ''];
+
+        $user = $request->user; // Token del usuario que va a realizar el registro de favorito
+
+        $club = $request -> getContent();
+        $club = json_decode($club);
+
+        // Cojo del postman el id del club y lo busco en la tabla clubs para comprobar que exista
+        $idClubPostman = $club->idClub; // idClub se pasa desde el body del postman
+        $checkClub = DB::table('clubs')->where('id', $idClubPostman)->first();
+        
+        // Comprobación de que no esté ya añadido a favoritos
+        $userId = $user->id;
+        $check=DB::table('favourites')
+                        ->select('user_id', 'club_id')
+                        ->where('user_id', $userId)
+                        ->where('club_id', $idClubPostman)
+                        ->first();
+        
+        try {
+            if($checkClub){
+                // Si la relación ya existe en la tabla de favoritos no les puedo volver a añadir
+                if($check){
+                    $answer['msg'] = "Este club ya se encuentra añadido a favoritos";
+                }else{
+                    // Añado el club a favoritos
+                    $clubFav = new ClubFav();
+                    $clubFav -> user_id = $userId;
+                    $clubFav -> club_id = $idClubPostman;
+                    $clubFav -> save();
+                    $answer['msg'] = "El club ha sido añadido a favoritos";
+                }
+                
+            }else{
+                $answer['msg'] = "El club seleccionado no existe";
+            }
+        } catch (\Exception $e) {
+            $answer['msg'] = $e -> getMessage();
+            $answer['status'] = 0;
+        }
+        
+        return response() -> json($answer);
     }
 
 }
