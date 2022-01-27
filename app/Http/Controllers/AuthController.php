@@ -12,9 +12,14 @@ use Illuminate\Support\Str;
 class AuthController extends Controller
 {
 
+    /**
+     * Registro de Usuario
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function register(Request $request)
     {
-
         $validatedData = Validator::make(
             $request->all(),
             [
@@ -59,9 +64,14 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Login de Usuario
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function login(Request $request)
     {
-
         if (!Auth::attempt($request->only('email', 'password'))) {
             return $this->sendError('Credenciales incorrectas', 'Email o password incorrectos', 401);
         }
@@ -78,11 +88,23 @@ class AuthController extends Controller
         ], 'Sesion iniciada correctamente');
     }
 
+    /**
+     * Información del Usuario
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function infouser(Request $request)
     {
         return $request->user();
     }
 
+    /**
+     * Recuperar Contraseña
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function recoverPass(Request $request)
     {
 
@@ -108,6 +130,12 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Modificar Datos del Usuario
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function modifyUser(Request $request)
     {
 
@@ -162,6 +190,12 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Modificar Contraseña
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function modifyPass(Request $request)
     {
         $validatedData = Validator::make(
