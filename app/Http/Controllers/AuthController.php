@@ -104,7 +104,6 @@ class AuthController extends Controller
         $validatedData = Validator::make($request->all(),[
             'name' => 'bail|string|max:255|nullable',
             'email' => 'bail|string|email|max:255|unique:users|nullable',
-            'password' => 'bail|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/|nullable',
             'genre' => 'in:Hombre,Mujer,Otro|nullable',
             'surname' => 'string|max:255|nullable',
             'image' => 'string|max:255|nullable'
@@ -117,8 +116,6 @@ class AuthController extends Controller
             'email.string' => 'El email debe ser un string',
             'email.email' => 'Introduce formato valido de email',
             'email.unique' => 'Este email ya esta registrado',
-            'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-            'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
             'surname.required' => 'Introduce tu apellido'
         ]);
 
@@ -154,6 +151,29 @@ class AuthController extends Controller
         
     }
 
+    public function modifiPass(Request $request){
+        $validatedData = Validator::make($request->all(),[
+            'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/'
+        ],
+        [
+            'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
+            'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula'
+        ]);
+
+        if ($validatedData->fails()) {
+            return $this->sendError('Formato incorrecto', $validatedData->errors()->all(),400);
+        }else{
+            try{
+                $user = $request->user();
+                if(isset($request->password)){
+                    $user->name = $request->name;
+                }
+                $user->save();
+            }catch(\Exception $e){
+                return $this->sendError('No se puede modificar el usuario', $e->getMessage(),406);
+            }
+        }
+    }
 
 
 
