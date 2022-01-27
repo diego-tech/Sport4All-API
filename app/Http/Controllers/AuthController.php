@@ -151,7 +151,7 @@ class AuthController extends Controller
         
     }
 
-    public function modifiPass(Request $request){
+    public function modifyPass(Request $request){
         $validatedData = Validator::make($request->all(),[
             'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/'
         ],
