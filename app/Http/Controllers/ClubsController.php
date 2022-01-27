@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Club;
-use App\Models\ClubFav;
+use App\Models\Favourite;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ClubsController extends Controller
@@ -78,19 +77,26 @@ class ClubsController extends Controller
     }
 
     /**
-     * Función para registrar clubs favoritos
+     * Función para registrar clubs como favoritos
      */
     public function registerFavClub(Request $request){
-        $answer = ['status' => 1, 'msg' => ''];
+        $answer = ['status' => 1, 'msg' =>[]];
 
-        $user = $request->user; // Token del usuario que va a realizar el registro de favorito
+        $user = $request->user(); // Token del usuario que va a realizar el registro de favorito
 
         $club = $request -> getContent();
         $club = json_decode($club);
 
-        // Cojo del postman el id del club y lo busco en la tabla clubs para comprobar que exista
-        $idClubPostman = $club->idClub; // idClub se pasa desde el body del postman
-        $checkClub = DB::table('clubs')->where('id', $idClubPostman)->first();
+        $validatedData = Validator::make($request->all(),[
+            'club_id' => 'required|exists:clubs,id'
+        ],
+        [
+            'club_id.required' => 'Introduzca el id del club',
+            'club_id.exists' => 'El club seleccionado no existe'
+        ]);
+        
+        // Cojo del postman el id del club
+        $idClubPostman = $request->input('club_id'); // idClub se pasa desde el body del postman
         
         // Comprobación de que no esté ya añadido a favoritos
         $userId = $user->id;
@@ -100,27 +106,29 @@ class ClubsController extends Controller
                         ->where('club_id', $idClubPostman)
                         ->first();
         
-        try {
-            if($checkClub){
-                // Si la relación ya existe en la tabla de favoritos no les puedo volver a añadir
-                if($check){
-                    $answer['msg'] = "Este club ya se encuentra añadido a favoritos";
-                }else{
-                    // Añado el club a favoritos
-                    $clubFav = new ClubFav();
-                    $clubFav -> user_id = $userId;
-                    $clubFav -> club_id = $idClubPostman;
-                    $clubFav -> save();
-                    $answer['msg'] = "El club ha sido añadido a favoritos";
-                }
-                
+        if($validatedData->fails()) {
+                $answer['msg']['error'] = $validatedData->errors()->all();
+                return response()->json($answer,406);
             }else{
-                $answer['msg'] = "El club seleccionado no existe";
+                
+                try {
+                    // Si la relación ya existe en la tabla de favoritos no les puedo volver a añadir
+                    if($check){
+                        $answer['msg'] = "Este club ya se encuentra añadido a favoritos";
+                    }else{
+                        // Añado el club a favoritos
+                        $clubFav = new Favourite();
+                        $clubFav -> user_id = $userId;
+                        $clubFav -> club_id = $idClubPostman;
+                        $clubFav -> save();
+                        $answer['msg'] = "El club ha sido añadido a favoritos";
+                    }
+                } catch (\Exception $e) {
+                    $answer['msg'] = $e -> getMessage();
+                    $answer['status'] = 0;
+                }
             }
-        } catch (\Exception $e) {
-            $answer['msg'] = $e -> getMessage();
-            $answer['status'] = 0;
-        }
+        
         
         return response() -> json($answer);
     }

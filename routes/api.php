@@ -27,4 +27,4 @@ Route::get('/userinfo', [AuthController::class, 'infouser'])->middleware('auth:s
 // CLUBS
 Route::post('/registerclub', [ClubsController::class, 'register']);
 Route::get('/listclubs', [ClubsController::class, 'listClubs'])->middleware('auth:sanctum');
-Route::put('/registerfavclub', [ClubsController::class, 'registerFavClub']); // El user tendrá que estar logeado para poder añadir clubes favoritos
+Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->middleware('auth:sanctum'); // El user tendrá que estar logeado para poder añadir clubes favoritos
