@@ -11,173 +11,187 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    
-    public function register(Request $request){
 
-        $validatedData = Validator::make($request->all(),[
-            'name' => 'bail|required|string|max:255',
-            'email' => 'bail|required|string|email|max:255|unique:users',
-            'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/',
-            'genre' => 'required|in:Hombre,Mujer,Otro',
-            'surname' => 'required|string|max:255',
-            'image' => 'string|max:255|nullable'
-        ],
-        [
-            'name.required' => 'Introduce tu nombre',
-            'name.string' => 'El nombre debe ser un String',
-            'name.max' => 'El nombre no puede superar 255 caracteres',
-            'email.required' => 'Introduce un email correcto',
-            'email.string' => 'El email debe ser un string',
-            'email.email' => 'Introduce formato valido de email',
-            'email.unique' => 'Este email ya esta registrado',
-            'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-            'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-            'surname.required' => 'Introduce tu apellido'
-        ]);
+    public function register(Request $request)
+    {
+
+        $validatedData = Validator::make(
+            $request->all(),
+            [
+                'name' => 'bail|required|string|max:255',
+                'email' => 'bail|required|string|email|max:255|unique:users',
+                'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/',
+                'genre' => 'required|in:Hombre,Mujer,Otro',
+                'surname' => 'required|string|max:255',
+                'image' => 'string|max:255|nullable'
+            ],
+            [
+                'name.required' => 'Introduce tu nombre',
+                'name.string' => 'El nombre debe ser un String',
+                'name.max' => 'El nombre no puede superar 255 caracteres',
+                'email.required' => 'Introduce un email correcto',
+                'email.string' => 'El email debe ser un string',
+                'email.email' => 'Introduce formato valido de email',
+                'email.unique' => 'Este email ya esta registrado',
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
+                'surname.required' => 'Introduce tu apellido'
+            ]
+        );
 
         if ($validatedData->fails()) {
-            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(),406);
-        }else{
-            try{
-            $user = User::create([
-            'name' => $request->input('name'),
-            'surname' => $request->input('surname'),
-            'image' => $request->input('image'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-            'genre' => $request->input('genre')
-            ]);
+            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(), 406);
+        } else {
+            try {
+                $user = User::create([
+                    'name' => $request->input('name'),
+                    'surname' => $request->input('surname'),
+                    'image' => $request->input('image'),
+                    'email' => $request->input('email'),
+                    'password' => Hash::make($request->input('password')),
+                    'genre' => $request->input('genre')
+                ]);
 
-             return $this->sendResponse(['info' => 'Token no created, Login to make token'],'Usuario registrado correctamenre');
-            }catch(\Exception $e){
-            return $this->sendError('Usuario no registrado', $e->getMessage(),406); 
+                return $this->sendResponse(['info' => 'Token no created, Login to make token'], 'Usuario registrado correctamenre');
+            } catch (\Exception $e) {
+                return $this->sendError('Usuario no registrado', $e->getMessage(), 406);
             }
         }
     }
 
-    public function login(Request $request){
+    public function login(Request $request)
+    {
 
-        if (!Auth::attempt($request->only('email', 'password'))) { 
-            return $this->sendError('Credenciales incorrectas','Email o password incorrectos', 401);
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return $this->sendError('Credenciales incorrectas', 'Email o password incorrectos', 401);
         }
 
-        $user = User::where('email',$request['email'])->firstOrFail(); 
+        $user = User::where('email', $request['email'])->firstOrFail();
 
         $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return $this->sendResponse(['access_Token' => $token,
-            'token_type' => 'Bearer'], 'Sesion iniciada correctamente');
+        return $this->sendResponse([
+            'access_Token' => $token,
+            'token_type' => 'Bearer'
+        ], 'Sesion iniciada correctamente');
     }
 
-    public function infouser(Request $request){
+    public function infouser(Request $request)
+    {
         return $request->user();
     }
 
-    public function recoverPass(Request $request){
+    public function recoverPass(Request $request)
+    {
 
 
         $Pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
 
-        $user = User::where('email',$request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
         if ($user) {
-            do{
+            do {
                 $password = Str::random(8);
-            }while(!preg_match($Pass_pattern, $password)); //hacer para que se envie por correo??
+            } while (!preg_match($Pass_pattern, $password)); //hacer para que se envie por correo??
             $user->password = Hash::make($password);
             $user->save();
 
             return response()->json([
-            'Mensaje' => $password
-        ]);
-        }else{
+                'Mensaje' => $password
+            ]);
+        } else {
             return response()->json([
                 'Mensaje' => 'No se encunetra el usuario en el sistema'
             ], 404);
         }
     }
 
-    public function modifyUser(Request $request){
+    public function modifyUser(Request $request)
+    {
 
-        $validatedData = Validator::make($request->all(),[
-            'name' => 'bail|string|max:255|nullable',
-            'email' => 'bail|string|email|max:255|unique:users|nullable',
-            'genre' => 'in:Hombre,Mujer,Otro|nullable',
-            'surname' => 'string|max:255|nullable',
-            'image' => 'string|max:255|nullable'
-        ],
-        [
-            'name.required' => 'Introduce tu nombre',
-            'name.string' => 'El nombre debe ser un String',
-            'name.max' => 'El nombre no puede superar 255 caracteres',
-            'email.required' => 'Introduce un email correcto',
-            'email.string' => 'El email debe ser un string',
-            'email.email' => 'Introduce formato valido de email',
-            'email.unique' => 'Este email ya esta registrado',
-            'surname.required' => 'Introduce tu apellido'
-        ]);
+        $validatedData = Validator::make(
+            $request->all(),
+            [
+                'name' => 'bail|string|max:255|nullable',
+                'email' => 'bail|string|email|max:255|unique:users|nullable',
+                'genre' => 'in:Hombre,Mujer,Otro|nullable',
+                'surname' => 'string|max:255|nullable',
+                'image' => 'string|max:255|nullable'
+            ],
+            [
+                'name.required' => 'Introduce tu nombre',
+                'name.string' => 'El nombre debe ser un String',
+                'name.max' => 'El nombre no puede superar 255 caracteres',
+                'email.required' => 'Introduce un email correcto',
+                'email.string' => 'El email debe ser un string',
+                'email.email' => 'Introduce formato valido de email',
+                'email.unique' => 'Este email ya esta registrado',
+                'surname.required' => 'Introduce tu apellido'
+            ]
+        );
 
         if ($validatedData->fails()) {
-            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(),400);
-        }else{
-            try{
+            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(), 400);
+        } else {
+            try {
                 $user = $request->user();
-                if(isset($request->name)){
+                if (isset($request->name)) {
                     $user->name = $request->name;
                 }
-                if(isset($request->email)){
+                if (isset($request->email)) {
                     $user->email = $request->email;
                 }
-                if(isset($request->surname)){
+                if (isset($request->surname)) {
                     $user->surname = $request->surname;
                 }
-                if(isset($request->image)){
+                if (isset($request->image)) {
                     $user->image = $request->image;
                 }
-                if(isset($request->genre)){
+                if (isset($request->genre)) {
                     $user->genre = $request->genre;
                 }
 
                 $user->save();
 
-                return $this->sendResponse(['info' => 'Peticion aceptada'],'Usuario modificado correctamenre');
-            }catch(\Exception $e){
-                return $this->sendError('No se puede modificar el usuario', $e->getMessage(),406);
+                return $this->sendResponse(['info' => 'Peticion aceptada'], 'Usuario modificado correctamenre');
+            } catch (\Exception $e) {
+                return $this->sendError('No se puede modificar el usuario', $e->getMessage(), 406);
             }
-            
         }
-        
     }
 
-    public function modifyPass(Request $request){
-        $validatedData = Validator::make($request->all(),[
-            'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/'
-        ],
-        [
-            'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-            'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula'
-        ]);
+    public function modifyPass(Request $request)
+    {
+        $validatedData = Validator::make(
+            $request->all(),
+            [
+                'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/'
+            ],
+            [
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula'
+            ]
+        );
 
         if ($validatedData->fails()) {
-            return $this->sendError('Formato incorrecto', $validatedData->errors()->all(),400);
-        }else{
-            try{
+            return $this->sendError('Formato incorrecto', $validatedData->errors()->all(), 400);
+        } else {
+            try {
                 $user = $request->user();
-                if(isset($request->password)){
+                if (isset($request->password)) {
                     $user->name = $request->name;
                 }
                 $user->save();
-            }catch(\Exception $e){
-                return $this->sendError('No se puede modificar el usuario', $e->getMessage(),406);
+            } catch (\Exception $e) {
+                return $this->sendError('No se puede modificar el usuario', $e->getMessage(), 406);
             }
         }
     }
 
-
-
-    public function sendResponse($result, $message){
+    public function sendResponse($result, $message)
+    {
         $response = [
             'success' => '1',
             'data'    => $result,
@@ -187,15 +201,16 @@ class AuthController extends Controller
         return response()->json($response, 200);
     }
 
-    public function sendError($error, $errorMessages = [], $code){
+    public function sendError($error, $errorMessages = [], $code)
+    {
         $response = [
             'success' => '0',
             'message' => $error,
         ];
 
-        if(!empty($errorMessages))
+        if (!empty($errorMessages))
             $response['data']['error'] = $errorMessages;
-        
-        return response()->json($response, $code);         
+
+        return response()->json($response, $code);
     }
 }
