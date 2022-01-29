@@ -189,6 +189,7 @@ class AuthController extends Controller
      */
     public function modifyUser(Request $request)
     {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $validatedData = Validator::make(
             $request->all(),
@@ -200,19 +201,20 @@ class AuthController extends Controller
                 'image' => 'string|max:255|nullable'
             ],
             [
-                'name.required' => 'Introduce tu nombre',
                 'name.string' => 'El nombre debe ser un String',
                 'name.max' => 'El nombre no puede superar 255 caracteres',
-                'email.required' => 'Introduce un email correcto',
                 'email.string' => 'El email debe ser un string',
                 'email.email' => 'Introduce formato valido de email',
                 'email.unique' => 'Este email ya esta registrado',
-                'surname.required' => 'Introduce tu apellido'
             ]
         );
 
         if ($validatedData->fails()) {
-            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(), 400);
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors();
+            $response['msg'] = "Ha Ocurrido un Error";
+
+            return response()->json($response, 400);
         } else {
             try {
                 $user = $request->user();
@@ -234,9 +236,15 @@ class AuthController extends Controller
 
                 $user->save();
 
-                return $this->sendResponse(['info' => 'Peticion aceptada'], 'Usuario modificado correctamenre');
+                $response['status'] = 1;
+                $response['msg'] = "Usuario Modificado Correctamente";
+
+                return response()->json($response, 200);
             } catch (\Exception $e) {
-                return $this->sendError('No se puede modificar el usuario', $e->getMessage(), 406);
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+                $response['status'] = 0;
+
+                return response()->json($response, 406);
             }
         }
     }
