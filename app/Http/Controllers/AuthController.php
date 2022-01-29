@@ -208,15 +208,15 @@ class AuthController extends Controller
                 'email.unique' => 'Este email ya esta registrado',
             ]
         );
+        try {
+            if ($validatedData->fails()) {
+                $response['status'] = 0;
+                $response['data']['errors'] = $validatedData->errors();
+                $response['msg'] = "Ha Ocurrido un Error";
 
-        if ($validatedData->fails()) {
-            $response['status'] = 0;
-            $response['data']['errors'] = $validatedData->errors();
-            $response['msg'] = "Ha Ocurrido un Error";
+                return response()->json($response, 400);
+            } else {
 
-            return response()->json($response, 400);
-        } else {
-            try {
                 $user = $request->user();
                 if (isset($request->name)) {
                     $user->name = $request->name;
@@ -240,12 +240,12 @@ class AuthController extends Controller
                 $response['msg'] = "Usuario Modificado Correctamente";
 
                 return response()->json($response, 200);
-            } catch (\Exception $e) {
-                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
-                $response['status'] = 0;
-
-                return response()->json($response, 406);
             }
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
         }
     }
 
@@ -257,29 +257,43 @@ class AuthController extends Controller
      */
     public function modifyPass(Request $request)
     {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
         $validatedData = Validator::make(
             $request->all(),
             [
-                'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/'
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
             ],
             [
-                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula'
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
             ]
         );
+        try {
+            if ($validatedData->fails()) {
+                $response['status'] = 0;
+                $response['data']['errors'] = $validatedData->errors()->all();
+                $response['msg'] = "Ha Ocurrido un Error";
 
-        if ($validatedData->fails()) {
-            return $this->sendError('Formato incorrecto', $validatedData->errors()->all(), 400);
-        } else {
-            try {
+                return response()->json($response, 406);
+            } else {
                 $user = $request->user();
+
                 if (isset($request->password)) {
-                    $user->name = $request->name;
+                    $user->password = $request->password;
                 }
                 $user->save();
-            } catch (\Exception $e) {
-                return $this->sendError('No se puede modificar el usuario', $e->getMessage(), 406);
+
+                $response['status'] = 1;
+                $response['msg'] = "Contraseña Modificada Correctamente";
+
+                return response()->json($response, 200);
             }
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
         }
     }
 }
