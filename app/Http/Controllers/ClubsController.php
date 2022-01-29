@@ -18,13 +18,15 @@ class ClubsController extends Controller
      */
     public function register(Request $request)
     {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
         // Validación de los campos
         $validatedData = Validator::make(
             $request->all(),
             [
                 'name' => 'bail|required|string|max:255',
-                'club_img' => 'string|max:255|nullable',
-                'club_banner' => 'string|max:255|nullable',
+                'club_img' => 'required|string|max:255',
+                'club_banner' => 'required|string|max:255',
                 'direction' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs'
@@ -41,13 +43,19 @@ class ClubsController extends Controller
                 'email.required' => 'Introduce un email correcto',
                 'email.string' => 'El email debe ser un string',
                 'email.email' => 'Introduce formato válido de email',
-                'email.unique' => 'Este email ya está registrado'
+                'email.unique' => 'Este email ya está registrado',
+                'club_img.required' => 'Introduzca una Imagen de Perfil',
+                'club_banner.required' => 'Introduzca una Imagen de Banner'
             ]
         );
 
         if ($validatedData->fails()) {
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors();
+            $response['msg'] = "Datos Incorrectos, club no registrado";
+
             // Comprobación si hay algún dato incorrecto
-            return $this->sendError('Datos incorrectos, club no registrado', $validatedData->errors()->all(), 406);
+            return response()->json($response, 406);
         } else {
             // Si los campos son correctos se crea el club
             try {
@@ -60,17 +68,16 @@ class ClubsController extends Controller
                     'email' => $request->input('email')
                 ]);
 
-                $token = $club->createToken('auth_token')->plainTextToken;
+                $response['status'] = 1;
+                $response['data'] = $club;
+                $response['msg'] = 'Usuario Registrado Correctamente';
 
-                return response()->json([
-                    'access_Token' => $token,
-                    'token_type' => 'Bearer'
-                ]);
+                return response()->json($response, 200);
             } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Error al registrar el club',
-                    'error' => $e
-                ], 401);
+                $response['status'] = 0;
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+                return response()->json($response, 406);
             }
         }
     }
@@ -83,8 +90,22 @@ class ClubsController extends Controller
      */
     public function listClubs()
     {
-        $clubs = Club::all();
-        return $clubs;
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        try {
+            $clubs = Club::all();
+
+            $response['status'] = 1;
+            $response['data'] = $clubs;
+            $response['msg'] = "Todos los Clubes";
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
     }
 
     /**
@@ -95,7 +116,7 @@ class ClubsController extends Controller
      */
     public function registerFavClub(Request $request)
     {
-        $answer = ['status' => 1, 'msg' => []];
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
         // Token del usuario que va a realizar el registro de favorito
         $user = $request->user();
@@ -116,7 +137,7 @@ class ClubsController extends Controller
         );
 
         // Recogemos el id del club seleccionado
-        $idClubPostman = $request->input('club_id');
+        $idClub = $request->input('club_id');
 
         // Comprobación de que no esté ya añadido a favoritos
         $userId = $user->id;
@@ -124,32 +145,42 @@ class ClubsController extends Controller
         $check = DB::table('favourites')
             ->select('user_id', 'club_id')
             ->where('user_id', $userId)
-            ->where('club_id', $idClubPostman)
+            ->where('club_id', $idClub)
             ->first();
 
         // Comprobación si hay algún dato incorrecto
         if ($validatedData->fails()) {
-            $answer['msg']['error'] = $validatedData->errors()->all();
-            return response()->json($answer, 406);
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors();
+            $response['msg'] = "Ha Ocurrido un Error";
+
+            return response()->json($response, 406);
         } else {
             try {
                 // Si la relación ya existe en la tabla de favoritos no les puedo volver a añadir
                 if ($check) {
-                    $answer['msg'] = "Este club ya se encuentra añadido a favoritos";
+                    $response['status'] = 0;
+                    $response['msg'] = "Este club ya se encuentra añadido a favoritos";
+
+                    return response()->json($response, 406);
                 } else {
                     // Añado el club a favoritos
                     $clubFav = new Favourite();
                     $clubFav->user_id = $userId;
-                    $clubFav->club_id = $idClubPostman;
+                    $clubFav->club_id = $idClub;
                     $clubFav->save();
-                    $answer['msg'] = "El club ha sido añadido a favoritos";
+
+                    $response['status'] = 1;
+                    $response['msg'] = "El club ha sido añadido a favoritos";
+
+                    return response()->json($response, 200);
                 }
             } catch (\Exception $e) {
-                $answer['msg'] = $e->getMessage();
-                $answer['status'] = 0;
+                $response['status'] = 0;
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+    
+                return response()->json($response, 406);
             }
         }
-        
-        return response()->json($answer);
     }
 }

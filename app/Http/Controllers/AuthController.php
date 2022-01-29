@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\Response;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -11,7 +12,6 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-
     /**
      * Registro de Usuario
      * 
@@ -20,15 +20,17 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
         $validatedData = Validator::make(
             $request->all(),
             [
                 'name' => 'bail|required|string|max:255',
                 'email' => 'bail|required|string|email|max:255|unique:users',
-                'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/',
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'genre' => 'required|in:Hombre,Mujer,Otro',
                 'surname' => 'required|string|max:255',
-                'image' => 'string|max:255|nullable'
+                'image' => 'required|string|max:255'
             ],
             [
                 'name.required' => 'Introduce tu nombre',
@@ -38,14 +40,19 @@ class AuthController extends Controller
                 'email.string' => 'El email debe ser un string',
                 'email.email' => 'Introduce formato valido de email',
                 'email.unique' => 'Este email ya esta registrado',
-                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-                'surname.required' => 'Introduce tu apellido'
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'surname.required' => 'Introduce tu apellido',
+                'image.required' => 'Introduzca una Imagen'
             ]
         );
 
         if ($validatedData->fails()) {
-            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(), 406);
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors();
+            $response['msg'] = 'Usuario No Registrado';
+
+            return response()->json($response, 406);
         } else {
             try {
                 $user = User::create([
@@ -57,9 +64,16 @@ class AuthController extends Controller
                     'genre' => $request->input('genre')
                 ]);
 
-                return $this->sendResponse(['info' => 'Token no created, Login to make token'], 'Usuario registrado correctamenre');
+                $response['status'] = 1;
+                $response['data'] = $user;
+                $response['msg'] = 'Usuario Registrado Correctamente';
+
+                return response()->json($response, 200);
             } catch (\Exception $e) {
-                return $this->sendError('Usuario no registrado', $e->getMessage(), 406);
+                $response['status'] = 0;
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+                return response()->json($response, 406);
             }
         }
     }
@@ -72,20 +86,36 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return $this->sendError('Credenciales incorrectas', 'Email o password incorrectos', 401);
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        $credentials = $request->only('email', 'password');
+
+        $user = User::where('email', $request['email'])->first();
+
+        try {
+            if ($user) {
+                if (!Auth::attempt($credentials)) {
+                    $response['status'] = 0;
+                    $response['msg'] = "Email o Contraseña incorrectos";
+
+                    return response()->json($response, 401);
+                } else {
+                    $user->tokens()->delete();
+                    $token = $user->createToken('auth_token')->plainTextToken;
+
+                    $response['status'] = 1;
+                    $response['data']['token'] = $token;
+                    $response['msg'] = "Sesión Iniciada Correctamente";
+
+                    return response()->json($response, 200);
+                }
+            }
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
         }
-
-        $user = User::where('email', $request['email'])->firstOrFail();
-
-        $user->tokens()->delete();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return $this->sendResponse([
-            'access_Token' => $token,
-            'token_type' => 'Bearer'
-        ], 'Sesion iniciada correctamente');
     }
 
     /**
@@ -96,7 +126,20 @@ class AuthController extends Controller
      */
     public function infouser(Request $request)
     {
-        return $request->user();
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        try {
+            $response['status'] = 1;
+            $response['data'] = $request->user();
+            $response['msg'] = "Datos del Usuario";
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
+        }
     }
 
     /**
@@ -107,26 +150,34 @@ class AuthController extends Controller
      */
     public function recoverPass(Request $request)
     {
-
-
-        $Pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+        $pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
 
         $user = User::where('email', $request->email)->first();
 
-        if ($user) {
-            do {
-                $password = Str::random(8);
-            } while (!preg_match($Pass_pattern, $password)); //hacer para que se envie por correo??
-            $user->password = Hash::make($password);
-            $user->save();
+        try {
+            if ($user) {
+                do {
+                    $password = Str::random(8);
+                } while (!preg_match($pass_pattern, $password)); //hacer para que se envie por correo??
+                $user->password = Hash::make($password);
+                $user->save();
 
-            return response()->json([
-                'Mensaje' => $password
-            ]);
-        } else {
-            return response()->json([
-                'Mensaje' => 'No se encunetra el usuario en el sistema'
-            ], 404);
+                $response['status'] = 1;
+                $response['msg'] = "Contraseña: " . $password;
+
+                return response()->json($response, 200);
+            } else {
+                $response['status'] = 0;
+                $response['msg'] = "No se encuentra el usuario en el sistema";
+
+                return response()->json($response, 404);
+            }
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
         }
     }
 
@@ -138,6 +189,7 @@ class AuthController extends Controller
      */
     public function modifyUser(Request $request)
     {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $validatedData = Validator::make(
             $request->all(),
@@ -149,21 +201,22 @@ class AuthController extends Controller
                 'image' => 'string|max:255|nullable'
             ],
             [
-                'name.required' => 'Introduce tu nombre',
                 'name.string' => 'El nombre debe ser un String',
                 'name.max' => 'El nombre no puede superar 255 caracteres',
-                'email.required' => 'Introduce un email correcto',
                 'email.string' => 'El email debe ser un string',
                 'email.email' => 'Introduce formato valido de email',
                 'email.unique' => 'Este email ya esta registrado',
-                'surname.required' => 'Introduce tu apellido'
             ]
         );
+        try {
+            if ($validatedData->fails()) {
+                $response['status'] = 0;
+                $response['data']['errors'] = $validatedData->errors();
+                $response['msg'] = "Ha Ocurrido un Error";
 
-        if ($validatedData->fails()) {
-            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(), 400);
-        } else {
-            try {
+                return response()->json($response, 400);
+            } else {
+
                 $user = $request->user();
                 if (isset($request->name)) {
                     $user->name = $request->name;
@@ -183,10 +236,16 @@ class AuthController extends Controller
 
                 $user->save();
 
-                return $this->sendResponse(['info' => 'Peticion aceptada'], 'Usuario modificado correctamenre');
-            } catch (\Exception $e) {
-                return $this->sendError('No se puede modificar el usuario', $e->getMessage(), 406);
+                $response['status'] = 1;
+                $response['msg'] = "Usuario Modificado Correctamente";
+
+                return response()->json($response, 200);
             }
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
         }
     }
 
@@ -198,53 +257,43 @@ class AuthController extends Controller
      */
     public function modifyPass(Request $request)
     {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
         $validatedData = Validator::make(
             $request->all(),
             [
-                'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/'
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
             ],
             [
-                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula'
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
             ]
         );
+        try {
+            if ($validatedData->fails()) {
+                $response['status'] = 0;
+                $response['data']['errors'] = $validatedData->errors()->all();
+                $response['msg'] = "Ha Ocurrido un Error";
 
-        if ($validatedData->fails()) {
-            return $this->sendError('Formato incorrecto', $validatedData->errors()->all(), 400);
-        } else {
-            try {
+                return response()->json($response, 406);
+            } else {
                 $user = $request->user();
+
                 if (isset($request->password)) {
-                    $user->name = $request->name;
+                    $user->password = Hash::make($request->password);
                 }
                 $user->save();
-            } catch (\Exception $e) {
-                return $this->sendError('No se puede modificar el usuario', $e->getMessage(), 406);
+
+                $response['status'] = 1;
+                $response['msg'] = "Contraseña Modificada Correctamente";
+
+                return response()->json($response, 200);
             }
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
         }
-    }
-
-    public function sendResponse($result, $message)
-    {
-        $response = [
-            'success' => '1',
-            'data'    => $result,
-            'message' => $message,
-        ];
-
-        return response()->json($response, 200);
-    }
-
-    public function sendError($error, $errorMessages = [], $code)
-    {
-        $response = [
-            'success' => '0',
-            'message' => $error,
-        ];
-
-        if (!empty($errorMessages))
-            $response['data']['error'] = $errorMessages;
-
-        return response()->json($response, $code);
     }
 }
