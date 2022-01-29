@@ -86,20 +86,36 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return $this->sendError('Credenciales incorrectas', 'Email o password incorrectos', 401);
+        $response = ["status" => 0, "data" => [], "msg" => ""];
+
+        $credentials = $request->only('email', 'password');
+
+        $user = User::where('email', $request['email'])->first();
+
+        try {
+            if ($user) {
+                if (!Auth::attempt($credentials)) { 
+                    $response['status'] = 0;
+                    $response['msg'] = "Email o Contraseña incorrectos";
+
+                    return response()->json($response, 401);
+                } else {
+                    $user->tokens()->delete();
+                    $token = $user->createToken('auth_token')->plainTextToken;
+
+                    $response['status'] = 1;
+                    $response['data']['token'] = $token;
+                    $response['msg'] = "Sesión Iniciada Correctamente";
+
+                    return response()->json($response, 200);
+                }
+            }
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
         }
-
-        $user = User::where('email', $request['email'])->firstOrFail();
-
-        $user->tokens()->delete();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return $this->sendResponse([
-            'access_Token' => $token,
-            'token_type' => 'Bearer'
-        ], 'Sesion iniciada correctamente');
     }
 
     /**
