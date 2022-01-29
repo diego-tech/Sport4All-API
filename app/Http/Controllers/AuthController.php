@@ -280,7 +280,7 @@ class AuthController extends Controller
                 $user = $request->user();
 
                 if (isset($request->password)) {
-                    $user->password = $request->password;
+                    $user->password = Hash::make($request->password);
                 }
                 $user->save();
 
