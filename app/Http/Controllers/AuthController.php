@@ -20,7 +20,7 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $response = ["status" => 0, "data" => [], "msg" => ""];
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $validatedData = Validator::make(
             $request->all(),
@@ -86,7 +86,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $response = ["status" => 0, "data" => [], "msg" => ""];
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $credentials = $request->only('email', 'password');
 
@@ -94,7 +94,7 @@ class AuthController extends Controller
 
         try {
             if ($user) {
-                if (!Auth::attempt($credentials)) { 
+                if (!Auth::attempt($credentials)) {
                     $response['status'] = 0;
                     $response['msg'] = "Email o Contraseña incorrectos";
 
@@ -126,7 +126,20 @@ class AuthController extends Controller
      */
     public function infouser(Request $request)
     {
-        return $request->user();
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        try {
+            $response['status'] = 1;
+            $response['data'] = $request->user();
+            $response['msg'] = "Datos del Usuario";
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
+        }
     }
 
     /**
