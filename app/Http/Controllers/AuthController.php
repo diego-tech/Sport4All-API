@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\Response;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -11,7 +12,6 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-
     /**
      * Registro de Usuario
      * 
@@ -20,15 +20,17 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        $response = ["status" => 0, "data" => [], "msg" => ""];
+
         $validatedData = Validator::make(
             $request->all(),
             [
                 'name' => 'bail|required|string|max:255',
                 'email' => 'bail|required|string|email|max:255|unique:users',
-                'password' => 'bail|required|string|regex:/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/',
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'genre' => 'required|in:Hombre,Mujer,Otro',
                 'surname' => 'required|string|max:255',
-                'image' => 'string|max:255|nullable'
+                'image' => 'required|string|max:255'
             ],
             [
                 'name.required' => 'Introduce tu nombre',
@@ -38,14 +40,19 @@ class AuthController extends Controller
                 'email.string' => 'El email debe ser un string',
                 'email.email' => 'Introduce formato valido de email',
                 'email.unique' => 'Este email ya esta registrado',
-                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra y una mayuscula',
-                'surname.required' => 'Introduce tu apellido'
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'surname.required' => 'Introduce tu apellido',
+                'image.required' => 'Introduzca una Imagen'
             ]
         );
 
         if ($validatedData->fails()) {
-            return $this->sendError('Usuario no registrado', $validatedData->errors()->all(), 406);
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors();
+            $response['msg'] = 'Usuario No Registrado';
+
+            return response()->json($response, 406);
         } else {
             try {
                 $user = User::create([
@@ -57,9 +64,16 @@ class AuthController extends Controller
                     'genre' => $request->input('genre')
                 ]);
 
-                return $this->sendResponse(['info' => 'Token no created, Login to make token'], 'Usuario registrado correctamenre');
+                $response['status'] = 1;
+                $response['data'] = $user;
+                $response['msg'] = 'Usuario Registrado Correctamente';
+
+                return response()->json($response, 200);
             } catch (\Exception $e) {
-                return $this->sendError('Usuario no registrado', $e->getMessage(), 406);
+                $response['status'] = 0;
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+                return response()->json($response, 406);
             }
         }
     }
@@ -222,29 +236,5 @@ class AuthController extends Controller
                 return $this->sendError('No se puede modificar el usuario', $e->getMessage(), 406);
             }
         }
-    }
-
-    public function sendResponse($result, $message)
-    {
-        $response = [
-            'success' => '1',
-            'data'    => $result,
-            'message' => $message,
-        ];
-
-        return response()->json($response, 200);
-    }
-
-    public function sendError($error, $errorMessages = [], $code)
-    {
-        $response = [
-            'success' => '0',
-            'message' => $error,
-        ];
-
-        if (!empty($errorMessages))
-            $response['data']['error'] = $errorMessages;
-
-        return response()->json($response, $code);
     }
 }
