@@ -150,26 +150,34 @@ class AuthController extends Controller
      */
     public function recoverPass(Request $request)
     {
-
-
-        $Pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+        $pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
 
         $user = User::where('email', $request->email)->first();
 
-        if ($user) {
-            do {
-                $password = Str::random(8);
-            } while (!preg_match($Pass_pattern, $password)); //hacer para que se envie por correo??
-            $user->password = Hash::make($password);
-            $user->save();
+        try {
+            if ($user) {
+                do {
+                    $password = Str::random(8);
+                } while (!preg_match($pass_pattern, $password)); //hacer para que se envie por correo??
+                $user->password = Hash::make($password);
+                $user->save();
 
-            return response()->json([
-                'Mensaje' => $password
-            ]);
-        } else {
-            return response()->json([
-                'Mensaje' => 'No se encunetra el usuario en el sistema'
-            ], 404);
+                $response['status'] = 1;
+                $response['msg'] = "Contraseña: " . $password;
+
+                return response()->json($response, 200);
+            } else {
+                $response['status'] = 0;
+                $response['msg'] = "No se encuentra el usuario en el sistema";
+
+                return response()->json($response, 404);
+            }
+        } catch (\Exception $e) {
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['status'] = 0;
+
+            return response()->json($response, 406);
         }
     }
 
