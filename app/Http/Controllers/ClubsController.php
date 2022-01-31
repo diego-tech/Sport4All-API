@@ -178,7 +178,7 @@ class ClubsController extends Controller
             } catch (\Exception $e) {
                 $response['status'] = 0;
                 $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
-    
+
                 return response()->json($response, 406);
             }
         }
