@@ -160,6 +160,7 @@ class ClubsController extends Controller
                 // Si la relación ya existe en la tabla de favoritos no les puedo volver a añadir
                 if ($check) {
                     $response['status'] = 0;
+                    $response['data']['errors'] = "";
                     $response['msg'] = "Este club ya se encuentra añadido a favoritos";
 
                     return response()->json($response, 406);
@@ -171,6 +172,7 @@ class ClubsController extends Controller
                     $clubFav->save();
 
                     $response['status'] = 1;
+                    $response['data']['errors'] = "";
                     $response['msg'] = "El club ha sido añadido a favoritos";
 
                     return response()->json($response, 200);
