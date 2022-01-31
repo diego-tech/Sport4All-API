@@ -20,7 +20,7 @@ use App\Http\Controllers\ClubsController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/userinfo', [AuthController::class, 'infouser'])->middleware('auth:sanctum');
-Route::get('/recoverpass', [AuthController::class, 'recoverPass']);
+Route::post('/recoverpass', [AuthController::class, 'recoverPass']);
 Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
 Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('auth:sanctum');
 
