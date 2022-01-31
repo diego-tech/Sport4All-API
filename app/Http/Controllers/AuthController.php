@@ -104,6 +104,7 @@ class AuthController extends Controller
                     $token = $user->createToken('auth_token')->plainTextToken;
 
                     $response['status'] = 1;
+                    $response['data'] = $user;
                     $response['data']['token'] = $token;
                     $response['msg'] = "Sesión Iniciada Correctamente";
 
