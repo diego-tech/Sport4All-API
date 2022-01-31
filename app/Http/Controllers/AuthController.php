@@ -151,7 +151,8 @@ class AuthController extends Controller
      */
     public function recoverPass(Request $request)
     {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
+        $response = ["status" => 1, "msg" => ""];
+
         $pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
 
         $user = User::where('email', $request->email)->first();
@@ -217,8 +218,8 @@ class AuthController extends Controller
 
                 return response()->json($response, 400);
             } else {
-
                 $user = $request->user();
+
                 if (isset($request->name)) {
                     $user->name = $request->name;
                 }
@@ -238,6 +239,7 @@ class AuthController extends Controller
                 $user->save();
 
                 $response['status'] = 1;
+                $response['data'] = $user;
                 $response['msg'] = "Usuario Modificado Correctamente";
 
                 return response()->json($response, 200);
@@ -286,6 +288,7 @@ class AuthController extends Controller
                 $user->save();
 
                 $response['status'] = 1;
+                $response['data']['errors'] = "";
                 $response['msg'] = "Contraseña Modificada Correctamente";
 
                 return response()->json($response, 200);
