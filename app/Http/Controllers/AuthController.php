@@ -96,6 +96,7 @@ class AuthController extends Controller
             if ($user) {
                 if (!Auth::attempt($credentials)) {
                     $response['status'] = 0;
+                    $response['data']['errors'] = "";
                     $response['msg'] = "Email o Contraseña incorrectos";
 
                     return response()->json($response, 401);
