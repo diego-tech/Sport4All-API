@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CourtsController extends Controller
 {
+    //Futuro cambiar a tener que estar logueado como club
     public function CourtRegist(Request $request){
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
