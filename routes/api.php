@@ -24,6 +24,7 @@ Route::post('/recoverpass', [AuthController::class, 'recoverPass']);
 Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
 Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('auth:sanctum');
 Route::post('/getUploadImage', [AuthController::class, 'getUploadImage']);
+Route::post('/checkIfUserExists', [AuthController::class, 'checkIfUserExists']);
 
 // Rutas Clubes
 Route::post('/registerclub', [ClubsController::class, 'register']);
