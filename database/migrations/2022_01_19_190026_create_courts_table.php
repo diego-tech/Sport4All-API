@@ -18,7 +18,6 @@ class CreateCourtsTable extends Migration
             $table->foreignId('club_id')->constrained()->nullable();
             $table->string('name');
             $table->enum('type',['Indoor','Outdoor']);
-            $table->boolean('lights');
             $table->double('price');
             $table->timestamps();
         });
