@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Helpers\Response;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -123,6 +124,8 @@ class AuthController extends Controller
                     'password' => Hash::make($request->input('password')),
                     'genre' => $request->input('genre')
                 ]);
+
+                event(new Registered($user));
 
                 $response['status'] = 1;
                 $response['data'] = $user;
