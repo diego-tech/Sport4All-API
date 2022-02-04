@@ -7,11 +7,73 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    /**
+     * Registro de Imagen
+     * 
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function getUploadImage(Request $request)
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        $fileName = Storage::putFile("profileImages", $request->file('fileName'));
+
+        $response['status'] = 1;
+        $response['data']['errors'] = "";
+        $response["msg"] = $fileName;
+
+        return response()->json($response);
+    }
+
+    /**
+     * Comprobación si el correo que introduce en la primera pantalla 
+     * ya existe.
+     * 
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function checkIfUserExists(Request $request)
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        $validatedData = Validator::make(
+            $request->all(),
+            [
+                'email' => 'required|email|unique:users',
+                'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
+            ],
+            [
+                'email.required' => "Introduzca un email",
+                'email.unique' => "Ya existe un usuario registrado con este correo",
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
+            ]
+        );
+
+        if ($validatedData->fails()) {
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors()->first();
+            $response['msg'] = 'Usuario ya registrado';
+
+            return response()->json($response, 406);
+        } else {
+            $response['status'] = 1;
+            $response['data']['errors'] = "";
+            $response['msg'] = 'Usuario No Registrado';
+
+            return response()->json($response, 200);
+        }
+    }
+
     /**
      * Registro de Usuario
      * 
@@ -30,7 +92,6 @@ class AuthController extends Controller
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'genre' => 'required|in:Hombre,Mujer,Otro',
                 'surname' => 'required|string|max:255',
-                'image' => 'required|string|max:255'
             ],
             [
                 'name.required' => 'Introduce tu nombre',
@@ -42,14 +103,13 @@ class AuthController extends Controller
                 'email.unique' => 'Este email ya esta registrado',
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
-                'surname.required' => 'Introduce tu apellido',
-                'image.required' => 'Introduzca una Imagen'
+                'surname.required' => 'Introduce tu apellido'
             ]
         );
 
         if ($validatedData->fails()) {
             $response['status'] = 0;
-            $response['data']['errors'] = $validatedData->errors();
+            $response['data']['errors'] = $validatedData->errors()->first();
             $response['msg'] = 'Usuario No Registrado';
 
             return response()->json($response, 406);
