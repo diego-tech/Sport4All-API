@@ -33,6 +33,14 @@ class AuthController extends Controller
         return response()->json($response);
     }
 
+    /**
+     * Comprobación si el correo que introduce en la primera pantalla 
+     * ya existe.
+     * 
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function checkIfUserExists(Request $request)
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
@@ -40,12 +48,12 @@ class AuthController extends Controller
         $validatedData = Validator::make(
             $request->all(),
             [
-                'email' => 'required|string|email|exists:users,email',
+                'email' => 'required|email|unique:users',
                 'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
             ],
             [
                 'email.required' => "Introduzca un email",
-                'email.exists' => "Ya existe un usuario registrado con este correo",
+                'email.unique' => "Ya existe un usuario registrado con este correo",
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
             ]
@@ -57,6 +65,12 @@ class AuthController extends Controller
             $response['msg'] = 'Usuario ya registrado';
 
             return response()->json($response, 406);
+        } else {
+            $response['status'] = 1;
+            $response['data']['errors'] = "";
+            $response['msg'] = 'Usuario No Registrado';
+
+            return response()->json($response, 200);
         }
     }
 
