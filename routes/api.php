@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClubsController;
+use App\Http\Controllers\CourtsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +31,4 @@ Route::post('/checkIfUserExists', [AuthController::class, 'checkIfUserExists']);
 Route::post('/registerclub', [ClubsController::class, 'register']);
 Route::get('/listclubs', [ClubsController::class, 'listClubs'])->middleware('auth:sanctum');
 Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->middleware('auth:sanctum'); // El user tendrá que estar logeado para poder añadir clubes favoritos
+Route::post('/registercourt', [CourtsController::class, 'CourtRegist']);
