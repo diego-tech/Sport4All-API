@@ -32,3 +32,4 @@ Route::get('/listclubs', [ClubsController::class, 'listClubs'])->middleware('aut
 Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->middleware('auth:sanctum'); // El user tendrá que estar logeado para poder añadir clubes favoritos
 Route::post('/registercourt', [CourtsController::class, 'CourtRegist']); //Futuro cambiar a tener que estar logueado como club
 Route::post('/creatematch',[MatchController::class, 'createMatch']); //Futuro cambiar a tener que estar logueado como club
+Route::get('/seematches',[MatchController::class, 'seeMatches']);

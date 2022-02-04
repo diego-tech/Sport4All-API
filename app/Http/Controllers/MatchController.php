@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Matchs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class MatchController extends Controller
@@ -65,8 +66,28 @@ class MatchController extends Controller
 
                 return response()->json($response, 406);
             }
+        }      
+    }
+
+    public function seeMatches(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+        try{
+            $Matchs = DB::table('matchs')
+                            ->join('clubs','club_id', 'clubs.id')
+                            ->join('courts','court_id', 'courts.id')
+                            ->select('clubs.name as Club','courts.name as Pista','matchs.start_dateTime as Hora inicio',
+                            'matchs.end_dateTime as Hora finalizacion','matchs.price_people as Precio persona')
+                            ->get();
+            
+            $response['data'] = $Matchs;
+            $response['msg'] = "Partidos";
+            return response()->json($response, 200);
+        }catch(\Exception $e){
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
         }
 
-        
     }
 }
