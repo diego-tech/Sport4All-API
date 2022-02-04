@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Matchs;
+use App\Models\MatchUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -89,5 +91,58 @@ class MatchController extends Controller
             return response()->json($response, 406);
         }
 
+    }
+
+    public function matchInscription(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        $validatedData = Validator::make($request->all(),[
+            'match_id' => 'required|exists:matchs,id',
+        ],
+        [
+            'match_id.required' => 'Introduce un partido',
+            'match_id.exists' => 'Introduce un partido que exista',
+        ]);
+
+        if ($validatedData->fails()) {
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors()->all();
+            $response['msg'] = 'No se te ha podido registrar en el partido ';
+
+            return response()->json($response, 406);
+        }else{
+            $count = MatchUser::where('match_id',$request->input('match_id'))->count();
+            $usercheck = MatchUser::where('user_id',Auth::id())->get();
+            try{
+                if($count == 4){
+                    $response['status'] = 0;
+                    $response['msg'] = 'El partido ya esta completo';
+                    return response()->json($response, 406);
+
+                }elseif(!empty($usercheck)){
+                    $response['status'] = 0;
+                    $response['msg'] = 'No te puedes inscribir 2 veces al mismo partido';
+                    return response()->json($response, 406);
+                }else{
+                    $MatchUser = MatchUser::create([
+                        'match_id' => $request->input('match_id'),
+                        'user_id' => Auth::id()
+                    ]);
+    
+                    $response['status'] = 1;
+                    $response['data'] = $MatchUser;
+                    $response['msg'] = 'Inscrito al partido correctamente';
+    
+                    
+                    return response()->json($response, 200);
+                }
+                
+            }catch(\Exception $e){
+                $response['status'] = 0;
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+                return response()->json($response, 406);
+            }
+        }
     }
 }
