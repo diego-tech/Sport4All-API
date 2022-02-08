@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Club;
+use App\Models\Event;
 use App\Models\Favourite;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -185,4 +187,82 @@ class ClubsController extends Controller
             }
         }
     }
+
+    /**
+     * Registro de Eventos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function registerEvent(Request $request)
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        // Validación de los campos
+        $validatedData = Validator::make(
+            $request->all(),
+            [
+                'name' => 'required|string|max:255',
+                'visibility' => ['required',Rule::in(['Publico','Privado','Oculto'])],
+                'people_left' => 'required|integer|min:0',
+                'type' => 'required|string|max:255',
+                'price' => 'required|min:0',
+                'club_id' => 'required|exists:clubs,id'
+            ],
+            [
+                'name.required' => 'Introduzca un nombre para el evento',
+                'name.string' => 'El nombre debe ser un String',
+                'name.max' => 'El nombre no puede superar 255 caracteres',
+                'visibility.required' => 'Introduzca un estado de visibilidad',
+                'people_left.required' => 'Introduzca una cantidad de personas',
+                'people_left.integer' => 'La cantidad de personas debe ser un Integer',
+                'people_left.min' => 'La cantidad de personas no puede ser inferior a 0',
+                'type.required' => 'Introduzca el tipo de evento',
+                'type.string' => 'El tipo debe ser un String',
+                'type.max' => 'El tipo no puede superar 255 caracteres',
+                'price.required' => 'Introduzca el precio',
+                'price.min' => 'El precio no puede ser inferior a 0'
+            ]
+        );
+
+        if ($validatedData->fails()) {
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors();
+            $response['msg'] = "Datos incorrectos, evento no registrado";
+
+            return response()->json($response, 406);
+        } else {
+            
+            try {
+                $event = Event::create([
+                    'name' => $request->input('name'),
+                    'visibility' => $request->input('visibility'),
+                    'people_left' => $request->input('people_left'),
+                    'type' => $request->input('type'),
+                    'price' => $request->input('price'),
+                    'club_id' => $request->input('club_id')
+                ]);
+
+                $response['status'] = 1;
+                $response['data'] = $event;
+                $response['msg'] = 'Evento registrado correctamente';
+
+                return response()->json($response, 200);
+            } catch (\Exception $e) {
+                $response['status'] = 0;
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+                return response()->json($response, 406);
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
 }

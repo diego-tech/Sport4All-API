@@ -28,3 +28,5 @@ Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('a
 Route::post('/registerclub', [ClubsController::class, 'register']);
 Route::get('/listclubs', [ClubsController::class, 'listClubs'])->middleware('auth:sanctum');
 Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->middleware('auth:sanctum'); // El user tendrá que estar logeado para poder añadir clubes favoritos
+Route::post('/registerevent', [ClubsController::class, 'registerEvent']); // Tendrá que pasar por un middleware para poder registrarlos
+
