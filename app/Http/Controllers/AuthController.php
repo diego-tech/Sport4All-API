@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Helpers\Response;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -301,4 +302,32 @@ class AuthController extends Controller
             return response()->json($response, 406);
         }
     }
+
+    /**
+     * Listar Eventos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function listevents()
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        try {
+            $events = Event::all();
+
+            $response['status'] = 1;
+            $response['data'] = $events;
+            $response['msg'] = "Estos son todos los Eventos";
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+
 }
