@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -328,6 +329,68 @@ class AuthController extends Controller
             return response()->json($response, 406);
         }
     }
+
+    /**
+     * Listar Clubes Favoritos
+     * 
+     * Necesitas el id de el usuario para listar sólo sus clubs favoritos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function listfavs(Request $request)
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        // Token del usuario que solicita la lista
+        $user = $request->user();
+        $userId = $user->id;
+
+        $validatedData = Validator::make(
+            $request->all(),
+            [
+                'user_id' => 'required|exists:userss,id'
+            ],
+            [
+                'user_id.required' => 'Introduzca el id del usuario',
+                'user_id.exists' => 'El usuario seleccionado no existe'
+            ]
+        );
+
+        
+        if ($validatedData->fails()) {
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors();
+            $response['msg'] = "Ha Ocurrido un Error";
+
+            return response()->json($response, 406);
+        } else {
+            try {
+                    // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
+                    $response['msg'] = "Estos son tus clubs favoritos:";
+                    $clubsFavs = DB::table('clubs') // ESTO NO LO ESTÁS USANDO
+                        ->join('clubs','favourites.club_id', '=', 'clubs.id')
+                        ->join('users','favourites.user_id', '=', 'users.id')
+                        ->select('clubs.name')
+                        ->where('users.id','like','%'.$userId.'%')
+                        ->get();
+
+                    $response['status'] = 1;
+                    $response['data']['errors'] = "";
+                    
+                    return response()->json($response, 200);
+                
+            } catch (\Exception $e) {
+                $response['status'] = 0;
+                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+                return response()->json($response, 406);
+            }
+        }
+
+    }
+
+
 
 
 }
