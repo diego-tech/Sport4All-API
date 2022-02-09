@@ -331,7 +331,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Listar Clubes Favoritos
+     * Listar Clubs Favoritos
      * 
      * Necesitas el id de el usuario para listar sólo sus clubs favoritos
      * 
@@ -348,7 +348,7 @@ class AuthController extends Controller
         try {
                 // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
                 $response['msg'] = "Estos son tus clubs favoritos:";
-                $clubsFavs = DB::table('favourites') // ESTO NO LO ESTÁS USANDO
+                $clubsFavs = DB::table('favourites')
                     ->join('clubs','favourites.club_id', '=', 'clubs.id')
                     ->join('users','favourites.user_id', '=', 'users.id')
                     ->select('clubs.*')
@@ -368,7 +368,40 @@ class AuthController extends Controller
         
     }
 
+    /**
+     * Buscar Clubs por Nombre
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function searchClubs(Request $request)
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
+        $clubName = $request->input('name');
+       
+        try{
+            if($clubName){
+                $response['msg'] = "Resultados de la búsqueda:";
+
+                $finalResults['data'] = DB::table('clubs')
+                    ->select('clubs.*')
+                    ->where('clubs.name','like','%'.$clubName.'%')
+                    ->get();
+
+                $response['data'] = $finalResults;
+                return response()->json($response, 200);
+
+                }else{
+                    $response['msg'] = "Introduzca un término a buscar";
+                }
+        }catch(\Exception $e){
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
 
 
 }
