@@ -338,56 +338,34 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function listfavs(Request $request)
+    public function listfavs()
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        // Token del usuario que solicita la lista
-        $user = $request->user();
-        $userId = $user->id;
-
-        $validatedData = Validator::make(
-            $request->all(),
-            [
-                'user_id' => 'required|exists:userss,id'
-            ],
-            [
-                'user_id.required' => 'Introduzca el id del usuario',
-                'user_id.exists' => 'El usuario seleccionado no existe'
-            ]
-        );
-
+        // Id del usuario que solicita la lista
+        $userId = Auth::id();
         
-        if ($validatedData->fails()) {
+        try {
+                // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
+                $response['msg'] = "Estos son tus clubs favoritos:";
+                $clubsFavs = DB::table('favourites') // ESTO NO LO ESTÁS USANDO
+                    ->join('clubs','favourites.club_id', '=', 'clubs.id')
+                    ->join('users','favourites.user_id', '=', 'users.id')
+                    ->select('clubs.*')
+                    ->where('users.id','like','%'.$userId.'%')
+                    ->get();
+
+                $response['data'] = $clubsFavs;
+                
+                return response()->json($response, 200);
+            
+        } catch (\Exception $e) {
             $response['status'] = 0;
-            $response['data']['errors'] = $validatedData->errors();
-            $response['msg'] = "Ha Ocurrido un Error";
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
-        } else {
-            try {
-                    // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
-                    $response['msg'] = "Estos son tus clubs favoritos:";
-                    $clubsFavs = DB::table('clubs') // ESTO NO LO ESTÁS USANDO
-                        ->join('clubs','favourites.club_id', '=', 'clubs.id')
-                        ->join('users','favourites.user_id', '=', 'users.id')
-                        ->select('clubs.name')
-                        ->where('users.id','like','%'.$userId.'%')
-                        ->get();
-
-                    $response['status'] = 1;
-                    $response['data']['errors'] = "";
-                    
-                    return response()->json($response, 200);
-                
-            } catch (\Exception $e) {
-                $response['status'] = 0;
-                $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
-
-                return response()->json($response, 406);
-            }
         }
-
+        
     }
 
 
