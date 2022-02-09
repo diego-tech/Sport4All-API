@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Validator;
 class MatchController extends Controller
 {
     //Futuro cambiar a tener que estar logueado como club
+    /**
+     * Crear Partido
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function createMatch(Request $request){
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
@@ -70,7 +76,12 @@ class MatchController extends Controller
             }
         }      
     }
-
+    /**
+     *Ver Partidos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function seeMatches(Request $request){
         $response = ["status" => 1, "msg" => "", "data" => []];
         try{
@@ -93,6 +104,12 @@ class MatchController extends Controller
 
     }
 
+    /**
+     * Inscribirse a partido
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function matchInscription(Request $request){
         $response = ["status" => 1, "msg" => "", "data" => []];
 

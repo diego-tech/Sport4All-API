@@ -26,6 +26,7 @@ Route::post('/recoverpass', [AuthController::class, 'recoverPass']);
 Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
 Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('auth:sanctum');
 Route::post('/matchinscription',[MatchController::class, 'matchInscription'])->middleware('auth:sanctum');
+Route::post('/courtreserve',[CourtsController::class, 'CourtReserve'])->middleware('auth:sanctum');
 
 // Rutas Clubes
 Route::post('/registerclub', [ClubsController::class, 'register']);
