@@ -102,6 +102,16 @@ class CourtsController extends Controller
             return response()->json($response, 406);
         }else{
             //falta condicional para no poder reservar 2 a la vez en el mismo intervalo de tiempo
+            $query1 = Reserve::where('start_dateTime','<=', $request->input('start_dateTime'))
+                                ->where('end_dateTime','>', $request->input('start_dateTime'))
+                                ->get();
+                            
+            $query2 = Reserve::where('start_dateTime', '<', $request->input('end_dateTime'))
+                                ->orWhere('end_dateTime','<',$request->input('end_dateTime'))
+                                ->get();
+            $response['data']['query1'] = $query1;
+            $response['data']['query2'] = $query2;
+            return response()->json($response);
             try{        
                 $QR = mt_rand(1000,9999);
                 $Reserve = Reserve::create([
