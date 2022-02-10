@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Court;
+use App\Models\Matchs;
 use App\Models\Reserve;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -103,14 +104,19 @@ class CourtsController extends Controller
         }else{
             //falta condicional para no poder reservar 2 a la vez en el mismo intervalo de tiempo
             $query1 = Reserve::where('start_dateTime','<=', $request->input('start_dateTime'))
-                                ->where('end_dateTime','>', $request->input('start_dateTime'))
+                                ->where('end_dateTime','>=', $request->input('start_dateTime'))
                                 ->get();
                             
-            $query2 = Reserve::where('start_dateTime', '<', $request->input('end_dateTime'))
-                                ->orWhere('end_dateTime','<',$request->input('end_dateTime'))
+            $query2 = Reserve::where('start_dateTime', '<=', $request->input('end_dateTime'))
+                                ->Where('end_dateTime','>=',$request->input('end_dateTime'))
+                                ->get();
+            
+            $query3 = Reserve::where('start_dateTime','>=', $request->input('start_dateTime'))
+                                ->where('end_dateTime','<=', $request->input('end_dateTime'))
                                 ->get();
             $response['data']['query1'] = $query1;
             $response['data']['query2'] = $query2;
+            $response['data']['query3'] = $query3;
             return response()->json($response);
             try{        
                 $QR = mt_rand(1000,9999);

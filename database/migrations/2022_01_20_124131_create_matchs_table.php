@@ -20,8 +20,9 @@ class CreateMatchsTable extends Migration
             $table->foreignId('court_id')->constrained()->nullable();
             $table->double('price_people');
             $table->boolean('lights');
-            $table->dateTime('start_dateTime');
-            $table->dateTime('end_dateTime');
+            $table->date('day');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->timestamps();
         });
     }
