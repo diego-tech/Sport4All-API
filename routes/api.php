@@ -26,7 +26,7 @@ Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('a
 Route::get('/listevents', [AuthController::class, 'listevents']); // Tendrá que pasar por un middleware
 Route::get('/listfavs', [AuthController::class, 'listfavs'])->middleware('auth:sanctum');
 Route::get('/searchclubs', [AuthController::class, 'searchClubs'])->middleware('auth:sanctum');
-
+Route::post('/joinevent', [AuthController::class, 'joinEvent'])->middleware('auth:sanctum');
 
 // Rutas Clubes
 Route::post('/registerclub', [ClubsController::class, 'register']);
