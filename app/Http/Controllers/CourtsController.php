@@ -145,4 +145,25 @@ class CourtsController extends Controller
             }
         }
     }
+
+    public function freeCourts(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        $validatedData = Validator::make($request->all(),[
+            'day' => 'required|date_format:Y-m-d',
+            'start_time' => 'required|date_format: H:i:s'
+        ]);
+
+        if ($validatedData->fails()) {
+            $response['status'] = 0;
+            $response['data']['errors'] = $validatedData->errors()->all();
+            $response['msg'] = 'No se te ha podido reservar la pista ';
+
+            return response()->json($response, 406);
+        }else{
+            
+        }
+
+
+    }
 }
