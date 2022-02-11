@@ -16,11 +16,13 @@ class CreateMatchsTable extends Migration
         Schema::create('matchs', function (Blueprint $table) {
             $table->id();
             $table->string('QR')->nullable();
-            $table->foreignId('user_id')->constrained()->nullable();
+            $table->foreignId('club_id')->constrained()->nullable();
             $table->foreignId('court_id')->constrained()->nullable();
             $table->double('price_people');
-            $table->dateTime('start_dateTime');
-            $table->dateTime('end_dateTime');
+            $table->boolean('lights');
+            $table->date('day');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->timestamps();
         });
     }
