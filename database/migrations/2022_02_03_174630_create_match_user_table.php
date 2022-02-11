@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateReservesTable extends Migration
+class CreateMatchUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,15 +13,11 @@ class CreateReservesTable extends Migration
      */
     public function up()
     {
-        Schema::create('reserves', function (Blueprint $table) {
+        Schema::create('match_user', function (Blueprint $table) {
             $table->id();
-            $table->string('QR')->nullable();
             $table->foreignId('user_id')->constrained()->nullable();
-            $table->foreignId('court_id')->constrained()->nullable();
-            $table->boolean('lights');
-            $table->date('day');
-            $table->time('start_time');
-            $table->time('end_time');
+            $table->unsignedBigInteger('match_id');
+            $table->foreign('match_id')->references('id')->on('matchs');
             $table->timestamps();
         });
     }
@@ -33,6 +29,6 @@ class CreateReservesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('reserves');
+        Schema::dropIfExists('match_user');
     }
 }
