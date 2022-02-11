@@ -12,25 +12,14 @@ use Illuminate\Support\Facades\Auth;
 
 class CourtsController extends Controller
 {
-<<<<<<< HEAD
-    /**
-     * Registro de Pistas
-     * 
-=======
-    //Futuro cambiar a tener que estar logueado como club
+
     /**
      * Registro de Pista
->>>>>>> pistas
-     * 
+     * Futuro cambiar a tener que estar logueado como club
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-<<<<<<< HEAD
-    public function courtRegister(Request $request)
-    {
-=======
-    public function CourtRegist(Request $request){
->>>>>>> pistas
+    public function CourtRegister(Request $request){
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $validatedData = Validator::make(

@@ -10,11 +10,8 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-<<<<<<< HEAD
 use Illuminate\Support\Facades\Storage;
-=======
 use Illuminate\Support\Facades\DB;
->>>>>>> Eventos
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
