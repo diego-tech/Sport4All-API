@@ -35,3 +35,5 @@ Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->mi
 Route::post('/registercourt', [CourtsController::class, 'CourtRegist']); //Futuro cambiar a tener que estar logueado como club
 Route::post('/creatematch',[MatchController::class, 'createMatch']); //Futuro cambiar a tener que estar logueado como club
 Route::get('/seematches',[MatchController::class, 'seeMatches']);
+
+// Cambio para merge
