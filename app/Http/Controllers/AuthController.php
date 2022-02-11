@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Helpers\Response;
+use App\Models\Event;
+use App\Models\Inscription;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Storage;
+=======
+use Illuminate\Support\Facades\DB;
+>>>>>>> Eventos
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -364,4 +370,162 @@ class AuthController extends Controller
             return response()->json($response, 406);
         }
     }
+
+    /**
+     * Listar Eventos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function listevents()
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        try {
+            $events = Event::all();
+
+            $response['status'] = 1;
+            $response['data'] = $events;
+            $response['msg'] = "Estos son todos los Eventos";
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    /**
+     * Listar Clubs Favoritos
+     * 
+     * Necesitas el id de el usuario para listar sólo sus clubs favoritos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function listfavs()
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        // Id del usuario que solicita la lista
+        $userId = Auth::id();
+        
+        try {
+                // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
+                $response['msg'] = "Estos son tus clubs favoritos:";
+                $clubsFavs = DB::table('favourites')
+                    ->join('clubs','favourites.club_id', '=', 'clubs.id')
+                    ->join('users','favourites.user_id', '=', 'users.id')
+                    ->select('clubs.*')
+                    ->where('users.id','like','%'.$userId.'%')
+                    ->get();
+
+                $response['data'] = $clubsFavs;
+                
+                return response()->json($response, 200);
+            
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+        
+    }
+
+    /**
+     * Buscar Clubs por Nombre
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function searchClubs(Request $request)
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        $clubName = $request->input('name');
+       
+        try{
+            if($clubName){
+                $response['msg'] = "Resultados de la búsqueda:";
+
+                $finalResults['data'] = DB::table('clubs')
+                    ->select('clubs.*')
+                    ->where('clubs.name','like','%'.$clubName.'%')
+                    ->get();
+
+                $response['data'] = $finalResults;
+                return response()->json($response, 200);
+
+                }else{
+                    $response['msg'] = "Introduzca un término a buscar";
+                }
+        }catch(\Exception $e){
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    /**
+     * Inscribirse en Evento
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function joinEvent(Request $request)
+    {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        // Recibes el id del evento al que te quieres inscribir
+        $eventId = $request->input('id');
+
+        // Id del usuario que se va a inscribir al evento
+        $userId = Auth::id();
+
+        // Compruebas que existe y que no esté ya inscrito en él
+        $checkEvent=DB::table('events')
+                ->select('event_id')
+                ->where('event_id', $eventId)
+                ->first();
+        
+        $checkInscription=DB::table('inscriptions')
+                ->select('event_id', 'user_id')
+                ->where('event_id', $eventId)
+                ->where('user_id', $userId)
+                ->first();
+
+        // Te inscribes
+        try{
+            if($checkEvent){
+                if($checkInscription){
+                    $inscription = new Inscription();
+                    $inscription -> event_id = $eventId;
+                    $inscription -> user_id = $userId;
+                    $inscription -> save();
+                    
+                    $response['msg'] = "Inscripción realizada";
+                
+                    $response['data'] = $inscription;
+                    return response()->json($response, 200);
+
+                }else{
+                    $response['msg'] = "Ya estás inscrito a este evento";
+                }
+            }else{
+                $response['msg'] = "El evento no existe";
+            }
+            
+        }catch(\Exception $e){
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+
+    }
+
 }
