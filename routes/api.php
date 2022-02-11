@@ -20,7 +20,7 @@ use App\Http\Controllers\MatchController;
 
 // Rutas Usuarios
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('verifiedEmail');
 Route::get('/userinfo', [AuthController::class, 'infouser'])->middleware('auth:sanctum');
 Route::post('/recoverpass', [AuthController::class, 'recoverPass']);
 Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
