@@ -161,6 +161,8 @@ class CourtsController extends Controller
 
             return response()->json($response, 406);
         }else{
+            $day = $request->input('day');
+            $hour = $request->input('hour');
             
         }
 
