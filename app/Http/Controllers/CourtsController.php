@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Court;
 use App\Models\Matchs;
 use App\Models\Reserve;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CourtsController extends Controller
 {
@@ -83,16 +85,17 @@ class CourtsController extends Controller
         $validatedData = Validator::make($request->all(),[
             'court_id' => 'required|exists:courts,id',
             'lights' => 'required|boolean',
-            'start_dateTime' => 'required|date_format:Y-m-d H:i:s',
-            'end_dateTime' => 'required|date_format:Y-m-d H:i:s',
+            'day' => 'required|date_format:Y-m-d',
+            'start_time' => 'required|date_format:H:i:s',
+            'time' => ['required', Rule::in(['60','90','120'])],
         ],
         [
             'court_id.required' => 'Introduce una pista',
             'court_id.exists' => 'Introduce una pista que exista',
             'start_dateTime.required' => 'Introduce fecha de inicio del partido',
-            'start_dateTime.date_format' => 'Introduce el formato de la fecha de esta manera: Y-m-d H:i:s',
-            'end_dateTime.required' => 'Introduce fecha a la que acaba el partido',
-            'end_dateTime.date_format' => 'Introduce el formato de la fecha de esta manera: Y-m-d H:i:s',
+            'start_dateTime.date_format' => 'Introduce el formato de la fecha de esta manera: H:i:s',
+            'day.required' => 'Introduce dia de la reserva',
+            'day.date_format' => 'Introduce dia de la reserva en este formato: Y-m-d ',
         ]);
 
         if ($validatedData->fails()) {
@@ -102,39 +105,35 @@ class CourtsController extends Controller
 
             return response()->json($response, 406);
         }else{
-            //falta condicional para no poder reservar 2 a la vez en el mismo intervalo de tiempo
-            $query1 = Reserve::where('start_dateTime','<=', $request->input('start_dateTime'))
-                                ->where('end_dateTime','>=', $request->input('start_dateTime'))
-                                ->get();
-                            
-            $query2 = Reserve::where('start_dateTime', '<=', $request->input('end_dateTime'))
-                                ->Where('end_dateTime','>=',$request->input('end_dateTime'))
-                                ->get();
-            
-            $query3 = Reserve::where('start_dateTime','>=', $request->input('start_dateTime'))
-                                ->where('end_dateTime','<=', $request->input('end_dateTime'))
-                                ->get();
-            $response['data']['query1'] = $query1;
-            $response['data']['query2'] = $query2;
-            $response['data']['query3'] = $query3;
-            return response()->json($response);
-            try{        
+            try{
+                $time = Carbon::parse($request->input('start_time'));        
+                $endTime = $time->addMinutes($request->input('time'));
+                $parsedEndTime = $endTime->format('H:i:s');
                 $QR = mt_rand(1000,9999);
                 $Reserve = Reserve::create([
                     'QR' => $QR,
                     'user_id' => Auth::id(),
                     'court_id' => $request->input('court_id'),
                     'lights' => $request->input('lights'),
-                    'start_dateTime' => $request->input('start_dateTime'),
-                    'end_dateTime' => $request->input('end_dateTime'),
+                    'start_time' => $request->input('start_time'),
+                    'end_time' => $parsedEndTime,
+                    'day' => $request->input('day'),
                 ]);
 
                 $court = Court::find($request->input('court_id'));
 
                 $response['status'] = 1;
                 $response['data'] = $Reserve;
-                $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $court->price . '€';
-
+                if($request->input('time') == '60'){
+                    $price = $court->price;
+                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
+                }elseif($request->input('time') == '90'){
+                    $price = $court->price * 1.5;
+                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
+                }else{
+                    $price = $court->price * 2;
+                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
+                }
                 
                 return response()->json($response, 200);
             }catch(\Exception $e){
@@ -151,7 +150,7 @@ class CourtsController extends Controller
 
         $validatedData = Validator::make($request->all(),[
             'day' => 'required|date_format:Y-m-d',
-            'start_time' => 'required|date_format: H:i:s'
+            'start_time' => 'required|date_format:H:i:s'
         ]);
 
         if ($validatedData->fails()) {
@@ -163,6 +162,18 @@ class CourtsController extends Controller
         }else{
             $day = $request->input('day');
             $hour = $request->input('hour');
+            $reserveCourt = DB::table('reserves')->pluck('court_id')->all();
+            $courts = DB::table('courts')
+                        ->leftJoin('reserves','court_id','courts.id')
+                        ->select('courts.*')
+                        ->where('reserves.day', $day)
+                        ->where('reserves.start_time',$hour)
+                        //->whereNotIn('courts.id', $reserveCourt)
+                        ->get();
+            
+
+            $response['data'] = $courts;
+            return response()->json($response, 200);
             
         }
 

@@ -226,6 +226,7 @@ class AuthController extends Controller
 
         try {
             if ($user) {
+                $password = "";
                 do {
                     $password = Str::random(8);
                 } while (!preg_match($pass_pattern, $password)); //hacer para que se envie por correo??

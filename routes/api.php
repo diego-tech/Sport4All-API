@@ -42,3 +42,7 @@ Route::post('/registerevent', [ClubsController::class, 'registerEvent']); // Ten
 Route::post('/registercourt', [CourtsController::class, 'CourtRegister']); //Futuro cambiar a tener que estar logueado como club
 Route::post('/creatematch',[MatchController::class, 'createMatch']); //Futuro cambiar a tener que estar logueado como club
 Route::get('/seematches',[MatchController::class, 'seeMatches']);
+
+//Lista pistas libres
+
+Route::get('/freecourts',[CourtsController::class, 'freeCourts']);

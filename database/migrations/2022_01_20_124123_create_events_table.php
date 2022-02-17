@@ -21,6 +21,9 @@ class CreateEventsTable extends Migration
             $table->integer('people_left');
             $table->string('type');
             $table->double('price');
+            $table->date('day');
+            $table->time('start_time');
+            $table->time('end_time');
             $table->timestamps();
         });
     }
