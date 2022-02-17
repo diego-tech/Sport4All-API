@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PDO;
 
 class CourtsController extends Controller
 {
@@ -162,14 +163,34 @@ class CourtsController extends Controller
         }else{
             $day = $request->input('day');
             $hour = $request->input('hour');
-            $reserveCourt = DB::table('reserves')->pluck('court_id')->all();
-            $courts = DB::table('courts')
-                        ->leftJoin('reserves','court_id','courts.id')
-                        ->select('courts.*')
-                        ->where('reserves.day', $day)
-                        ->where('reserves.start_time',$hour)
-                        //->whereNotIn('courts.id', $reserveCourt)
-                        ->get();
+
+            $reserves = Reserve::select('id')
+                            ->where('reserves.day', $day)
+                            ->where('reserves.start_time', "19:00:01")
+                            ->pluck('id')
+                            ->toArray();
+
+            $courts = Court::select('id')->pluck('id')->toArray();
+
+        
+
+            $result = array_diff($courts,$reserves);
+            print_r($result);
+            die;
+            
+          /*  foreach($courts as $courtid){
+                foreach ($reserves as $reserveid) {
+                    if ($courtid != $reserveid) {
+                        $query = DB::table('courts')->where('id', $courtid->id)->get();
+                        array_push($response['data'], $query);
+                    }
+                }
+            }*/
+
+            return response()->json($response, 200);
+
+            die;
+
             
 
             $response['data'] = $courts;
