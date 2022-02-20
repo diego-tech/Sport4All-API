@@ -8,7 +8,7 @@
     <title>Sports4All</title>
 
     <!-- Links -->
-    <link rel="icon" href="{{url('img/logoapp.png') }}">
+    <link rel="icon" href="{{url('img/WhiteLogo.png') }}">
     <link rel="stylesheet" href="{{url('css/app.css')}}" />
 </head>
 
