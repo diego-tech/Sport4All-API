@@ -486,8 +486,8 @@ class AuthController extends Controller
 
         // Compruebas que existe y que no esté ya inscrito en él
         $checkEvent=DB::table('events')
-                ->select('event_id')
-                ->where('event_id', $eventId)
+                ->select('id')
+                ->where('id', $eventId)
                 ->first();
         
         $checkInscription=DB::table('inscriptions')
@@ -499,7 +499,7 @@ class AuthController extends Controller
         // Te inscribes
         try{
             if($checkEvent){
-                if($checkInscription){
+                if(!$checkInscription){
                     $inscription = new Inscription();
                     $inscription -> event_id = $eventId;
                     $inscription -> user_id = $userId;
@@ -512,9 +512,11 @@ class AuthController extends Controller
 
                 }else{
                     $response['msg'] = "Ya estás inscrito a este evento";
+                    return response()->json($response, 406);
                 }
             }else{
                 $response['msg'] = "El evento no existe";
+                return response()->json($response, 404);
             }
             
         }catch(\Exception $e){

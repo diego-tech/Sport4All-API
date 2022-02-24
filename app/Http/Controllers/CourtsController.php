@@ -146,8 +146,14 @@ class CourtsController extends Controller
         }
     }
 
+
+    /**
+     * Obtener pistas libres
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function freeCourts(Request $request){
-        $response = ["status" => 1, "msg" => "", "data" => []];
 
         $validatedData = Validator::make($request->all(),[
             'day' => 'required|date_format:Y-m-d',
@@ -171,33 +177,15 @@ class CourtsController extends Controller
                             ->toArray();
 
             $courts = Court::select('id')->pluck('id')->toArray();
-
-        
-
             $result = array_diff($courts,$reserves);
-            print_r($result);
-            die;
             
-          /*  foreach($courts as $courtid){
-                foreach ($reserves as $reserveid) {
-                    if ($courtid != $reserveid) {
-                        $query = DB::table('courts')->where('id', $courtid->id)->get();
-                        array_push($response['data'], $query);
-                    }
-                }
-            }*/
+            foreach($result as $court){
+                $freecourt[] = Court::find($court);
+            }            
 
-            return response()->json($response, 200);
-
-            die;
-
-            
-
-            $response['data'] = $courts;
-            return response()->json($response, 200);
-            
+            $response['msg'] = 'Pistas libres';
+            $response['data'] = $freecourt;
+            return response()->json($response, 200); 
         }
-
-
     }
 }

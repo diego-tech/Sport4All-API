@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Club;
 use App\Models\Event;
 use App\Models\Favourite;
+use App\Models\Service;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -87,7 +88,7 @@ class ClubsController extends Controller
     /**
      * Listado Completo de Clubes
      * 
-     * @param 
+     * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
     public function listClubs()
@@ -95,10 +96,24 @@ class ClubsController extends Controller
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
         try {
-            $clubs = Club::all();
+            $query = Club::all();
+            $clubs_array = [];
+
+            foreach ($query as $clubs) {
+                $ClubArray['id'] = $clubs->id;
+                $ClubArray['name'] = $clubs->name;
+                $ClubArray['club_img'] = $clubs->club_img;
+                $ClubArray['club_banner'] = $clubs->club_banner;
+                $ClubArray['direction'] = $clubs->direction;
+                $ClubArray['tlf'] = $clubs->tlf;
+                $ClubArray['email'] = $clubs->email;
+                $ClubArray['services'] = $this->Get_services_from_club($clubs->id);
+    
+                $clubs_array[] = $ClubArray;
+            }
 
             $response['status'] = 1;
-            $response['data'] = $clubs;
+            $response['data'] = $clubs_array;
             $response['msg'] = "Todos los Clubes";
 
             return response()->json($response, 200);
@@ -108,6 +123,20 @@ class ClubsController extends Controller
 
             return response()->json($response, 406);
         }
+    }
+
+    /**
+     * Obtener servicios de los clubes
+     * 
+     * @param \App\Models\Club->id
+     * @return $query
+     */
+    public function Get_services_from_club($clubId){
+        $query = Service::join('clubs_services','services.id','=','clubs_services.service_id')
+                        ->select('services.name')
+                        ->where('clubs_services.club_id',$clubId)
+                        ->get();
+        return $query;
     }
 
     /**
