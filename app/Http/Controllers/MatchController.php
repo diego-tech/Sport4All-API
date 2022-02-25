@@ -53,6 +53,7 @@ class MatchController extends Controller
         }else{
             try{
                 $QR = mt_rand(1000,9999);
+                $final_time = $request->input('day') . " ". $request->input('end_time');
                 $Match = Matchs::create([
                     'QR' => $QR,
                     'club_id' => $request->input('club_id'),
@@ -62,6 +63,7 @@ class MatchController extends Controller
                     'price_people' => $request->input('price_people'),
                     'start_time' => $request->input('start_time'),
                     'end_time' => $request->input('end_time'),
+                    'final_time' => $final_time,
                 ]);
 
                 $response['status'] = 1;
@@ -132,14 +134,13 @@ class MatchController extends Controller
             return response()->json($response, 406);
         }else{
             $count = MatchUser::where('match_id',$request->input('match_id'))->count();
-            $usercheck = MatchUser::where('user_id',Auth::id());
-            try{
+            $usercheck = MatchUser::where('user_id',Auth::id())->where('match_id',$request->input('match_id'))->get();            try{
                 if($count == 4){
                     $response['status'] = 0;
                     $response['msg'] = 'El partido ya esta completo';
                     return response()->json($response, 406);
 
-                }elseif($usercheck){
+                }elseif(!$usercheck->isEmpty()){
                     $response['status'] = 0;
                     $response['msg'] = 'No te puedes inscribir 2 veces al mismo partido';
                     return response()->json($response, 406);
@@ -185,8 +186,7 @@ class MatchController extends Controller
                         ->join('match_user','matchs.id','=','match_user.match_id')
                         ->select('matchs.*')
                         ->where('match_user.user_id',Auth::id())
-                        ->where('matchs.day','<=',$dayformat)
-                        ->orWhere('matchs.end_time','<', $timeFormat)
+                        ->where('matchs.final_time','<',now())
                         ->get();
 
             $response['status'] = 1;

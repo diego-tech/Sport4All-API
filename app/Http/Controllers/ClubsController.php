@@ -286,12 +286,4 @@ class ClubsController extends Controller
         }
     }
 
-
-
-
-
-
-
-
-
 }

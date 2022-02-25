@@ -23,6 +23,7 @@ class Matchs extends Model
         'price_people',
         'start_time',
         'end_time',
+        'final_time',
     ];
 
 
