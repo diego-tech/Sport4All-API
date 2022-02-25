@@ -236,7 +236,11 @@ class ClubsController extends Controller
                 'people_left' => 'required|integer|min:0',
                 'type' => 'required|string|max:255',
                 'price' => 'required|min:0',
-                'club_id' => 'required|exists:clubs,id'
+                'club_id' => 'required|exists:clubs,id',
+                'day' => 'required|date_format:Y-m-d',
+                'start_time' => 'required|date_format:H:i:s',
+                'end_time' => 'required|date_format:H:i:s',
+
             ],
             [
                 'name.required' => 'Introduzca un nombre para el evento',
@@ -250,7 +254,11 @@ class ClubsController extends Controller
                 'type.string' => 'El tipo debe ser un String',
                 'type.max' => 'El tipo no puede superar 255 caracteres',
                 'price.required' => 'Introduzca el precio',
-                'price.min' => 'El precio no puede ser inferior a 0'
+                'price.min' => 'El precio no puede ser inferior a 0',
+                'start_time.required' => 'Introduce fecha de inicio del partido',
+                'start_time.date_format' => 'Introduce el formato de la fecha de esta manera: H:i:s',
+                'end_time.required' => 'Introduce fecha a la que acaba el partido',
+                'end_time.date_format' => 'Introduce el formato de la fecha de esta manera: H:i:s',
             ]
         );
 
@@ -261,15 +269,19 @@ class ClubsController extends Controller
 
             return response()->json($response, 406);
         } else {
-            
             try {
+                $final_time = $request->input('day') . " ". $request->input('end_time');
                 $event = Event::create([
                     'name' => $request->input('name'),
                     'visibility' => $request->input('visibility'),
                     'people_left' => $request->input('people_left'),
                     'type' => $request->input('type'),
                     'price' => $request->input('price'),
-                    'club_id' => $request->input('club_id')
+                    'club_id' => $request->input('club_id'),
+                    'day' => $request->input('day'),
+                    'start_time' => $request->input('start_time'),
+                    'end_time' => $request->input('end_time'),
+                    'final_time' => $final_time,
                 ]);
 
                 $response['status'] = 1;
