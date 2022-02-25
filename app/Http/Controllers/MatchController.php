@@ -178,10 +178,6 @@ class MatchController extends Controller
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try{
-            $dayformat =  Carbon::now()->format('Y-m-d');
-            $timeFormat = Carbon::now()->format('H:i:s');
-
-
             $query = DB::table('matchs')
                         ->join('match_user','matchs.id','=','match_user.match_id')
                         ->select('matchs.*')

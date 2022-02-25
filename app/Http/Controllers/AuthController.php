@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Inscription;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -495,24 +496,29 @@ class AuthController extends Controller
                 ->where('event_id', $eventId)
                 ->where('user_id', $userId)
                 ->first();
+                
 
+        $count = Inscription::where('event_id',$request->input('id'))->count();
+        $event = Event::where('id', $request->input('id'))->value('people_left');
         // Te inscribes
         try{
             if($checkEvent){
-                if(!$checkInscription){
-                    $inscription = new Inscription();
-                    $inscription -> event_id = $eventId;
-                    $inscription -> user_id = $userId;
-                    $inscription -> save();
+                if($count < $event->people_left){
+                    if(!$checkInscription){
+                        $inscription = new Inscription();
+                        $inscription -> event_id = $eventId;
+                        $inscription -> user_id = $userId;
+                        $inscription -> save();
+                        
+                        $response['msg'] = "Inscripción realizada";
                     
-                    $response['msg'] = "Inscripción realizada";
-                
-                    $response['data'] = $inscription;
-                    return response()->json($response, 200);
-
-                }else{
-                    $response['msg'] = "Ya estás inscrito a este evento";
-                    return response()->json($response, 406);
+                        $response['data'] = $inscription;
+                        return response()->json($response, 200);
+    
+                    }else{
+                        $response['msg'] = "Ya estás inscrito a este evento";
+                        return response()->json($response, 406);
+                    }
                 }
             }else{
                 $response['msg'] = "El evento no existe";
@@ -526,6 +532,38 @@ class AuthController extends Controller
             return response()->json($response, 406);
         }
 
+    }
+
+    /**
+     * Eventos finalizados
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function ended_events(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try{
+            $query = DB::table('events')
+                        ->join('inscriptions','events.id','=','inscriptions.event_id')
+                        ->select('events.*')
+                        ->where('inscriptions.user_id',Auth::id())
+                        ->where('events.final_time','<', Carbon::now('Europe/Madrid'))
+                        ->get();
+
+            $response['status'] = 1;
+            $response['data'] = $query;
+            $response['msg'] = 'Eventos finalizados';
+        
+                        
+            return response()->json($response, 200);
+
+        }catch(\Exception $e){
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
     }
 
 }
