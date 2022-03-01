@@ -10,6 +10,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class ClubsController extends Controller
 {
@@ -32,7 +33,8 @@ class ClubsController extends Controller
                 'club_banner' => 'required|string|max:255',
                 'direction' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
-                'email' => 'bail|required|string|email|max:255|unique:clubs'
+                'email' => 'bail|required|string|email|max:255|unique:clubs',
+                'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
             ],
             [
                 'name.required' => 'Introduzca un nombre para el club',
@@ -48,7 +50,9 @@ class ClubsController extends Controller
                 'email.email' => 'Introduce formato válido de email',
                 'email.unique' => 'Este email ya está registrado',
                 'club_img.required' => 'Introduzca una Imagen de Perfil',
-                'club_banner.required' => 'Introduzca una Imagen de Banner'
+                'club_banner.required' => 'Introduzca una Imagen de Banner', 
+                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
             ]
         );
 
@@ -62,8 +66,10 @@ class ClubsController extends Controller
         } else {
             // Si los campos son correctos se crea el club
             try {
+
                 $club = Club::create([
                     'name' => $request->input('name'),
+                    'password' => Hash::make($request->input('password')),
                     'club_img' => $request->input('club_img'),
                     'club_banner' => $request->input('club_banner'),
                     'direction' => $request->input('direction'),
@@ -108,7 +114,7 @@ class ClubsController extends Controller
                 $ClubArray['tlf'] = $clubs->tlf;
                 $ClubArray['email'] = $clubs->email;
                 $ClubArray['services'] = $this->Get_services_from_club($clubs->id);
-    
+
                 $clubs_array[] = $ClubArray;
             }
 
@@ -132,11 +138,12 @@ class ClubsController extends Controller
      * @param \App\Models\Club->id
      * @return $query
      */
-    public function Get_services_from_club($clubId){
-        $query = Service::join('clubs_services','services.id','=','clubs_services.service_id')
-                        ->select('services.name')
-                        ->where('clubs_services.club_id',$clubId)
-                        ->get();
+    public function Get_services_from_club($clubId)
+    {
+        $query = Service::join('clubs_services', 'services.id', '=', 'clubs_services.service_id')
+            ->select('services.name')
+            ->where('clubs_services.club_id', $clubId)
+            ->get();
         return $query;
     }
 
@@ -233,7 +240,7 @@ class ClubsController extends Controller
             $request->all(),
             [
                 'name' => 'required|string|max:255',
-                'visibility' => ['required',Rule::in(['Publico','Privado','Oculto'])],
+                'visibility' => ['required', Rule::in(['Publico', 'Privado', 'Oculto'])],
                 'people_left' => 'required|integer|min:0',
                 'type' => 'required|string|max:255',
                 'price' => 'required|min:0',
@@ -271,7 +278,7 @@ class ClubsController extends Controller
             return response()->json($response, 406);
         } else {
             try {
-                $final_time = $request->input('day') . " ". $request->input('end_time');
+                $final_time = $request->input('day') . " " . $request->input('end_time');
                 $event = Event::create([
                     'name' => $request->input('name'),
                     'visibility' => $request->input('visibility'),
@@ -298,5 +305,4 @@ class ClubsController extends Controller
             }
         }
     }
-
 }
