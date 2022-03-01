@@ -21,4 +21,6 @@ class Court extends Model
         'price',
     ];
 
+    protected $table="courts";
+
 }

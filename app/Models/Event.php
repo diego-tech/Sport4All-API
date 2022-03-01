@@ -22,7 +22,11 @@ class Event extends Model
         'people_left',
         'type',
         'price',
-        'club_id'
+        'club_id',
+        'day',
+        'start_time',
+        'end_time',
+        'final_time',
     ];
 
     /**

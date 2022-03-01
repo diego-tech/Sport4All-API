@@ -33,6 +33,9 @@ Route::get('/searchclubs', [AuthController::class, 'searchClubs'])->middleware('
 Route::post('/joinevent', [AuthController::class, 'joinEvent'])->middleware('auth:sanctum');
 Route::post('/matchinscription',[MatchController::class, 'matchInscription'])->middleware('auth:sanctum');
 Route::post('/courtreserve',[CourtsController::class, 'CourtReserve'])->middleware('auth:sanctum');
+Route::get('/endedmatches',[MatchController::class, 'ended_matches'])->middleware('auth:sanctum');
+Route::get('/endedevents',[AuthController::class, 'ended_events'])->middleware('auth:sanctum');
+
 
 // Rutas Clubes
 Route::post('/registerclub', [ClubsController::class, 'register']);
@@ -42,3 +45,7 @@ Route::post('/registerevent', [ClubsController::class, 'registerEvent']); // Ten
 Route::post('/registercourt', [CourtsController::class, 'CourtRegister']); //Futuro cambiar a tener que estar logueado como club
 Route::post('/creatematch',[MatchController::class, 'createMatch']); //Futuro cambiar a tener que estar logueado como club
 Route::get('/seematches',[MatchController::class, 'seeMatches']);
+
+//Lista pistas libres
+
+Route::get('/freecourts',[CourtsController::class, 'freeCourts']);
