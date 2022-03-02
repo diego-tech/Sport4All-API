@@ -31,6 +31,8 @@ class ClubsController extends Controller
                 'club_img' => 'required|string|max:255',
                 'club_banner' => 'required|string|max:255',
                 'direction' => 'required|string|max:255',
+                'password' => 'required|string|max:255',
+                'description' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs'
             ],

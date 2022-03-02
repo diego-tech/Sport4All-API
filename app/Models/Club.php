@@ -21,6 +21,8 @@ class Club extends Model
         'club_img',
         'club_banner',
         'direction',
+        'password',
+        'description',
         'tlf',
         'email'
     ];
