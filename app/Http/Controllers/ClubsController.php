@@ -54,7 +54,8 @@ class ClubsController extends Controller
                 'club_img.required' => 'Introduzca una Imagen de Perfil',
                 'club_banner.required' => 'Introduzca una Imagen de Banner', 
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
-                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
+                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
+                'description.required' => 'La descripción debe ser obligatoria'
             ]
         );
 
@@ -76,7 +77,8 @@ class ClubsController extends Controller
                     'club_banner' => $request->input('club_banner'),
                     'direction' => $request->input('direction'),
                     'tlf' => $request->input('tlf'),
-                    'email' => $request->input('email')
+                    'email' => $request->input('email'),
+                    'description' => $request->input('description')
                 ]);
 
                 $response['status'] = 1;
