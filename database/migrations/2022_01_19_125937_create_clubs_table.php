@@ -16,7 +16,7 @@ class CreateClubsTable extends Migration
         Schema::create('clubs', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('passwords');
+            $table->string('password');
             $table->string('description');
             $table->string('club_img');
             $table->string('club_banner');
