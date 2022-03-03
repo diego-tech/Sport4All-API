@@ -22,6 +22,8 @@ class Reserve extends Model
         'end_time',
         'day',
         'user_id',
+        'final_time',
+        'start_Datetime',
     ];
 
     protected $table = 'reserves';

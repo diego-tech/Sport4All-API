@@ -110,6 +110,8 @@ class CourtsController extends Controller
                 $time = Carbon::parse($request->input('start_time'));        
                 $endTime = $time->addMinutes($request->input('time'));
                 $parsedEndTime = $endTime->format('H:i:s');
+                $final_time = $request->input('day') . " ". $parsedEndTime;
+                $start_time = $request->input('day') . " ". $request->input('start_time');
                 $QR = mt_rand(1000,9999);
                 $Reserve = Reserve::create([
                     'QR' => $QR,
@@ -119,6 +121,8 @@ class CourtsController extends Controller
                     'start_time' => $request->input('start_time'),
                     'end_time' => $parsedEndTime,
                     'day' => $request->input('day'),
+                    'final_time' => $final_time,
+                    'start_Datetime' => $start_time,
                 ]);
 
                 $court = Court::find($request->input('court_id'));

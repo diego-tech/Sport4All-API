@@ -54,6 +54,7 @@ class MatchController extends Controller
             try{
                 $QR = mt_rand(1000,9999);
                 $final_time = $request->input('day') . " ". $request->input('end_time');
+                $start_time = $request->input('day') . " ". $request->input('start_time');
                 $Match = Matchs::create([
                     'QR' => $QR,
                     'club_id' => $request->input('club_id'),
@@ -64,6 +65,7 @@ class MatchController extends Controller
                     'start_time' => $request->input('start_time'),
                     'end_time' => $request->input('end_time'),
                     'final_time' => $final_time,
+                    'start_Datetime' => $start_time,
                 ]);
 
                 $response['status'] = 1;
