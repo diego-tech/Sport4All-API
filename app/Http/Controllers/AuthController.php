@@ -429,6 +429,7 @@ class AuthController extends Controller
                     $ClubArray['club_img'] = $clubs->club_img;
                     $ClubArray['club_banner'] = $clubs->club_banner;
                     $ClubArray['direction'] = $clubs->direction;
+                    $ClubArray['description'] = $clubs->description;
                     $ClubArray['tlf'] = $clubs->tlf;
                     $ClubArray['email'] = $clubs->email;
                     $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);

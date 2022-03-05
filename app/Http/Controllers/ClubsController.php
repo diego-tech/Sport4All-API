@@ -52,7 +52,7 @@ class ClubsController extends Controller
                 'email.email' => 'Introduce formato válido de email',
                 'email.unique' => 'Este email ya está registrado',
                 'club_img.required' => 'Introduzca una Imagen de Perfil',
-                'club_banner.required' => 'Introduzca una Imagen de Banner', 
+                'club_banner.required' => 'Introduzca una Imagen de Banner',
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'description.required' => 'La descripción debe ser obligatoria'
@@ -117,6 +117,7 @@ class ClubsController extends Controller
                 $ClubArray['direction'] = $clubs->direction;
                 $ClubArray['tlf'] = $clubs->tlf;
                 $ClubArray['email'] = $clubs->email;
+                $ClubArray['description'] = $clubs->description;
                 $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
 
                 $clubs_array[] = $ClubArray;
@@ -136,7 +137,7 @@ class ClubsController extends Controller
         }
     }
 
-    
+
     /**
      * Registrar Clubes como Favoritos
      * 
