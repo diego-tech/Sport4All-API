@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Club;
 use App\Models\Event;
 use App\Models\Favourite;
-use App\Models\Service;
+use App\Http\Helpers\AuxFunctions;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -117,7 +117,7 @@ class ClubsController extends Controller
                 $ClubArray['direction'] = $clubs->direction;
                 $ClubArray['tlf'] = $clubs->tlf;
                 $ClubArray['email'] = $clubs->email;
-                $ClubArray['services'] = $this->Get_services_from_club($clubs->id);
+                $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
 
                 $clubs_array[] = $ClubArray;
             }
@@ -136,21 +136,7 @@ class ClubsController extends Controller
         }
     }
 
-    /**
-     * Obtener servicios de los clubes
-     * 
-     * @param \App\Models\Club->id
-     * @return $query
-     */
-    public function Get_services_from_club($clubId)
-    {
-        $query = Service::join('clubs_services', 'services.id', '=', 'clubs_services.service_id')
-            ->select('services.name')
-            ->where('clubs_services.club_id', $clubId)
-            ->get();
-        return $query;
-    }
-
+    
     /**
      * Registrar Clubes como Favoritos
      * 
