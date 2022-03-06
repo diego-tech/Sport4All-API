@@ -19,8 +19,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-use function PHPSTORM_META\map;
-
 class AuthController extends Controller
 {
     /**
@@ -41,47 +39,6 @@ class AuthController extends Controller
         $response["msg"] = $fileName;
 
         return response()->json($response);
-    }
-
-    /**
-     * Comprobación si el correo que introduce en la primera pantalla 
-     * ya existe.
-     * 
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return response()->json($response)
-     */
-    public function checkIfUserExists(Request $request)
-    {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
-
-        $validatedData = Validator::make(
-            $request->all(),
-            [
-                'email' => 'required|email|unique:users',
-                'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
-            ],
-            [
-                'email.required' => "Introduzca un email",
-                'email.unique' => "Ya existe un usuario registrado con este correo",
-                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
-                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
-            ]
-        );
-
-        if ($validatedData->fails()) {
-            $response['status'] = 0;
-            $response['data']['errors'] = $validatedData->errors()->first();
-            $response['msg'] = 'Usuario ya registrado';
-
-            return response()->json($response, 406);
-        } else {
-            $response['status'] = 1;
-            $response['data']['errors'] = "";
-            $response['msg'] = 'Usuario No Registrado';
-
-            return response()->json($response, 200);
-        }
     }
 
     /**
