@@ -418,7 +418,7 @@ class AuthController extends Controller
             if ($clubName) {
                 $response['msg'] = "Resultados de la búsqueda:";
 
-                $finalResults['data'] = DB::table('clubs')
+                $finalResults = DB::table('clubs')
                     ->select('clubs.*')
                     ->where('clubs.name', 'like', '%' . $clubName . '%')
                     ->get();
