@@ -97,23 +97,16 @@ class AuthController extends Controller
         $validatedData = Validator::make(
             $request->all(),
             [
-                'name' => 'bail|required|string|max:255',
                 'email' => 'bail|required|string|email|max:255|unique:users',
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
-                'genre' => 'required|in:Hombre,Mujer,Otro',
-                'surname' => 'required|string|max:255',
             ],
             [
-                'name.required' => 'Introduce tu nombre',
-                'name.string' => 'El nombre debe ser un String',
-                'name.max' => 'El nombre no puede superar 255 caracteres',
                 'email.required' => 'Introduce un email correcto',
                 'email.string' => 'El email debe ser un string',
                 'email.email' => 'Introduce formato valido de email',
                 'email.unique' => 'Este email ya esta registrado',
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
-                'surname.required' => 'Introduce tu apellido'
             ]
         );
 
