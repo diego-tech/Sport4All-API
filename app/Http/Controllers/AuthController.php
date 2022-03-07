@@ -426,6 +426,12 @@ class AuthController extends Controller
                     $ClubArray['tlf'] = $club->tlf;
                     $ClubArray['email'] = $club->email;
                     $ClubArray['description'] = $club->description;
+                    $query = Favourite::where('user_id',Auth::id())->where('club_id',$club->id)->value('id');
+                    if($query){
+                        $ClubArray['fav'] = True;
+                    }else{
+                        $ClubArray['fav'] = False;
+                    }
                     $ClubArray['services'] = AuxFunctions::Get_services_from_club($club->id);
     
                     $clubs_array[] = $ClubArray;
