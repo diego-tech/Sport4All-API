@@ -383,11 +383,11 @@ class AuthController extends Controller
                     $ClubArray['tlf'] = $clubs->tlf;
                     $ClubArray['email'] = $clubs->email;
                     $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
-    
+
                     $clubArray[] = $ClubArray;
                 }
             }
-            
+
             $response['status'] = 1;
             $response['data'] = $clubArray;
             $response['msg'] = "Estos son tus clubs favoritos:";
@@ -416,14 +416,30 @@ class AuthController extends Controller
 
         try {
             if ($clubName) {
-                $response['msg'] = "Resultados de la búsqueda:";
+                $clubs_array = [];
 
                 $finalResults = DB::table('clubs')
                     ->select('clubs.*')
                     ->where('clubs.name', 'like', '%' . $clubName . '%')
                     ->get();
 
-                $response['data'] = $finalResults;
+                foreach ($finalResults as $club) {
+                    $ClubArray['id'] = $club->id;
+                    $ClubArray['name'] = $club->name;
+                    $ClubArray['club_img'] = $club->club_img;
+                    $ClubArray['club_banner'] = $club->club_banner;
+                    $ClubArray['direction'] = $club->direction;
+                    $ClubArray['tlf'] = $club->tlf;
+                    $ClubArray['email'] = $club->email;
+                    $ClubArray['description'] = $club->description;
+                    $ClubArray['services'] = AuxFunctions::Get_services_from_club($club->id);
+    
+                    $clubs_array[] = $ClubArray;
+                }
+
+                $response['status'] = 1;
+                $response['data'] = $clubs_array;
+                $response['msg'] = "Resultados de la búsqueda:";
                 return response()->json($response, 200);
             } else {
                 $response['msg'] = "Introduzca un término a buscar";
