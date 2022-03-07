@@ -364,7 +364,7 @@ class AuthController extends Controller
 
         try {
             // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
-            $getFavs = Favourite::where('user_id', $userId)->get('club_id');
+            $getFavs = Favourite::where('user_id', $userId)->get();
             $favArray = [];
             $clubArray = [];
 
