@@ -76,12 +76,8 @@ class AuthController extends Controller
         } else {
             try {
                 $user = User::create([
-                    'name' => $request->input('name'),
-                    'surname' => $request->input('surname'),
-                    'image' => $request->input('image'),
                     'email' => $request->input('email'),
                     'password' => Hash::make($request->input('password')),
-                    'genre' => $request->input('genre')
                 ]);
 
                 event(new Registered($user));
@@ -361,35 +357,33 @@ class AuthController extends Controller
      */
     public function listfavs()
     {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
+        $response = ["status" => 1, "msg" => "","data" => []];
 
         // Id del usuario que solicita la lista
         $userId = Auth::id();
 
         try {
             // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
-            $getFavs = Favourite::where('user_id', $userId)->get('club_id');
-            $clubArray = [];
+            $getFavs['clubs'] = Favourite::where('user_id', $userId)->get('club_id');
 
-            foreach ($getFavs as $clubFav) {
-                $getClub = Club::where('clubs.id', $clubFav->club_id)->get();
-                foreach ($getClub as $clubs) {
-                    $ClubArray['id'] = $clubs->id;
-                    $ClubArray['name'] = $clubs->name;
-                    $ClubArray['club_img'] = $clubs->club_img;
-                    $ClubArray['club_banner'] = $clubs->club_banner;
-                    $ClubArray['direction'] = $clubs->direction;
-                    $ClubArray['description'] = $clubs->description;
-                    $ClubArray['tlf'] = $clubs->tlf;
-                    $ClubArray['email'] = $clubs->email;
-                    $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
+            $favArray = [];
 
-                    $clubArray[] = $ClubArray;
-                }
+            foreach ($getFavs['clubs'] as $clubFav) {
+                $getClub[] = Club::where('clubs.id', $clubFav->club_id)->value('id');
+                $ClubArray['id'] = Club::where('clubs.id', $clubFav->club_id)->value('id');
+                $ClubArray['name'] = Club::where('clubs.id', $clubFav->club_id)->value('name');
+                $ClubArray['club_img'] = Club::where('clubs.id', $clubFav->club_id)->value('club_img');
+                $ClubArray['club_banner'] = Club::where('clubs.id', $clubFav->club_id)->value('club_banner');
+                $ClubArray['direction'] = Club::where('clubs.id', $clubFav->club_id)->value('direction');
+                $ClubArray['description'] = Club::where('clubs.id', $clubFav->club_id)->value('description');
+                $ClubArray['tlf'] = Club::where('clubs.id', $clubFav->club_id)->value('tlf');
+                $ClubArray['email'] = Club::where('clubs.id', $clubFav->club_id)->value('email');
+                $ClubArray['fav'] = True;
+                $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubFav->club_id);
+                $favArray[] = $ClubArray;  
             }
-
             $response['status'] = 1;
-            $response['data'] = $clubArray;
+            $response['data'] = $favArray;
             $response['msg'] = "Estos son tus clubs favoritos:";
 
             return response()->json($response, 200);

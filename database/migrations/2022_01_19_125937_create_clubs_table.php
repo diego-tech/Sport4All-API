@@ -17,11 +17,12 @@ class CreateClubsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('password');
-            $table->string('description');
-            $table->string('club_img');
-            $table->string('club_banner');
-            $table->string('direction');
-            $table->string('tlf');
+            $table->text('description')->nullable();
+            $table->string('web')->nullable();
+            $table->string('club_img')->nullable();
+            $table->string('club_banner')->nullable();
+            $table->string('direction')->nullable();
+            $table->string('tlf')->nullable();
             $table->string('email')->unique();
             $table->timestamps();
         });

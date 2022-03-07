@@ -24,6 +24,7 @@ class CreateMatchsTable extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->dateTime('final_time');
+            $table->dateTime('start_Datetime');
             $table->timestamps();
         });
     }
