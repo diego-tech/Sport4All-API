@@ -29,13 +29,13 @@ class ClubsController extends Controller
         $validatedData = Validator::make(
             $request->all(),
             [
-                'name' => 'bail|required|string|max:255|unique',
+                'name' => 'bail|required|string|max:255|unique:clubs',
                 'club_img' => 'required|string|max:255',
                 'club_banner' => 'required|string|max:255',
                 'direction' => 'required|string|max:255',
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'description' => 'required|string|max:255',
-                'web' => 'required|url|max:255',
+                'web' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs',
             ],
@@ -59,7 +59,7 @@ class ClubsController extends Controller
                 'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'description.required' => 'La descripción debe ser obligatoria',
                 'web.required' => 'Introduzca una web',
-                'web.url' => 'Introduzca una url correcta'
+                'web.string' => 'Introduzca una url correcta'
             ]
         );
 
