@@ -35,7 +35,7 @@ class ClubsController extends Controller
                 'direction' => 'required|string|max:255',
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'description' => 'required|string|max:255',
-                'web' => 'required|string|max:255',
+                'web' => 'required|url|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs',
             ],
@@ -57,7 +57,9 @@ class ClubsController extends Controller
                 'club_banner.required' => 'Introduzca una Imagen de Banner',
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
-                'description.required' => 'La descripción debe ser obligatoria'
+                'description.required' => 'La descripción debe ser obligatoria',
+                'web.required' => 'Introduzca una web',
+                'web.url' => 'Introduzca una url correcta'
             ]
         );
 
@@ -80,7 +82,8 @@ class ClubsController extends Controller
                     'direction' => $request->input('direction'),
                     'tlf' => $request->input('tlf'),
                     'email' => $request->input('email'),
-                    'description' => $request->input('description')
+                    'description' => $request->input('description'),
+                    'web' => $request->input('web')
                 ]);
 
                 $response['status'] = 1;
