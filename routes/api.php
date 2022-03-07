@@ -26,7 +26,6 @@ Route::post('/recoverpass', [AuthController::class, 'recoverPass']);
 Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
 Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('auth:sanctum');
 Route::post('/getUploadImage', [AuthController::class, 'getUploadImage']);
-Route::post('/checkIfUserExists', [AuthController::class, 'checkIfUserExists']);
 Route::get('/listevents', [AuthController::class, 'listevents']); // Tendrá que pasar por un middleware
 Route::get('/listfavs', [AuthController::class, 'listfavs'])->middleware('auth:sanctum');
 Route::get('/searchclubs', [AuthController::class, 'searchClubs'])->middleware('auth:sanctum');

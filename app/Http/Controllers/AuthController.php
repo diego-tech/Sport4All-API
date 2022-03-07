@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\AuxFunctions;
+use Carbon\Carbon;
 use App\Http\Helpers\Response;
+use App\Models\Club;
 use App\Models\Event;
+use App\Models\Favourite;
 use App\Models\Inscription;
 use Illuminate\Http\Request;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -36,47 +39,6 @@ class AuthController extends Controller
         $response["msg"] = $fileName;
 
         return response()->json($response);
-    }
-
-    /**
-     * Comprobación si el correo que introduce en la primera pantalla 
-     * ya existe.
-     * 
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return response()->json($response)
-     */
-    public function checkIfUserExists(Request $request)
-    {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
-
-        $validatedData = Validator::make(
-            $request->all(),
-            [
-                'email' => 'required|email|unique:users',
-                'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
-            ],
-            [
-                'email.required' => "Introduzca un email",
-                'email.unique' => "Ya existe un usuario registrado con este correo",
-                'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
-                'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial'
-            ]
-        );
-
-        if ($validatedData->fails()) {
-            $response['status'] = 0;
-            $response['data']['errors'] = $validatedData->errors()->first();
-            $response['msg'] = 'Usuario ya registrado';
-
-            return response()->json($response, 406);
-        } else {
-            $response['status'] = 1;
-            $response['data']['errors'] = "";
-            $response['msg'] = 'Usuario No Registrado';
-
-            return response()->json($response, 200);
-        }
     }
 
     /**
@@ -399,28 +361,41 @@ class AuthController extends Controller
 
         // Id del usuario que solicita la lista
         $userId = Auth::id();
-        
-        try {
-                // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
-                $response['msg'] = "Estos son tus clubs favoritos:";
-                $clubsFavs = DB::table('favourites')
-                    ->join('clubs','favourites.club_id', '=', 'clubs.id')
-                    ->join('users','favourites.user_id', '=', 'users.id')
-                    ->select('clubs.*')
-                    ->where('users.id','like','%'.$userId.'%')
-                    ->get();
 
-                $response['data'] = $clubsFavs;
-                
-                return response()->json($response, 200);
-            
+        try {
+            // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
+            $getFavs = Favourite::where('user_id', $userId)->get('club_id');
+            $clubArray = [];
+
+            foreach ($getFavs as $clubFav) {
+                $getClub = Club::where('clubs.id', $clubFav->club_id)->get();
+                foreach ($getClub as $clubs) {
+                    $ClubArray['id'] = $clubs->id;
+                    $ClubArray['name'] = $clubs->name;
+                    $ClubArray['club_img'] = $clubs->club_img;
+                    $ClubArray['club_banner'] = $clubs->club_banner;
+                    $ClubArray['direction'] = $clubs->direction;
+                    $ClubArray['description'] = $clubs->description;
+                    $ClubArray['tlf'] = $clubs->tlf;
+                    $ClubArray['email'] = $clubs->email;
+                    $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
+
+                    $clubArray[] = $ClubArray;
+                }
+            }
+
+            $response['status'] = 1;
+            $response['data'] = $clubArray;
+            $response['msg'] = "Estos son tus clubs favoritos:";
+
+            return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
         }
-        
     }
 
     /**
@@ -434,23 +409,38 @@ class AuthController extends Controller
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $clubName = $request->input('name');
-       
-        try{
-            if($clubName){
-                $response['msg'] = "Resultados de la búsqueda:";
 
-                $finalResults['data'] = DB::table('clubs')
+        try {
+            if ($clubName) {
+                $clubs_array = [];
+
+                $finalResults = DB::table('clubs')
                     ->select('clubs.*')
-                    ->where('clubs.name','like','%'.$clubName.'%')
+                    ->where('clubs.name', 'like', '%' . $clubName . '%')
                     ->get();
 
-                $response['data'] = $finalResults;
-                return response()->json($response, 200);
-
-                }else{
-                    $response['msg'] = "Introduzca un término a buscar";
+                foreach ($finalResults as $club) {
+                    $ClubArray['id'] = $club->id;
+                    $ClubArray['name'] = $club->name;
+                    $ClubArray['club_img'] = $club->club_img;
+                    $ClubArray['club_banner'] = $club->club_banner;
+                    $ClubArray['direction'] = $club->direction;
+                    $ClubArray['tlf'] = $club->tlf;
+                    $ClubArray['email'] = $club->email;
+                    $ClubArray['description'] = $club->description;
+                    $ClubArray['services'] = AuxFunctions::Get_services_from_club($club->id);
+    
+                    $clubs_array[] = $ClubArray;
                 }
-        }catch(\Exception $e){
+
+                $response['status'] = 1;
+                $response['data'] = $clubs_array;
+                $response['msg'] = "Resultados de la búsqueda:";
+                return response()->json($response, 200);
+            } else {
+                $response['msg'] = "Introduzca un término a buscar";
+            }
+        } catch (\Exception $e) {
             $response['status'] = 0;
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
@@ -475,52 +465,49 @@ class AuthController extends Controller
         $userId = Auth::id();
 
         // Compruebas que existe y que no esté ya inscrito en él
-        $checkEvent=DB::table('events')
-                ->select('id')
-                ->where('id', $eventId)
-                ->first();
-        
-        $checkInscription=DB::table('inscriptions')
-                ->select('event_id', 'user_id')
-                ->where('event_id', $eventId)
-                ->where('user_id', $userId)
-                ->first();
-                
+        $checkEvent = DB::table('events')
+            ->select('id')
+            ->where('id', $eventId)
+            ->first();
 
-        $count = Inscription::where('event_id',$request->input('id'))->count();
+        $checkInscription = DB::table('inscriptions')
+            ->select('event_id', 'user_id')
+            ->where('event_id', $eventId)
+            ->where('user_id', $userId)
+            ->first();
+
+
+        $count = Inscription::where('event_id', $request->input('id'))->count();
         $event = Event::where('id', $request->input('id'))->value('people_left');
         // Te inscribes
-        try{
-            if($checkEvent){
-                if($count < $event->people_left){
-                    if(!$checkInscription){
+        try {
+            if ($checkEvent) {
+                if ($count < $event->people_left) {
+                    if (!$checkInscription) {
                         $inscription = new Inscription();
-                        $inscription -> event_id = $eventId;
-                        $inscription -> user_id = $userId;
-                        $inscription -> save();
-                        
+                        $inscription->event_id = $eventId;
+                        $inscription->user_id = $userId;
+                        $inscription->save();
+
                         $response['msg'] = "Inscripción realizada";
-                    
+
                         $response['data'] = $inscription;
                         return response()->json($response, 200);
-    
-                    }else{
+                    } else {
                         $response['msg'] = "Ya estás inscrito a este evento";
                         return response()->json($response, 406);
                     }
                 }
-            }else{
+            } else {
                 $response['msg'] = "El evento no existe";
                 return response()->json($response, 404);
             }
-            
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             $response['status'] = 0;
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
         }
-
     }
 
     /**
@@ -529,30 +516,29 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function ended_events(Request $request){
+    public function ended_events(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        try{
+        try {
             $query = DB::table('events')
-                        ->join('inscriptions','events.id','=','inscriptions.event_id')
-                        ->select('events.*')
-                        ->where('inscriptions.user_id',Auth::id())
-                        ->where('events.final_time','<', Carbon::now('Europe/Madrid'))
-                        ->get();
+                ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
+                ->select('events.*')
+                ->where('inscriptions.user_id', Auth::id())
+                ->where('events.final_time', '<', Carbon::now('Europe/Madrid'))
+                ->get();
 
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Eventos finalizados';
-        
-                        
-            return response()->json($response, 200);
 
-        }catch(\Exception $e){
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
             $response['status'] = 0;
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
         }
     }
-
 }
