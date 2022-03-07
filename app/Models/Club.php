@@ -27,7 +27,8 @@ class Club extends Authenticatable
         'description',
         'tlf',
         'email',
-        'password'
+        'password',
+        'web'
     ];
 
     /**

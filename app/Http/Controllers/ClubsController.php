@@ -29,18 +29,19 @@ class ClubsController extends Controller
         $validatedData = Validator::make(
             $request->all(),
             [
-                'name' => 'bail|required|string|max:255',
+                'name' => 'bail|required|string|max:255|unique',
                 'club_img' => 'required|string|max:255',
                 'club_banner' => 'required|string|max:255',
                 'direction' => 'required|string|max:255',
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'description' => 'required|string|max:255',
+                'web' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs',
-                'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
             ],
             [
                 'name.required' => 'Introduzca un nombre para el club',
+                'name.unique' => 'Este nombre ya existe',
                 'name.string' => 'El nombre debe ser un String',
                 'name.max' => 'El nombre no puede superar 255 caracteres',
                 'direction.required' => 'Intruduzca una dirección para el club',
