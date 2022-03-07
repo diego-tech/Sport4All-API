@@ -8,6 +8,7 @@ use App\Models\Favourite;
 use App\Http\Helpers\AuxFunctions;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -118,6 +119,12 @@ class ClubsController extends Controller
                 $ClubArray['tlf'] = $clubs->tlf;
                 $ClubArray['email'] = $clubs->email;
                 $ClubArray['description'] = $clubs->description;
+                $query = Favourite::where('user_id',Auth::id())->where('club_id',$clubs->id)->value('id');
+                if($query){
+                    $ClubArray['fav'] = True;
+                }else{
+                    $ClubArray['fav'] = False;
+                }
                 $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
 
                 $clubs_array[] = $ClubArray;

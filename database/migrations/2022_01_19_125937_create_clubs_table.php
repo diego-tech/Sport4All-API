@@ -17,7 +17,8 @@ class CreateClubsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('password');
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
+            $table->string('web')->nullable();
             $table->string('club_img')->nullable();
             $table->string('club_banner')->nullable();
             $table->string('direction')->nullable();
