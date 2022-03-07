@@ -396,6 +396,21 @@ class AuthController extends Controller
         }
     }
 
+    public function delete_favs(Request $request){
+        $response = ["status" => 1, "msg" => "","data" => []];
+        $userId = Auth::id();
+        try{
+            $clubFav = Favourite::where('user_id',$userId)->where('club_id',$request->input('club_id'));
+            $clubFav->delete();
+
+        }catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['data'] = "";
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
     /**
      * Buscar Clubs por Nombre
      * 
