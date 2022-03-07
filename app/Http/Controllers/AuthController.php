@@ -365,23 +365,27 @@ class AuthController extends Controller
         try {
             // De la tabla clubs, selecciona aquellos cuyo id aparezca relacionado al del usuario en la tabla favoritos
             $getFavs = Favourite::where('user_id', $userId)->get('club_id');
+            $favArray = [];
             $clubArray = [];
 
             foreach ($getFavs as $clubFav) {
                 $getClub = Club::where('clubs.id', $clubFav->club_id)->get();
-                foreach ($getClub as $clubs) {
-                    $ClubArray['id'] = $clubs->id;
-                    $ClubArray['name'] = $clubs->name;
-                    $ClubArray['club_img'] = $clubs->club_img;
-                    $ClubArray['club_banner'] = $clubs->club_banner;
-                    $ClubArray['direction'] = $clubs->direction;
-                    $ClubArray['description'] = $clubs->description;
-                    $ClubArray['tlf'] = $clubs->tlf;
-                    $ClubArray['email'] = $clubs->email;
-                    $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
+                $favArray[] = $getClub;
+            
+            }
 
-                    $clubArray[] = $ClubArray;
-                }
+            foreach ($favArray as $clubs) {
+                $ClubArray['id'] = $clubs->id;
+                $ClubArray['name'] = $clubs->name;
+                $ClubArray['club_img'] = $clubs->club_img;
+                $ClubArray['club_banner'] = $clubs->club_banner;
+                $ClubArray['direction'] = $clubs->direction;
+                $ClubArray['description'] = $clubs->description;
+                $ClubArray['tlf'] = $clubs->tlf;
+                $ClubArray['email'] = $clubs->email;
+                $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
+
+                $clubArray[] = $ClubArray;
             }
 
             $response['status'] = 1;
