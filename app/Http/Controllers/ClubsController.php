@@ -124,10 +124,10 @@ class ClubsController extends Controller
                 $ClubArray['email'] = $clubs->email;
                 $ClubArray['web'] = $clubs->web;
                 $ClubArray['description'] = $clubs->description;
-                $query = Favourite::where('user_id',Auth::id())->where('club_id',$clubs->id)->value('id');
-                if($query){
+                $query = Favourite::where('user_id', Auth::id())->where('club_id', $clubs->id)->value('id');
+                if ($query) {
                     $ClubArray['fav'] = True;
-                }else{
+                } else {
                     $ClubArray['fav'] = False;
                 }
                 $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
@@ -315,15 +315,18 @@ class ClubsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function most_rated_clubs(){
-        $response = ["status" => 1, "msg" => "","data" => []];
+    public function most_rated_clubs()
+    {
+        $response = ["status" => 1, "msg" => "", "data" => []];
 
-        try{
+        $bestArray = [];
+
+        try {
             $query = DB::table('favourites')
                 ->select(DB::raw("COUNT('favourites.club_id') as Total, favourites.club_id"))
-                ->leftJoin('clubs','favourites.club_id','=','clubs.id')
+                ->leftJoin('clubs', 'favourites.club_id', '=', 'clubs.id')
                 ->groupBy('favourites.club_id')
-                ->orderBy('Total','desc')
+                ->orderBy('Total', 'desc')
                 ->get();
 
             foreach ($query as $bestRated) {
@@ -338,14 +341,16 @@ class ClubsController extends Controller
                 $ClubArray['email'] = Club::where('clubs.id', $bestRated->club_id)->value('email');
                 $ClubArray['fav'] = True;
                 $ClubArray['services'] = AuxFunctions::Get_services_from_club($bestRated->club_id);
-                $bestArray[] = $ClubArray;  
-                }
+
+                $bestArray[] = $ClubArray;
+            }
+
             $response['status'] = 1;
             $response['data'] = $bestArray;
             $response['msg'] = "Estos son los clubs mejor valorados";
-    
-                return response()->json($response, 200);
-        }catch (\Exception $e) {
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
             $response['status'] = 0;
             $response['data'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
