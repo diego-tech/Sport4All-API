@@ -105,7 +105,8 @@ class ClubsController extends Controller
     public function listClubs()
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
-
+        $aaa = Favourite::join('clubs','club_id','clubs.id')->get();
+        return response()->json($aaa, 200);
         try {
             $query = Club::all();
             $clubs_array = [];
