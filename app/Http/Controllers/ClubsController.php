@@ -122,6 +122,7 @@ class ClubsController extends Controller
                 $ClubArray['direction'] = $clubs->direction;
                 $ClubArray['tlf'] = $clubs->tlf;
                 $ClubArray['email'] = $clubs->email;
+                $ClubArray['web'] = $clubs->web;
                 $ClubArray['description'] = $clubs->description;
                 $query = Favourite::where('user_id',Auth::id())->where('club_id',$clubs->id)->value('id');
                 if($query){
