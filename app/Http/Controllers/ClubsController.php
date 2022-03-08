@@ -29,17 +29,19 @@ class ClubsController extends Controller
         $validatedData = Validator::make(
             $request->all(),
             [
-                'name' => 'bail|required|string|max:255',
+                'name' => 'bail|required|string|max:255|unique:clubs',
                 'club_img' => 'required|string|max:255',
                 'club_banner' => 'required|string|max:255',
                 'direction' => 'required|string|max:255',
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'description' => 'required|string|max:255',
+                'web' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs',
             ],
             [
                 'name.required' => 'Introduzca un nombre para el club',
+                'name.unique' => 'Este nombre ya existe',
                 'name.string' => 'El nombre debe ser un String',
                 'name.max' => 'El nombre no puede superar 255 caracteres',
                 'direction.required' => 'Intruduzca una dirección para el club',
@@ -55,7 +57,9 @@ class ClubsController extends Controller
                 'club_banner.required' => 'Introduzca una Imagen de Banner',
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
                 'password.regex' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
-                'description.required' => 'La descripción debe ser obligatoria'
+                'description.required' => 'La descripción debe ser obligatoria',
+                'web.required' => 'Introduzca una web',
+                'web.string' => 'Introduzca una url correcta'
             ]
         );
 
@@ -78,7 +82,8 @@ class ClubsController extends Controller
                     'direction' => $request->input('direction'),
                     'tlf' => $request->input('tlf'),
                     'email' => $request->input('email'),
-                    'description' => $request->input('description')
+                    'description' => $request->input('description'),
+                    'web' => $request->input('web')
                 ]);
 
                 $response['status'] = 1;
@@ -104,6 +109,8 @@ class ClubsController extends Controller
     public function listClubs()
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
+        $aaa = Favourite::join('clubs','club_id','clubs.id')->get();
+        return response()->json($aaa, 200);
         try {
             $query = Club::all();
             $clubs_array = [];
@@ -116,6 +123,7 @@ class ClubsController extends Controller
                 $ClubArray['direction'] = $clubs->direction;
                 $ClubArray['tlf'] = $clubs->tlf;
                 $ClubArray['email'] = $clubs->email;
+                $ClubArray['web'] = $clubs->web;
                 $ClubArray['description'] = $clubs->description;
                 $query = Favourite::where('user_id',Auth::id())->where('club_id',$clubs->id)->value('id');
                 if($query){

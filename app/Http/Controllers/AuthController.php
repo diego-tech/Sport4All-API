@@ -392,6 +392,7 @@ class AuthController extends Controller
                 $ClubArray['description'] = Club::where('clubs.id', $clubFav->club_id)->value('description');
                 $ClubArray['tlf'] = Club::where('clubs.id', $clubFav->club_id)->value('tlf');
                 $ClubArray['email'] = Club::where('clubs.id', $clubFav->club_id)->value('email');
+                $ClubArray['web'] = Club::where('clubs.id', $clubFav->club_id)->value('web');
                 $ClubArray['fav'] = True;
                 $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubFav->club_id);
                 $favArray[] = $ClubArray;  
@@ -411,16 +412,20 @@ class AuthController extends Controller
     }
 
     public function delete_favs(Request $request){
-        $response = ["status" => 1, "msg" => "","data" => null];
+        $response = ["status" => 1, "msg" => "", "data" => []];
         $userId = Auth::id();
+
         try{
             $clubFav = Favourite::where('user_id',$userId)->where('club_id',$request->input('club_id'));
             $clubFav->delete();
             $response['msg'] = 'Club elimiado de favoritos';
+            $response['status'] = 1;
+            $response['data']['errors'] = "";
+
             return response()->json($response, 200);
         }catch (\Exception $e) {
             $response['status'] = 0;
-            $response['data'] = "";
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -455,7 +460,14 @@ class AuthController extends Controller
                     $ClubArray['direction'] = $club->direction;
                     $ClubArray['tlf'] = $club->tlf;
                     $ClubArray['email'] = $club->email;
+                    $ClubArray['web'] = $club->web;
                     $ClubArray['description'] = $club->description;
+                    $query = Favourite::where('user_id',Auth::id())->where('club_id',$club->id)->value('id');
+                    if($query){
+                        $ClubArray['fav'] = True;
+                    }else{
+                        $ClubArray['fav'] = False;
+                    }
                     $ClubArray['services'] = AuxFunctions::Get_services_from_club($club->id);
     
                     $clubs_array[] = $ClubArray;
