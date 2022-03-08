@@ -35,6 +35,7 @@ Route::post('/courtreserve',[CourtsController::class, 'CourtReserve'])->middlewa
 Route::get('/endedmatches',[MatchController::class, 'ended_matches'])->middleware('auth:sanctum');
 Route::get('/endedevents',[AuthController::class, 'ended_events'])->middleware('auth:sanctum');
 Route::delete('/deletefav',[AuthController::class, 'delete_favs'])->middleware('auth:sanctum');
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 
 // Rutas Clubes

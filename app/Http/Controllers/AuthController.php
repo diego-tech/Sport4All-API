@@ -138,6 +138,20 @@ class AuthController extends Controller
         }
     }
 
+    public function logout(Request $request){
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+        try{
+            $request->user()->currentAccessToken()->delete();
+            $response['msg'] = 'Sesion cerrada correctamente';
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+       
+    }
     /**
      * Información del Usuario
      * 
