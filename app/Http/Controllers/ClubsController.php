@@ -37,7 +37,6 @@ class ClubsController extends Controller
                 'description' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs',
-                'password' => 'required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
             ],
             [
                 'name.required' => 'Introduzca un nombre para el club',
@@ -105,8 +104,6 @@ class ClubsController extends Controller
     public function listClubs()
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
-        $aaa = Favourite::join('clubs','club_id','clubs.id')->get();
-        return response()->json($aaa, 200);
         try {
             $query = Club::all();
             $clubs_array = [];
@@ -302,6 +299,51 @@ class ClubsController extends Controller
 
                 return response()->json($response, 406);
             }
+        }
+    }
+
+    /**
+     * Listado Completo de Clubes mejor valorados
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function most_rated_clubs(){
+        $response = ["status" => 1, "msg" => "","data" => []];
+
+        try{
+            $query = DB::table('favourites')
+                ->select(DB::raw("COUNT('favourites.club_id') as Total, favourites.club_id"))
+                ->leftJoin('clubs','favourites.club_id','=','clubs.id')
+                ->groupBy('favourites.club_id')
+                ->orderBy('Total','desc')
+                ->get();
+
+            foreach ($query as $bestRated) {
+                $getClub[] = Club::where('clubs.id', $bestRated->club_id)->value('id');
+                $ClubArray['id'] = Club::where('clubs.id', $bestRated->club_id)->value('id');
+                $ClubArray['name'] = Club::where('clubs.id', $bestRated->club_id)->value('name');
+                $ClubArray['club_img'] = Club::where('clubs.id', $bestRated->club_id)->value('club_img');
+                $ClubArray['club_banner'] = Club::where('clubs.id', $bestRated->club_id)->value('club_banner');
+                $ClubArray['direction'] = Club::where('clubs.id', $bestRated->club_id)->value('direction');
+                $ClubArray['description'] = Club::where('clubs.id', $bestRated->club_id)->value('description');
+                $ClubArray['tlf'] = Club::where('clubs.id', $bestRated->club_id)->value('tlf');
+                $ClubArray['email'] = Club::where('clubs.id', $bestRated->club_id)->value('email');
+                $ClubArray['fav'] = True;
+                $ClubArray['services'] = AuxFunctions::Get_services_from_club($bestRated->club_id);
+                $bestArray[] = $ClubArray;  
+                }
+            $response['status'] = 1;
+            $response['data'] = $bestArray;
+            $response['msg'] = "Estos son los clubs mejor valorados";
+    
+                return response()->json($response, 200);
+        }catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['data'] = "";
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
         }
     }
 }
