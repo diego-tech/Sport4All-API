@@ -8,8 +8,10 @@
     <title>Sports4All</title>
 
     <!-- Links -->
-    <link rel="icon" href="{{url('img/WhiteLogo.png') }}">
-    <link rel="stylesheet" href="{{url('css/app.css')}}" />
+    <link rel="icon" href="{{url('img/logoapp.png') }}">
+    <link rel="stylesheet" href="{{url('css/main.css')}}" />
+    <!--<link rel="stylesheet" href="{{url('fontawesome-all.min.css')}}"/>-->
+    
 </head>
 
 <body class="is-preload">
@@ -39,7 +41,7 @@
 
         <div class="box alt container">
             <section class="feature left">
-                <a href="" class="image icon solid fa-mobile-alt"><img src="{{url('img/pic01.jpg')}}" alt="" /></a>
+                  <a href="" class="image icon solid fa-mobile-alt"> <img src="img/pic01.jpg" alt="" /></a>
                 <div class="content">
                     <h3>Reservar es fácil</h3>
                     <p>
