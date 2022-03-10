@@ -22,7 +22,8 @@ class CourtsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function CourtRegister(Request $request){
+    public function CourtRegister(Request $request)
+    {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $validatedData = Validator::make(
@@ -80,24 +81,28 @@ class CourtsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function CourtReserve(Request $request){
+    public function CourtReserve(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        $validatedData = Validator::make($request->all(),[
-            'court_id' => 'required|exists:courts,id',
-            'lights' => 'required|boolean',
-            'day' => 'required|date_format:Y-m-d',
-            'start_time' => 'required|date_format:H:i:s',
-            'time' => ['required', Rule::in(['60','90','120'])],
-        ],
-        [
-            'court_id.required' => 'Introduce una pista',
-            'court_id.exists' => 'Introduce una pista que exista',
-            'start_dateTime.required' => 'Introduce fecha de inicio del partido',
-            'start_dateTime.date_format' => 'Introduce el formato de la fecha de esta manera: H:i:s',
-            'day.required' => 'Introduce dia de la reserva',
-            'day.date_format' => 'Introduce dia de la reserva en este formato: Y-m-d ',
-        ]);
+        $validatedData = Validator::make(
+            $request->all(),
+            [
+                'court_id' => 'required|exists:courts,id',
+                'lights' => 'required|boolean',
+                'day' => 'required|date_format:Y-m-d',
+                'start_time' => 'required|date_format:H:i:s',
+                'time' => ['required', Rule::in(['60', '90', '120'])],
+            ],
+            [
+                'court_id.required' => 'Introduce una pista',
+                'court_id.exists' => 'Introduce una pista que exista',
+                'start_dateTime.required' => 'Introduce fecha de inicio del partido',
+                'start_dateTime.date_format' => 'Introduce el formato de la fecha de esta manera: H:i:s',
+                'day.required' => 'Introduce dia de la reserva',
+                'day.date_format' => 'Introduce dia de la reserva en este formato: Y-m-d ',
+            ]
+        );
 
         if ($validatedData->fails()) {
             $response['status'] = 0;
@@ -105,14 +110,14 @@ class CourtsController extends Controller
             $response['msg'] = 'No se te ha podido reservar la pista ';
 
             return response()->json($response, 406);
-        }else{
-            try{
-                $time = Carbon::parse($request->input('start_time'));        
+        } else {
+            try {
+                $time = Carbon::parse($request->input('start_time'));
                 $endTime = $time->addMinutes($request->input('time'));
                 $parsedEndTime = $endTime->format('H:i:s');
-                $final_time = $request->input('day') . " ". $parsedEndTime;
-                $start_time = $request->input('day') . " ". $request->input('start_time');
-                $QR = mt_rand(1000,9999);
+                $final_time = $request->input('day') . " " . $parsedEndTime;
+                $start_time = $request->input('day') . " " . $request->input('start_time');
+                $QR = mt_rand(1000, 9999);
                 $Reserve = Reserve::create([
                     'QR' => $QR,
                     'user_id' => Auth::id(),
@@ -129,19 +134,19 @@ class CourtsController extends Controller
 
                 $response['status'] = 1;
                 $response['data'] = $Reserve;
-                if($request->input('time') == '60'){
+                if ($request->input('time') == '60') {
                     $price = $court->price;
                     $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                }elseif($request->input('time') == '90'){
+                } elseif ($request->input('time') == '90') {
                     $price = $court->price * 1.5;
                     $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                }else{
+                } else {
                     $price = $court->price * 2;
                     $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
                 }
-                
+
                 return response()->json($response, 200);
-            }catch(\Exception $e){
+            } catch (\Exception $e) {
                 $response['status'] = 0;
                 $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
@@ -157,9 +162,10 @@ class CourtsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function freeCourts(Request $request){
+    public function freeCourts(Request $request)
+    {
 
-        $validatedData = Validator::make($request->all(),[
+        $validatedData = Validator::make($request->all(), [
             'day' => 'required|date_format:Y-m-d',
             'start_time' => 'required|date_format:H:i:s'
         ]);
@@ -170,26 +176,26 @@ class CourtsController extends Controller
             $response['msg'] = 'No se te ha podido reservar la pista ';
 
             return response()->json($response, 406);
-        }else{
+        } else {
             $day = $request->input('day');
             $hour = $request->input('hour');
 
             $reserves = Reserve::select('id')
-                            ->where('reserves.day', $day)
-                            ->where('reserves.start_time', "19:00:01")
-                            ->pluck('id')
-                            ->toArray();
+                ->where('reserves.day', $day)
+                ->where('reserves.start_time', "19:00:01")
+                ->pluck('id')
+                ->toArray();
 
             $courts = Court::select('id')->pluck('id')->toArray();
-            $result = array_diff($courts,$reserves);
-            
-            foreach($result as $court){
+            $result = array_diff($courts, $reserves);
+
+            foreach ($result as $court) {
                 $freecourt[] = Court::find($court);
-            }            
+            }
 
             $response['msg'] = 'Pistas libres';
             $response['data'] = $freecourt;
-            return response()->json($response, 200); 
+            return response()->json($response, 200);
         }
     }
 }

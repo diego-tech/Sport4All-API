@@ -26,7 +26,7 @@ Route::post('/recoverpass', [AuthController::class, 'recoverPass']);
 Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
 Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('auth:sanctum');
 Route::post('/getUploadImage', [AuthController::class, 'getUploadImage']);
-Route::get('/listevents', [AuthController::class, 'listevents']); // Tendrá que pasar por un middleware
+Route::get('/listevents', [AuthController::class, 'listevents'])->middleware('auth:sanctum'); // Tendrá que pasar por un middleware
 Route::get('/listfavs', [AuthController::class, 'listfavs'])->middleware('auth:sanctum');
 Route::get('/searchclubs', [AuthController::class, 'searchClubs'])->middleware('auth:sanctum');
 Route::post('/joinevent', [AuthController::class, 'joinEvent'])->middleware('auth:sanctum');
@@ -37,6 +37,7 @@ Route::get('/endedevents',[AuthController::class, 'ended_events'])->middleware('
 Route::delete('/deletefav',[AuthController::class, 'delete_favs'])->middleware('auth:sanctum');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/mostrated', [ClubsController::class, 'most_rated_clubs'])->middleware('auth:sanctum');
+Route::get('/seematches',[MatchController::class, 'seeMatches'])->middleware('auth:sanctum');
 
 
 // Rutas Clubes
@@ -46,7 +47,6 @@ Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->mi
 Route::post('/registerevent', [ClubsController::class, 'registerEvent']); // Tendrá que pasar por un middleware para poder registrarlos
 Route::post('/registercourt', [CourtsController::class, 'CourtRegister']); //Futuro cambiar a tener que estar logueado como club
 Route::post('/creatematch',[MatchController::class, 'createMatch']); //Futuro cambiar a tener que estar logueado como club
-Route::get('/seematches',[MatchController::class, 'seeMatches']);
 
 //Lista pistas libres
 
