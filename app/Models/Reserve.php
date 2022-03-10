@@ -18,10 +18,17 @@ class Reserve extends Model
         'QR',
         'court_id',
         'lights',
-        'start_dateTime',
-        'end_dateTime',
+        'start_time',
+        'end_time',
+        'day',
         'user_id',
+        'final_time',
+        'start_Datetime',
     ];
 
     protected $table = 'reserves';
+
+    public function courts(){
+        return $this->belongsTo(Court::class,'court_id','id');
+    }
 }

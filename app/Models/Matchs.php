@@ -19,9 +19,12 @@ class Matchs extends Model
         'club_id',
         'court_id',
         'lights',
+        'day',
         'price_people',
-        'start_dateTime',
-        'end_dateTime',
+        'start_time',
+        'end_time',
+        'final_time',
+        'start_Datetime',
     ];
 
 

@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 
-class Club extends Model
+class Club extends Authenticatable
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -21,8 +23,12 @@ class Club extends Model
         'club_img',
         'club_banner',
         'direction',
+        'password',
+        'description',
         'tlf',
-        'email'
+        'email',
+        'password',
+        'web'
     ];
 
     /**
@@ -43,4 +49,5 @@ class Club extends Model
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
 }
