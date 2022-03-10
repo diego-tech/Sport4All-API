@@ -94,18 +94,21 @@ class MatchController extends Controller
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
         try {
-            $Matchs = DB::table('matchs')
-                ->join('clubs', 'club_id', 'clubs.id')
-                ->join('courts', 'court_id', 'courts.id')
-                ->select(
-                    'clubs.name as Club',
-                    'courts.name as Pista',
-                    'matchs.start_dateTime as Hora inicio',
-                    'matchs.end_dateTime as Hora finalizacion',
-                    'matchs.price_people as Precio persona'
-                )
-                ->get();
-
+            $arra =Matchs::all()->where('day',$request->input('day'))
+                        ->groupBy('start_time')
+                        ->toArray();
+           $Matchs = DB::table('matchs')
+                        ->groupBy('matchs.start_time')
+                        ->join('match_user','match_user.match_id','matchs.id')
+                        ->join('users','users.id','match_user.user_id')
+                        ->select('matchs.*','users.image')
+                        //->orWhere('day', $request->input('day'))
+                        ->get();
+            
+           /* foreach($Matchs as $day){
+                $array[] = $day;
+                $array[][] = Matchs::where('start_time',$day)->where('day',$request->input('day'));
+            }*/
             // Imágenes de los usuarior inscritos
             // Array dentro de array que muestre el día y la hora del partido
 
