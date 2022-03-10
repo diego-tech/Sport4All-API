@@ -106,6 +106,9 @@ class MatchController extends Controller
                 )
                 ->get();
 
+            // Imágenes de los usuarior inscritos
+            // Array dentro de array que muestre el día y la hora del partido
+
             $response['data'] = $Matchs;
             $response['msg'] = "Partidos";
             return response()->json($response, 200);
