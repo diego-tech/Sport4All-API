@@ -346,10 +346,14 @@ class AuthController extends Controller
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
         try {
-            $events = Event::all();
+            $query = DB::table('events')
+                ->select('events.*')
+                ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->orderBy('events.final_time','asc')
+                ->get();
 
             $response['status'] = 1;
-            $response['data'] = $events;
+            $response['data'] = $query;
             $response['msg'] = "Estos son todos los Eventos";
 
             return response()->json($response, 200);
