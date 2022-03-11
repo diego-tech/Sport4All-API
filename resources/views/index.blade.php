@@ -85,35 +85,23 @@
                             <tr>
                                 <th>Club</th>
                                 <th>Descripción</th>
-                                <th>Valoración media</th>
+                                <th>Dirección</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach($clubs as $club)
                             <tr>
                                 <td>
-                                    Club deportivo <br />
-                                    Juan Lucas
+                                    {{$club['name']}}
                                 </td>
-                                <td>Es el club deportivo de pádel de Juan Lucas</td>
-                                <td>7/10</td>
-                            </tr>
-                            <tr>
-                                <td>Asociación deportiva Vallecas</td>
+                                <td>{{$club['description']}}</td>
                                 <td>
-                                    Club deportivo con pistas de pádel y tenis disponibles
+                                    <a style="color: #32446E;" target="blank" href="http://maps.google.com/?q=1200 {{$club['direction']}}">
+                                        {{$club['direction']}}
+                                    </a>
                                 </td>
-                                <td>6.5/10</td>
                             </tr>
-                            <tr>
-                                <td>Club deportivo Diego Muñoz</td>
-                                <td>Dieguiño tiene su propio club de pádel</td>
-                                <td>10/10</td>
-                            </tr>
-                            <tr>
-                                <td>Campo de tenis Las Tablas</td>
-                                <td>Es un campo de tenis que hay en las tablas</td>
-                                <td>4/10</td>
-                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -172,13 +160,6 @@
             <li>Diseñado por: <a href="http://html5up.net">Raccoons S.L.</a></li>
         </ul>
     </div>
-
-    <div>
-        @foreach($clubs as $club)
-            {{$club['name']}}
-        @endforeach
-    </div>
-
     <!-- Js Scripts -->
     <script src="{{url('js/jquery.min.js')}}"></script>
     <script src="{{url('js/browser.min.js')}}"></script>
