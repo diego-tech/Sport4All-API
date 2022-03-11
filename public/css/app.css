@@ -2526,6 +2526,10 @@ ul.icons li span:hover {
 	background-color: var(--bg-color);
 }
 
+#directionlink {
+    color: var(--hard-color) !important;
+}
+
 table {
     width: 100%;
 }
