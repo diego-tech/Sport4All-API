@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ClubsController extends Controller
 {
@@ -148,6 +149,23 @@ class ClubsController extends Controller
             return response()->json($response, 406);
         }
     }
+
+    public function showListClubsWeb()
+    {
+        $query = Club::all();
+        $clubs_array = [];
+
+        foreach ($query as $clubs) {
+            $ClubArray['name'] = $clubs->name;
+            $ClubArray['direction'] = $clubs->direction;
+            $ClubArray['description'] = $clubs->description;
+            $clubs_array[] = $ClubArray;
+        }
+
+        return view('index', ['clubs' => $clubs_array]);
+    }
+
+
 
 
     /**

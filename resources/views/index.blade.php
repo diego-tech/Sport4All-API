@@ -10,8 +10,7 @@
     <!-- Links -->
     <link rel="icon" href="{{url('img/logoapp.png') }}">
     <link rel="stylesheet" href="{{url('css/main.css')}}" />
-    <!--<link rel="stylesheet" href="{{url('fontawesome-all.min.css')}}"/>-->
-    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 
 <body class="is-preload">
@@ -41,7 +40,7 @@
 
         <div class="box alt container">
             <section class="feature left">
-                  <a href="" class="image icon solid fa-mobile-alt"> <img src="img/pic01.jpg" alt="" /></a>
+                <a href="" class="image icon solid fa-mobile-alt"> <img src="img/pic01.jpg" alt="" /></a>
                 <div class="content">
                     <h3>Reservar es fácil</h3>
                     <p>
@@ -146,7 +145,7 @@
                 Tu opinión es muy importante para nosotros
             </p>
 
-            <form method="" action="#">
+            <form method="Post" action="http://www.cursos-diseno.es/mi-mail.php">
                 <div class="row">
                     <div class="col-6 col-12-mobilep">
                         <input type="text" name="name" placeholder="Nombre" />
@@ -159,7 +158,9 @@
                     </div>
                     <div class="col-12">
                         <ul class="actions special">
-                            <li><input type="submit" value="Enviar mensaje" /></li>
+                            <li><input type="submit" value="Enviar mensaje" />
+                                <input type="hidden" name="destinatario" value="cristobal_lletget_tsapp1ma2021@cev.com">
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -167,9 +168,15 @@
         </div>
 
         <ul class="copyright">
-          <li>&copy; Sports4All.</li>
-          <li>Diseñado por: <a href="http://html5up.net">Raccoons S.L.</a></li>
+            <li>&copy; Sports4All.</li>
+            <li>Diseñado por: <a href="http://html5up.net">Raccoons S.L.</a></li>
         </ul>
+    </div>
+
+    <div>
+        @foreach($clubs as $club)
+            {{$club['name']}}
+        @endforeach
     </div>
 
     <!-- Js Scripts -->
