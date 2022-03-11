@@ -27,5 +27,9 @@ class Matchs extends Model
         'start_Datetime',
     ];
 
+    public function users(){
+        return $this->belongsToMany(User::class,'match_user','match_id');
+    }
+
 
 }

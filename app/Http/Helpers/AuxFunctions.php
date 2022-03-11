@@ -2,6 +2,7 @@
 
 namespace App\Http\Helpers;
 
+use App\Models\Matchs;
 use App\Models\Service;
 
 class AuxFunctions

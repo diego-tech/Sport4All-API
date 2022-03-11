@@ -110,8 +110,7 @@ class ClubsController extends Controller
     public function listClubs()
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
-
-        try {
+        try{
             $query = Club::all();
             $clubs_array = [];
 

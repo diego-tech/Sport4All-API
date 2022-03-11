@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\AuxFunctions;
 use App\Models\Matchs;
 use App\Models\MatchUser;
 use Illuminate\Http\Request;
@@ -94,22 +95,31 @@ class MatchController extends Controller
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
         try {
-            $Matchs = DB::table('matchs')
-                ->join('clubs', 'club_id', 'clubs.id')
-                ->join('courts', 'court_id', 'courts.id')
-                ->select(
-                    'clubs.name as Club',
-                    'courts.name as Pista',
-                    'matchs.start_dateTime as Hora inicio',
-                    'matchs.end_dateTime as Hora finalizacion',
-                    'matchs.price_people as Precio persona'
-                )
-                ->get();
+            $arra =Matchs::with('users')->where('day',$request->input('day'))
+                        ->orderBy('start_time','asc')
+                        ->get();
+            
+           /*$Matchs = DB::table('matchs')
+                        ->groupBy('matchs.start_time')
+                        ->join('match_user','match_user.match_id','matchs.id')
+                        ->join('users','users.id','match_user.user_id')
+                        ->select('matchs.*','users.image')
+                        //->orWhere('day', $request->input('day'))
+                        ->get();*/
+            $currentTime = null;
+           for($i=0; $i < sizeof($arra); $i++){
+               if($currentTime == $arra[$i]->start_time){
+                   $matchs[$currentTime][] = $arra[$i];
+               }else{
+                   $currentTime = $arra[$i]->start_time;
+                   $matchs[$currentTime][] = $arra[$i];
+               }
+            }
 
             // Imágenes de los usuarior inscritos
             // Array dentro de array que muestre el día y la hora del partido
 
-            $response['data'] = $Matchs;
+            $response['data'] = $matchs;
             $response['msg'] = "Partidos";
             return response()->json($response, 200);
         } catch (\Exception $e) {
