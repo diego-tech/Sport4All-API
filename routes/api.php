@@ -38,6 +38,7 @@ Route::delete('/deletefav',[AuthController::class, 'delete_favs'])->middleware('
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('/mostrated', [ClubsController::class, 'most_rated_clubs'])->middleware('auth:sanctum');
 Route::get('/seematches',[MatchController::class, 'seeMatches'])->middleware('auth:sanctum');
+Route::get('/pendingevents',[AuthController::class, 'pending_events'])->middleware('auth:sanctum');
 
 
 // Rutas Clubes
