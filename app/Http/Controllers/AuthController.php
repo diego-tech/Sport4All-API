@@ -527,7 +527,7 @@ class AuthController extends Controller
         // Te inscribes
         try {
             if ($checkEvent) {
-                if ($count < $event->people_left) {
+                if ($count < $event) {
                     if (!$checkInscription) {
                         $inscription = new Inscription();
                         $inscription->event_id = $eventId;
@@ -571,6 +571,31 @@ class AuthController extends Controller
                 ->select('events.*')
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '<', Carbon::now('Europe/Madrid'))
+                ->get();
+
+            $response['status'] = 1;
+            $response['data'] = $query;
+            $response['msg'] = 'Eventos finalizados';
+
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    public function pending_events(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try {
+            $query = DB::table('events')
+                ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
+                ->select('events.*')
+                ->where('inscriptions.user_id', Auth::id())
+                ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
 
             $response['status'] = 1;
