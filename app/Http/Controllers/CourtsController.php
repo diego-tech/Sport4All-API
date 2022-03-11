@@ -164,6 +164,8 @@ class CourtsController extends Controller
      */
     public function freeCourts(Request $request)
     {
+        $response = ['status' => 1, 'data' => [], 'msg' => ''];
+        $freecourt = [];
 
         $validatedData = Validator::make($request->all(), [
             'day' => 'required|date_format:Y-m-d',
@@ -187,7 +189,7 @@ class CourtsController extends Controller
                 ->pluck('id')
                 ->toArray();
 
-            $courts = Court::select('id')-> where('club_id',$request->input('club_id'))->pluck('id')->toArray();
+            $courts = Court::select('id')->where('club_id', $request->input('club_id'))->pluck('id')->toArray();
             $result = array_diff($courts, $reserves);
 
             foreach ($result as $court) {

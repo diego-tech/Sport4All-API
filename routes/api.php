@@ -50,4 +50,4 @@ Route::post('/creatematch',[MatchController::class, 'createMatch']); //Futuro ca
 
 //Lista pistas libres
 
-Route::get('/freecourts',[CourtsController::class, 'freeCourts']);
+Route::get('/freecourts',[CourtsController::class, 'freeCourts'])->middleware('auth:sanctum');
