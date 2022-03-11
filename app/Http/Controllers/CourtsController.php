@@ -181,12 +181,13 @@ class CourtsController extends Controller
             $hour = $request->input('hour');
 
             $reserves = Reserve::select('id')
+
                 ->where('reserves.day', $day)
-                ->where('reserves.start_time', "19:00:01")
+                ->where('reserves.start_time', $hour)
                 ->pluck('id')
                 ->toArray();
 
-            $courts = Court::select('id')->pluck('id')->toArray();
+            $courts = Court::select('id')-> where('club_id',$request->input('club_id'))->pluck('id')->toArray();
             $result = array_diff($courts, $reserves);
 
             foreach ($result as $court) {

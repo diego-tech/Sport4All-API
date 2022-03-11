@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\AuxFunctions;
 use App\Models\Matchs;
 use App\Models\MatchUser;
 use Illuminate\Http\Request;
@@ -94,25 +95,37 @@ class MatchController extends Controller
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
         try {
-            $arra =Matchs::all()->where('day',$request->input('day'))
-                        ->groupBy('start_time')
-                        ->toArray();
-           $Matchs = DB::table('matchs')
+            $arra =Matchs::with('users')->where('day',$request->input('day'))
+                        ->orderBy('start_time','asc')
+                        ->get();
+            return response()->json($arra, 200);
+            
+           /*$Matchs = DB::table('matchs')
                         ->groupBy('matchs.start_time')
                         ->join('match_user','match_user.match_id','matchs.id')
                         ->join('users','users.id','match_user.user_id')
                         ->select('matchs.*','users.image')
                         //->orWhere('day', $request->input('day'))
-                        ->get();
+                        ->get();*/
             
-           /* foreach($Matchs as $day){
-                $array[] = $day;
-                $array[][] = Matchs::where('start_time',$day)->where('day',$request->input('day'));
-            }*/
+           foreach($arra as $day){
+               
+                $matchArray['id'] = $day->id;
+                $matchArray['QR'] = $day->QR;
+                $matchArray['club_id'] = $day->club_id;
+                $matchArray['court_id'] = $day->court_id;
+                $matchArray['price_people'] = $day->price_people;
+                $matchArray['lights'] = $day->lights;
+                $matchArray['satart_time'] = $day->satart_time;
+                $matchArray['end_time'] = $day->end_time;
+                $matchArray['users'] = AuxFunctions::get_users_from_matchs($day->id);
+
+                $arrayMatch[] = $matchArray;
+            }
             // Imágenes de los usuarior inscritos
             // Array dentro de array que muestre el día y la hora del partido
 
-            $response['data'] = $Matchs;
+            $response['data'] = $arra;
             $response['msg'] = "Partidos";
             return response()->json($response, 200);
         } catch (\Exception $e) {
