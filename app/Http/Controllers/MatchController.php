@@ -98,7 +98,6 @@ class MatchController extends Controller
             $arra =Matchs::with('users')->where('day',$request->input('day'))
                         ->orderBy('start_time','asc')
                         ->get();
-            return response()->json($arra, 200);
             
            /*$Matchs = DB::table('matchs')
                         ->groupBy('matchs.start_time')
@@ -107,25 +106,20 @@ class MatchController extends Controller
                         ->select('matchs.*','users.image')
                         //->orWhere('day', $request->input('day'))
                         ->get();*/
-            
-           foreach($arra as $day){
-               
-                $matchArray['id'] = $day->id;
-                $matchArray['QR'] = $day->QR;
-                $matchArray['club_id'] = $day->club_id;
-                $matchArray['court_id'] = $day->court_id;
-                $matchArray['price_people'] = $day->price_people;
-                $matchArray['lights'] = $day->lights;
-                $matchArray['satart_time'] = $day->satart_time;
-                $matchArray['end_time'] = $day->end_time;
-                $matchArray['users'] = AuxFunctions::get_users_from_matchs($day->id);
-
-                $arrayMatch[] = $matchArray;
+            $currentTime = null;
+           for($i=0; $i < sizeof($arra); $i++){
+               if($currentTime == $arra[$i]->start_time){
+                   $matchs[$currentTime][] = $arra[$i];
+               }else{
+                   $currentTime = $arra[$i]->start_time;
+                   $matchs[$currentTime][] = $arra[$i];
+               }
             }
+
             // Imágenes de los usuarior inscritos
             // Array dentro de array que muestre el día y la hora del partido
 
-            $response['data'] = $arra;
+            $response['data'] = $matchs;
             $response['msg'] = "Partidos";
             return response()->json($response, 200);
         } catch (\Exception $e) {

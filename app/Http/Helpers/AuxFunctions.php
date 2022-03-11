@@ -21,13 +21,4 @@ class AuxFunctions
             ->get();
         return $query;
     }
-
-    public static function get_users_from_matchs($matchId){
-        $query = Matchs::join('match_user', 'matchs.id', '=','match_user.match_id')
-                ->join('users','match_user.user_id','=','users.id')
-                ->select('users.name','users.image')
-                ->where('match_user.match_id', $matchId)
-                ->get();
-        return $query;
-    }
 }
