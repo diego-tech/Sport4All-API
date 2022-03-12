@@ -164,9 +164,6 @@ class ClubsController extends Controller
         return view('index', ['clubs' => $clubs_array]);
     }
 
-
-
-
     /**
      * Registrar Clubes como Favoritos
      * 
