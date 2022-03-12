@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Court;
+use App\Models\Court_Price;
 use App\Models\Matchs;
+use App\Models\Price;
 use App\Models\Reserve;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
@@ -166,6 +168,8 @@ class CourtsController extends Controller
     {
         $response = ['status' => 1, 'data' => [], 'msg' => ''];
         $freecourt = [];
+        $prices = [];
+        $arrayResults = [];
 
         $validatedData = Validator::make($request->all(), [
             'day' => 'required|date_format:Y-m-d',
@@ -183,7 +187,6 @@ class CourtsController extends Controller
             $hour = $request->input('hour');
 
             $reserves = Reserve::select('id')
-
                 ->where('reserves.day', $day)
                 ->where('reserves.start_time', $hour)
                 ->pluck('id')
@@ -193,7 +196,17 @@ class CourtsController extends Controller
             $result = array_diff($courts, $reserves);
 
             foreach ($result as $court) {
-                $freecourt[] = Court::find($court);
+                $court = Court::find($court);
+                $court_price = Court_Price::where('court_id', $court->id)->pluck('price_id');
+                $price = Price::where('id', $court_price)->get();
+                $arrayResults['id'] = $court->id;
+                $arrayResults['club_id'] = $court->club_id;
+                $arrayResults['name'] = $court->name;
+                $arrayResults['type'] = $court->type;
+                $arrayResults['prices'] = $price;
+   
+                // $freecourt[] = Court::find($court);
+                $freecourt[] = $arrayResults;
             }
 
             $response['msg'] = 'Pistas libres';
