@@ -168,7 +168,6 @@ class CourtsController extends Controller
     {
         $response = ['status' => 1, 'data' => [], 'msg' => ''];
         $freecourt = [];
-        $prices = [];
         $arrayResults = [];
 
         $validatedData = Validator::make($request->all(), [
@@ -204,8 +203,6 @@ class CourtsController extends Controller
                 $arrayResults['name'] = $court->name;
                 $arrayResults['type'] = $court->type;
                 $arrayResults['prices'] = $price;
-   
-                // $freecourt[] = Court::find($court);
                 $freecourt[] = $arrayResults;
             }
 
