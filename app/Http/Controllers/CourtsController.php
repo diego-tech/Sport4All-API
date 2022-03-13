@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\AuxFunctions;
 use App\Models\Court;
 use App\Models\Court_Price;
 use App\Models\Matchs;
@@ -167,12 +168,13 @@ class CourtsController extends Controller
     public function freeCourts(Request $request)
     {
         $response = ['status' => 1, 'data' => [], 'msg' => ''];
-        $freecourt = [];
+        $freecourts = [];
         $arrayResults = [];
+        $prices = [];
 
         $validatedData = Validator::make($request->all(), [
             'day' => 'required|date_format:Y-m-d',
-            'start_time' => 'required|date_format:H:i:s'
+            'hour' => 'required|date_format:H:i:s'
         ]);
 
         if ($validatedData->fails()) {
@@ -182,6 +184,7 @@ class CourtsController extends Controller
 
             return response()->json($response, 406);
         } else {
+            $club_id = $request->input('club_id');
             $day = $request->input('day');
             $hour = $request->input('hour');
 
@@ -191,23 +194,29 @@ class CourtsController extends Controller
                 ->pluck('id')
                 ->toArray();
 
-            $courts = Court::select('id')->where('club_id', $request->input('club_id'))->pluck('id')->toArray();
-            $result = array_diff($courts, $reserves);
+            $courts = Court::select('id')->where('club_id', $club_id)->pluck('id')->toArray();
 
-            foreach ($result as $court) {
-                $court = Court::find($court);
-                $court_price = Court_Price::where('court_id', $court->id)->pluck('price_id');
-                $price = Price::where('id', $court_price)->get();
+            $freeCourtsId = array_diff($courts, $reserves);
+            foreach ($freeCourtsId as $court) {
+                $court = Court::find($court); 
+                $court_prices = Court_Price::where('court_id', $court->id)->pluck('price_id')->toArray();
+
                 $arrayResults['id'] = $court->id;
                 $arrayResults['club_id'] = $court->club_id;
                 $arrayResults['name'] = $court->name;
                 $arrayResults['type'] = $court->type;
-                $arrayResults['prices'] = $price;
-                $freecourt[] = $arrayResults;
+    
+                foreach ($court_prices as $price) {
+                    $price = Price::find($price);
+                    $finalArray = $price->all();
+                    $arrayResults['prices'] = $finalArray;
+                }
+
+                $freecourts[] = $arrayResults;
             }
 
             $response['msg'] = 'Pistas libres';
-            $response['data'] = $freecourt;
+            $response['data'] = $freecourts;
             return response()->json($response, 200);
         }
     }

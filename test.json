@@ -1,0 +1,50 @@
+{
+    "status": 1,
+    "data": [
+        {
+            "id": 1,
+            "club_id": 2,
+            "name": "Pista de Prueba",
+            "type": "Outdoor",
+            "prices": [
+                {
+                    "id": 1,
+                    "price": 10,
+                    "time": 60,
+                    "created_at": null,
+                    "updated_at": null
+                },
+                {
+                    "id": 2,
+                    "price": 20,
+                    "time": 90,
+                    "created_at": null,
+                    "updated_at": null
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "club_id": 2,
+            "name": "Pista de Prueba 1",
+            "type": "Indoor",
+            "prices": [
+                {
+                    "id": 1,
+                    "price": 10,
+                    "time": 60,
+                    "created_at": null,
+                    "updated_at": null
+                },
+                {
+                    "id": 2,
+                    "price": 20,
+                    "time": 90,
+                    "created_at": null,
+                    "updated_at": null
+                }
+            ]
+        }
+    ],
+    "msg": "Pistas libres"
+}
