@@ -27,6 +27,7 @@ class Event extends Model
         'start_time',
         'end_time',
         'final_time',
+        'img',
     ];
 
     /**

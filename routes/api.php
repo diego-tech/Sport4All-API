@@ -32,6 +32,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
     //Rutas de eventos
 Route::get('/listevents', [AuthController::class, 'listevents'])->middleware('auth:sanctum'); 
 Route::get('/pendingevents',[AuthController::class, 'pending_events'])->middleware('auth:sanctum');
+Route::get('/listfavouritegevents',[AuthController::class, 'list_events_by_favourites'])->middleware('auth:sanctum');
 Route::post('/joinevent', [AuthController::class, 'joinEvent'])->middleware('auth:sanctum');
 Route::get('/endedevents',[AuthController::class, 'ended_events'])->middleware('auth:sanctum');
 
