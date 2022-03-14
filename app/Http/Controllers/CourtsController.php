@@ -168,6 +168,8 @@ class CourtsController extends Controller
     public function freeCourts(Request $request)
     {
         $response = ['status' => 1, 'data' => [], 'msg' => ''];
+        
+        $courtsResults = [];
 
         $validatedData = Validator::make($request->all(), [
             'day' => 'required|date_format:Y-m-d',
@@ -184,23 +186,28 @@ class CourtsController extends Controller
             $club_id = $request->input('club_id');
             $day = $request->input('day');
             $hour = $request->input('hour');
-
+        
             $courts = Court::with('reserves', 'prices')
                 ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
                 ->select('courts.*')
                 ->where('club_id', $club_id)
-                ->where(function ($query) use ($day, $hour) {
-                    $query->where(function ($q) use ($day, $hour) {
-                        $q->where('start_time', '!=', $hour)
-                            ->orWhere('day', '!=', $day);
-                    })
-                    ->orWhereNull('reserves.day');
-                })
-                ->get();
-            
+                ->where('start_time', '<=', $hour)
+                ->where('end_time', '>=', $hour)
+                ->where('day', $day)
+                ->pluck('id')
+                ->toArray();
 
+            $courtsAll = Court::all()->pluck('id')->toArray();
+            $results = array_diff($courtsAll, $courts);
+            
+            foreach ($results as $court) {
+                $court = Court::with('prices')->where('id', $court)->get();
+                $courtsResults[] = $court[0];
+            }
+            
             $response['msg'] = 'Pistas libres';
-            $response['data'] = $courts;
+            $response['data'] = $courtsResults;
+
             return response()->json($response, 200);
         }
     }
