@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClubsController;
 use App\Http\Controllers\Web\EmailVerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,9 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', [ClubsController::class, 'showListClubsWeb'])->name('index');
 
 
 Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verifyEmail'])->name('verification.verify');

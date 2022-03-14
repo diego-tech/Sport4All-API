@@ -23,4 +23,11 @@ class Court extends Model
 
     protected $table="courts";
 
+    public function prices() {
+        return $this->belongsToMany(Price::class, 'court_prices', 'court_id');
+    }
+
+    public function reserves() {
+        return $this->hasMany(Reserve::class);
+    }
 }

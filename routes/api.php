@@ -60,4 +60,4 @@ Route::get('/mostrated', [ClubsController::class, 'most_rated_clubs'])->middlewa
 
 //Lista pistas libres
 
-Route::get('/freecourts',[CourtsController::class, 'freeCourts']);
+Route::get('/freecourts',[CourtsController::class, 'freeCourts'])->middleware('auth:sanctum');

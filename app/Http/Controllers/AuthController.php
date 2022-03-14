@@ -32,7 +32,7 @@ class AuthController extends Controller
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        $fileName = Storage::putFile("profileImages", $request->file('fileName'));
+        $fileName = Storage::putFile("", $request->file('fileName'));
 
         $response['status'] = 1;
         $response['data']['errors'] = "";
