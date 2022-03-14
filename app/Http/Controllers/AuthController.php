@@ -347,7 +347,8 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                ->select('events.*')
+                ->join('clubs','clubs.id','=','events.club_id')
+                ->select('events.*','clubs.name')
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->orderBy('events.final_time','asc')
                 ->get();

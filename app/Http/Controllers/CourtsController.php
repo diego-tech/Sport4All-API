@@ -164,10 +164,12 @@ class CourtsController extends Controller
      */
     public function freeCourts(Request $request)
     {
+        $response = ["status" => 1, "msg" => "", "data" => []];
+        $hours = [60,90,120];
 
         $validatedData = Validator::make($request->all(), [
             'day' => 'required|date_format:Y-m-d',
-            'start_time' => 'required|date_format:H:i:s'
+            'hour' => 'required|date_format:H:i:s'
         ]);
 
         if ($validatedData->fails()) {
@@ -191,7 +193,9 @@ class CourtsController extends Controller
             $result = array_diff($courts, $reserves);
 
             foreach ($result as $court) {
-                $freecourt[] = Court::find($court);
+                $courts = Court::find($court);
+                $freecourt[] = $courts;
+                $price = [$courts->price,$courts->price * 1.5,$courts->price*2];
             }
 
             $response['msg'] = 'Pistas libres';
