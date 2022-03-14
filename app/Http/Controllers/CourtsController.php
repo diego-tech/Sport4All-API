@@ -168,9 +168,6 @@ class CourtsController extends Controller
     public function freeCourts(Request $request)
     {
         $response = ['status' => 1, 'data' => [], 'msg' => ''];
-        $freecourts = [];
-        $arrayResults = [];
-        $prices = [];
 
         $validatedData = Validator::make($request->all(), [
             'day' => 'required|date_format:Y-m-d',
@@ -188,35 +185,22 @@ class CourtsController extends Controller
             $day = $request->input('day');
             $hour = $request->input('hour');
 
-            $reserves = Reserve::select('id')
-                ->where('reserves.day', $day)
-                ->where('reserves.start_time', $hour)
-                ->pluck('id')
-                ->toArray();
-
-            $courts = Court::select('id')->where('club_id', $club_id)->pluck('id')->toArray();
-
-            $freeCourtsId = array_diff($courts, $reserves);
-            foreach ($freeCourtsId as $court) {
-                $court = Court::find($court); 
-                $court_prices = Court_Price::where('court_id', $court->id)->pluck('price_id')->toArray();
-
-                $arrayResults['id'] = $court->id;
-                $arrayResults['club_id'] = $court->club_id;
-                $arrayResults['name'] = $court->name;
-                $arrayResults['type'] = $court->type;
-    
-                foreach ($court_prices as $price) {
-                    $price = Price::find($price);
-                    $finalArray = $price->all();
-                    $arrayResults['prices'] = $finalArray;
-                }
-
-                $freecourts[] = $arrayResults;
-            }
+            $courts = Court::with('reserves', 'prices')
+                ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
+                ->select('courts.*')
+                ->where('club_id', $club_id)
+                ->where(function ($query) use ($day, $hour) {
+                    $query->where(function ($q) use ($day, $hour) {
+                        $q->where('start_time', '!=', $hour)
+                            ->orWhere('day', '!=', $day);
+                    })
+                    ->orWhereNull('reserves.day');
+                })
+                ->get();
+            
 
             $response['msg'] = 'Pistas libres';
-            $response['data'] = $freecourts;
+            $response['data'] = $courts;
             return response()->json($response, 200);
         }
     }
