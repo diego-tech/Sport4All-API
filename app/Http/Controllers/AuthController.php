@@ -627,8 +627,7 @@ class AuthController extends Controller
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
                     ->where(function ($query) {
-                        $query->where('favourites.user_id','=', Auth::id())
-                        ->orWhereNull('favourites.user_id');
+                        $query->where('favourites.user_id','=', Auth::id());
                     })
                     ->where('clubs.name','!=','Admin')
                     ->orderBy('favourites.club_id','desc')
