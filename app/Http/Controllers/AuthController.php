@@ -446,15 +446,16 @@ class AuthController extends Controller
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        $clubName = $request->input('name');
+        $query = $request->input('name');
 
         try {
-            if ($clubName) {
+            if ($query) {
                 $clubs_array = [];
 
                 $finalResults = DB::table('clubs')
                     ->select('clubs.*')
-                    ->where('clubs.name', 'like', '%' . $clubName . '%')
+                    ->where('clubs.name', 'like', '%' . $query . '%')
+                    ->orWhere('clubs.direction', 'like', '%' . $query . '%')
                     ->get();
 
                 foreach ($finalResults as $club) {
