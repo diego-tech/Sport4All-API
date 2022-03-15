@@ -39,14 +39,18 @@ class ClubCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('name');
-        CRUD::column('club_img');
-        CRUD::column('club_banner');
-        CRUD::column('direction');
-        CRUD::column('password');
-        CRUD::column('description');
-        CRUD::column('tlf');
-        CRUD::column('email');
+        $this->addColumns();
+        
+
+        if(backpack_user()->name == 'Admin'){
+        }else{
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
+            $this->crud->removeButton('search');
+            
+        }
+        
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -65,14 +69,15 @@ class ClubCrudController extends CrudController
     {
         CRUD::setValidation(ClubRequest::class);
 
-        CRUD::field('name');
-        CRUD::field('club_img');
-        CRUD::field('club_banner');
-        CRUD::field('direction');
-        CRUD::field('password');
-        CRUD::field('description');
-        CRUD::field('tlf');
-        CRUD::field('email');
+        $this->addFields();
+        
+        if(backpack_user()->name == 'Admin'){
+        }else{
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+            $this->crud->denyAccess('create');
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
+        }
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -90,5 +95,82 @@ class ClubCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+        if(backpack_user()->name == 'Admin'){
+        }else{
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+            $this->crud->denyAccess('create');
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
+        }
+    }
+
+    private function addColumns(){
+        $this->crud->addColumns([
+            [
+                'name' => 'name',
+                'label' => 'Nombre'
+            ],
+            [
+                'name' => 'email',
+                'label' => 'Email',
+            ],
+            [
+                'name' => 'description',
+                'label' => 'Descripción'
+            ],
+            [
+                'name' => 'web',
+                'label' => 'Página web',
+            ],
+            [
+                'name' => 'tlf',
+                'label' => 'Teléfono'
+            ],
+            [
+                'name' => 'club_img',
+                'label' => 'Logo'
+            ],
+            [
+                'name' => 'club_banner',
+                'label' => 'Banner'
+            ]
+        ]);
+    }
+
+    private function addFields(){
+        $this->crud->addFields([
+            [
+                'name' => 'name',
+                'label' => 'Nombre',
+            ],
+            [
+                'name' => 'email',
+                'label' => 'Email',
+            ],
+            [
+                'name' => 'password',
+                'label' => 'Contraseña'
+            ],
+            [
+                'name' => 'description',
+                'label' => 'Descripción'
+            ],
+            [
+                'name' => 'web',
+                'label' => 'Página web',
+            ],
+            [
+                'name' => 'tlf',
+                'label' => 'Teléfono'
+            ],
+            [
+                'name' => 'club_img',
+                'label' => 'Logo'
+            ],
+            [
+                'name' => 'club_banner',
+                'label' => 'Banner'
+            ]
+            ]);
     }
 }

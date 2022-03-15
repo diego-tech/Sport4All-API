@@ -265,6 +265,7 @@ class ClubsController extends Controller
                 'day' => 'required|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
                 'end_time' => 'required|date_format:H:i:s',
+                'img' => 'string|max:255|nullable',
 
             ],
             [
@@ -307,6 +308,7 @@ class ClubsController extends Controller
                     'start_time' => $request->input('start_time'),
                     'end_time' => $request->input('end_time'),
                     'final_time' => $final_time,
+                    'img' => $request->input('img'),
                 ]);
 
                 $response['status'] = 1;
