@@ -350,6 +350,7 @@ class AuthController extends Controller
                 ->join('clubs','clubs.id','=','events.club_id')
                 ->select('events.*','clubs.name')
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->where('clubs.name','!=','Admin')
                 ->orderBy('events.final_time','asc')
                 ->get();
 
@@ -455,6 +456,7 @@ class AuthController extends Controller
 
                 $finalResults = DB::table('clubs')
                     ->select('clubs.*')
+                    ->where('clubs.name','!=','Admin')
                     ->where('clubs.name', 'like', '%' . $query . '%')
                     ->orWhere('clubs.direction', 'like', '%' . $query . '%')
                     ->get();
@@ -486,6 +488,7 @@ class AuthController extends Controller
                 return response()->json($response, 200);
             } else {
                 $response['msg'] = "Introduzca un término a buscar";
+                return response()->json($response);
             }
         } catch (\Exception $e) {
             $response['status'] = 0;
@@ -627,6 +630,7 @@ class AuthController extends Controller
                         $query->where('favourites.user_id','=', Auth::id())
                         ->orWhereNull('favourites.user_id');
                     })
+                    ->where('clubs.name','!=','Admin')
                     ->orderBy('favourites.club_id','desc')
                     ->orderBy('events.final_time','asc')
                     ->get();
