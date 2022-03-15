@@ -47,6 +47,13 @@ class ClubCrudController extends CrudController
         CRUD::column('description');
         CRUD::column('tlf');
         CRUD::column('email');
+        
+
+        if(backpack_user()->name == 'Admin'){
+        }else{
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+        }
+        
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
