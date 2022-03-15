@@ -624,13 +624,12 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                ->select('events.*', 'clubs.name', 'favourites.club_id')
-                ->join('clubs', 'events.club_id', '=', 'clubs.id')
-                ->leftJoin('favourites', 'clubs.id', '=', 'favourites.club_id')
-                ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
-                ->where(function ($query) {
-                    $query->where('favourites.user_id', '=', Auth::id())
-                        ->orWhereNull('favourites.user_id');
+                    ->select('events.*', 'clubs.name', 'favourites.club_id')
+                    ->join('clubs','events.club_id','=','clubs.id')
+                    ->leftJoin('favourites','clubs.id','=','favourites.club_id')
+                    ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
+                    ->where(function ($query) {
+                        $query->where('favourites.user_id','=', Auth::id());
                     })
                     ->where('clubs.name','!=','Admin')
                     ->orderBy('favourites.club_id','desc')
