@@ -20,7 +20,6 @@ class CreateCourtsTable extends Migration
             $table->enum('type',['Indoor','Outdoor']);
             $table->enum('sport',['Tenis','Padel']);
             $table->enum('surfaces',['Hierba','Pista Rápida','Tierra Batida','Moqueta','Cesped']);
-            $table->double('price');
             $table->timestamps();
         });
     }

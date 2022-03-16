@@ -20,7 +20,7 @@ class Court extends Model
         'type',
         'price',
         'sport',
-        'surface',
+        'surfaces',
     ];
 
     protected $table="courts";

@@ -35,7 +35,6 @@ class CourtsController extends Controller
                 'club_id' => 'required|exists:clubs,id',
                 'name' => 'required|string|max:255',
                 'type' => ['required', Rule::in('Indoor', 'Outdoor')],
-                'price' => 'required|numeric',
                 'sport' => ['required', Rule::in('Padel','Tenis')],
                 'surface' => ['required', Rule::in('Hierba','Pista Rápida','Tierra Batida','Moqueta','Cesped')],
             ],
@@ -65,7 +64,7 @@ class CourtsController extends Controller
                     'type' => $request->input('type'),
                     'price' => $request->input('price'),
                     'sport' => $request->input('sport'),
-                    'surface' => $request->input('surface'),
+                    'surfaces' => $request->input('surface'),
                 ]);
 
                 $response['status'] = 1;
@@ -195,9 +194,12 @@ class CourtsController extends Controller
                 ->leftJoin('matchs', 'courts.id', '=', 'matchs.court_id')
                 ->select('courts.*')
                 ->where('club_id', $club_id)
-                ->where('start_time', '<=', $hour)
-                ->where('end_time', '>=', $hour)
-                ->where('day', $day)
+                ->where('reserves.start_time', '<=', $hour)
+                ->where('matchs.start_time', '<=', $hour)
+                ->where('reserves.end_time', '>=', $hour)
+                ->where('matchs.end_time', '>=', $hour)
+                ->where('reserves.day', $day)
+                ->where('matchs.day', $day)
                 ->pluck('id')
                 ->toArray();
 
