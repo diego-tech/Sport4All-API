@@ -62,7 +62,6 @@ class CourtsController extends Controller
                     'club_id' => $request->input('club_id'),
                     'name' => $request->input('name'),
                     'type' => $request->input('type'),
-                    'price' => $request->input('price'),
                     'sport' => $request->input('sport'),
                     'surfaces' => $request->input('surface'),
                 ]);
@@ -189,19 +188,25 @@ class CourtsController extends Controller
             $day = $request->input('day');
             $hour = $request->input('hour');
         
-            $courts = Court::with('reserves', 'prices')
+            $courts1 = Court::with('reserves', 'prices')
                 ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
+                ->select('courts.*')
+                ->where('courts.club_id', $club_id)
+                ->where('start_time', '<=', $hour)
+                ->where('end_time', '>=', $hour)
+                ->where('day', $day);
+            
+            $courts = Court::with('reserves', 'prices')
                 ->leftJoin('matchs', 'courts.id', '=', 'matchs.court_id')
                 ->select('courts.*')
-                ->where('club_id', $club_id)
-                ->where('reserves.start_time', '<=', $hour)
-                ->where('matchs.start_time', '<=', $hour)
-                ->where('reserves.end_time', '>=', $hour)
-                ->where('matchs.end_time', '>=', $hour)
-                ->where('reserves.day', $day)
-                ->where('matchs.day', $day)
+                ->union($courts1)
+                ->where('courts.club_id', $club_id)
+                ->where('start_time', '<=', $hour)
+                ->where('end_time', '>=', $hour)
+                ->where('day', $day)
                 ->pluck('id')
                 ->toArray();
+
 
             $courtsAll = Court::all()->pluck('id')->toArray();
             $results = array_diff($courtsAll, $courts);
