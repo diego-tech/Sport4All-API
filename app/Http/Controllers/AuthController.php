@@ -347,12 +347,18 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                ->join('clubs', 'clubs.id', '=', 'events.club_id')
-                ->select('events.*', 'clubs.name')
-                ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
-                ->where('clubs.name','!=','Admin')
-                ->orderBy('events.final_time','asc')
-                ->get();
+                    ->select('events.*', 'clubs.name', 'favourites.club_id')
+                    ->join('clubs','events.club_id','=','clubs.id')
+                    ->leftJoin('favourites','clubs.id','=','favourites.club_id')
+                    ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
+                    ->where(function ($query) {
+                        $query->where('favourites.user_id','!=', Auth::id())
+                        ->orWhereNull('favourites.user_id');
+                    })
+                    ->where('clubs.name','!=','Admin')
+                    ->orderBy('favourites.club_id','desc')
+                    ->orderBy('events.final_time','asc')
+                    ->get();
 
             $response['status'] = 1;
             $response['data'] = $query;
