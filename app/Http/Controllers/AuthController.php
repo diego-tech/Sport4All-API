@@ -605,9 +605,31 @@ class AuthController extends Controller
         try {
             $query = DB::table('events')
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
-                ->select('events.*')
-                ->where('inscriptions.user_id', Auth::id())
-                ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->join('clubs','events.club_id','=','clubs.id')
+                ->join('courts','clubs.id','=','courts.club_id')
+                ->join('reserves','courts.id','=','reserves.court_id')
+                ->join('matchs','clubs.id','=','matchs.club_id')
+                ->join('match_user','matchs.id','=','match_user.match_id')
+                ->select('events.img', 
+                    'clubs.club_img',
+                    'reserves.QR',
+                    'matchs.QR',
+                    'clubs.name',
+                    'events.name',
+                    'courts.name',
+                    'events.start_time',
+                    'events.end_time',
+                    'events.day',
+                    'matchs.start_time as MatchStart',
+                    'matchs.end_time as MatchEnd',
+                    'reserves.start_time as ReserveStart',
+                    'reserves.end_time as ReserveEnd')
+                ->orWhere('inscriptions.user_id', Auth::id())
+                ->orWhere('match_user.user_id',Auth::id())
+                ->orWhere('reserves.user_id', Auth::id())
+                ->orWhere('events.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->orWhere('matchs.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->orWhere('reserves.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
 
             $response['status'] = 1;
