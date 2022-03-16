@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
@@ -124,7 +124,7 @@
 <body>
     <div class="mainDiv">
         <div class="cardStyle">
-            <form action="" method="post" name="signupForm" id="signupForm">
+            <form action="" method="POST" name="signupForm" id="signupForm">
 
                 <img src="{{url('img/logoapp.png')}}" id="signupLogo" />
 
@@ -148,6 +148,8 @@
                         <span>Continuar</span>
                     </button>
                 </div>
+
+                <div>password: {{ $password ?? ''}} confirmPassword: {{ $confirmPassword ?? ''}}</div>
 
 
             </form>

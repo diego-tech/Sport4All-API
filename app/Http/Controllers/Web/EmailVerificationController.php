@@ -36,14 +36,21 @@ class EmailVerificationController extends Controller
 
         // Route::match(['get', 'post'],'/indexPassword', function (Request $req) {
 
-        //     $password = ($req->input('password'));
-        //     $confirmPassword = ($req->input('confirmPassword'));
-
+        //     if ($req ->isMethod('post')) {
+        //         $password = ($req->input('password'));
+        //         $confirmPassword = ($req->input('confirmPassword'));
+        //     }
+            
         //     print($password);
         //     print($confirmPassword);
+
+        Route::get('/indexPassword', function (Request $req) {
+
+            $password = ($req->input('password'));
+            $confirmPassword = ($req->input('confirmPassword'));
         
-        //     return view('indexPassword', ["indexPassword" => $password->format('bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/')]);
-        // }) -> name("indexPassword");
+            return view('indexPassword', ["indexPassword" => $password->format('bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/')]);
+        }) -> name("indexPassword");
 
         return view('indexPassword');
     }
