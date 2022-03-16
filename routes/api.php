@@ -51,6 +51,8 @@ Route::get('/pendingmatches', [MatchController::class, 'pending_matches'])->midd
 Route::get('/pendingreserves', [CourtsController::class, 'pending_reserves'])->middleware('auth:sanctum');
 Route::get('/endedreserves', [CourtsController::class, 'ended_reserves'])->middleware('auth:sanctum');
 
+//QR
+Route::get('/qrvalidation', [CourtsController::class, 'qr_validator'])->middleware('auth:sanctum');
 
 
 // Rutas Clubes

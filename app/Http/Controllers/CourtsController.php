@@ -272,4 +272,40 @@ class CourtsController extends Controller
             return response()->json($response, 406);
         }
     }
+
+    public function qr_validator(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try{
+            $queryM = Matchs::join('match_user','matchs.id','=','match_user.match_id')
+                    ->where('QR',$request->input('qr'))
+                    ->where('match_user.user_id', Auth::id());
+            $testM = $queryM->get();
+
+            $queryR = Reserve::where('QR',$request->input('qr'))->where('user_id',Auth::id());
+
+            $testR = $queryR->get();
+            if(!$testM->isEmpty()){
+                $matchQRvalidated = $queryM->where('start_Datetime','<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                if(!$matchQRvalidated->isEmpty()){
+                    $response['msg'] = 'Puerta abierta';
+                    return response()->json($response,200);
+                }
+            }elseif(!$testR->isEmpty()){
+                $reserveQRvalidated = $queryR->where('start_Datetime','<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                if(!$reserveQRvalidated->isEmpty()){
+                    $response['msg'] = 'Puerta abierta';
+                    return response()->json($response,200);
+                }
+            }
+
+            $response['msg'] = 'Horario incorrecto puerta cerrada';
+            return response()->json($response, 403);
+        }catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
 }
