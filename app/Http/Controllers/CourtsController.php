@@ -36,6 +36,8 @@ class CourtsController extends Controller
                 'name' => 'required|string|max:255',
                 'type' => ['required', Rule::in('Indoor', 'Outdoor')],
                 'price' => 'required|numeric',
+                'sport' => ['required', Rule::in('Padel','Tenis')],
+                'surface' => ['required', Rule::in('Hierba','Pista Rápida','Tierra Batida','Moqueta','Cesped')],
             ],
             [
                 'name.required' => 'Introduce nombre de la pista',
@@ -62,6 +64,8 @@ class CourtsController extends Controller
                     'name' => $request->input('name'),
                     'type' => $request->input('type'),
                     'price' => $request->input('price'),
+                    'sport' => $request->input('sport'),
+                    'surface' => $request->input('surface'),
                 ]);
 
                 $response['status'] = 1;
@@ -157,7 +161,6 @@ class CourtsController extends Controller
             }
         }
     }
-
 
     /**
      * Obtener pistas libres

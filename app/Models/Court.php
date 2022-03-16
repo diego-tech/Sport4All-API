@@ -19,6 +19,8 @@ class Court extends Model
         'club_id',
         'type',
         'price',
+        'sport',
+        'surface',
     ];
 
     protected $table="courts";
