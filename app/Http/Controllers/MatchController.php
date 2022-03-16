@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Helpers\AuxFunctions;
 use App\Models\Matchs;
 use App\Models\MatchUser;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -213,6 +214,32 @@ class MatchController extends Controller
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Partidos finalizados';
+
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    public function pending_matches(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try {
+            $query = DB::table('matchs')
+                ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
+                ->joins('clubs','matchs.club_id','=','clubs.id')
+                ->select('matchs.*','clubs.name','clubs.direction')
+                ->where('match_user.user_id', Auth::id())
+                ->where('matchs.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->get();
+
+            $response['status'] = 1;
+            $response['data'] = $query;
+            $response['msg'] = 'Eventos pendientes';
 
 
             return response()->json($response, 200);

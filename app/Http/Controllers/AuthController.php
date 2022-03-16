@@ -347,7 +347,7 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->select('events.*', 'clubs.name', 'favourites.club_id')
+                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id', 'clubs.direction as clubLocation')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
@@ -605,7 +605,8 @@ class AuthController extends Controller
         try {
             $query = DB::table('events')
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
-                ->select('events.*')
+                ->joins('clubs','events.club_id','=','clubs.id')
+                ->select('events.*','clubs.name','clubs.direction')
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
@@ -630,7 +631,7 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->select('events.*', 'clubs.name', 'favourites.club_id')
+            ->select('events.*', 'clubs.name as clubName', 'favourites.club_id', 'clubs.direction as clubLocation')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
