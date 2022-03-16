@@ -347,8 +347,8 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                ->join('clubs','clubs.id','=','events.club_id')
-                ->select('events.*','clubs.name')
+                ->join('clubs', 'clubs.id', '=', 'events.club_id')
+                ->select('events.*', 'clubs.name')
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->where('clubs.name','!=','Admin')
                 ->orderBy('events.final_time','asc')
@@ -438,6 +438,7 @@ class AuthController extends Controller
             return response()->json($response, 406);
         }
     }
+
     /**
      * Buscar Clubs por Nombre
      * 
@@ -582,7 +583,6 @@ class AuthController extends Controller
             $response['data'] = $query;
             $response['msg'] = 'Eventos finalizados';
 
-
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
@@ -592,7 +592,8 @@ class AuthController extends Controller
         }
     }
 
-    public function pending_events(Request $request){
+    public function pending_events(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
@@ -617,7 +618,8 @@ class AuthController extends Controller
         }
     }
 
-    public function list_events_by_favourites(Request $request){
+    public function list_events_by_favourites(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
@@ -638,7 +640,6 @@ class AuthController extends Controller
             $response['data'] = $query;
             $response['msg'] = 'Eventos pendientes';
 
-
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
@@ -646,6 +647,5 @@ class AuthController extends Controller
 
             return response()->json($response, 406);
         }
-
     }
 }
