@@ -35,7 +35,8 @@ class CourtsController extends Controller
                 'club_id' => 'required|exists:clubs,id',
                 'name' => 'required|string|max:255',
                 'type' => ['required', Rule::in('Indoor', 'Outdoor')],
-                'price' => 'required|numeric',
+                'sport' => ['required', Rule::in('Padel','Tenis')],
+                'surface' => ['required', Rule::in('Hierba','Pista Rápida','Tierra Batida','Moqueta','Cesped')],
             ],
             [
                 'name.required' => 'Introduce nombre de la pista',
@@ -61,7 +62,8 @@ class CourtsController extends Controller
                     'club_id' => $request->input('club_id'),
                     'name' => $request->input('name'),
                     'type' => $request->input('type'),
-                    'price' => $request->input('price'),
+                    'sport' => $request->input('sport'),
+                    'surfaces' => $request->input('surface'),
                 ]);
 
                 $response['status'] = 1;
@@ -158,7 +160,6 @@ class CourtsController extends Controller
         }
     }
 
-
     /**
      * Obtener pistas libres
      * 
@@ -187,15 +188,25 @@ class CourtsController extends Controller
             $day = $request->input('day');
             $hour = $request->input('hour');
         
-            $courts = Court::with('reserves', 'prices')
+            $courts1 = Court::with('reserves', 'prices')
                 ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
                 ->select('courts.*')
-                ->where('club_id', $club_id)
+                ->where('courts.club_id', $club_id)
+                ->where('start_time', '<=', $hour)
+                ->where('end_time', '>=', $hour)
+                ->where('day', $day);
+            
+            $courts = Court::with('reserves', 'prices')
+                ->leftJoin('matchs', 'courts.id', '=', 'matchs.court_id')
+                ->select('courts.*')
+                ->union($courts1)
+                ->where('courts.club_id', $club_id)
                 ->where('start_time', '<=', $hour)
                 ->where('end_time', '>=', $hour)
                 ->where('day', $day)
                 ->pluck('id')
                 ->toArray();
+
 
             $courtsAll = Court::all()->pluck('id')->toArray();
             $results = array_diff($courtsAll, $courts);
