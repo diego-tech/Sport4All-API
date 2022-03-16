@@ -211,4 +211,54 @@ class CourtsController extends Controller
             return response()->json($response, 200);
         }
     }
+
+    public function pending_reserves(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try {
+            $query = DB::table('reserves')
+                ->join('courts','reserves.court_id','=','courts.id')
+                ->join('clubs','courts.club_id','=','clubs.id')
+                ->select('reserves.*','clubs.name as clubName','clubs.direction as clubLocation','courts.name','courts.type','courts.sport','courts.surfaces')
+                ->where('reserves.user_id', Auth::id())
+                ->where('reserves.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->get();
+
+            $response['status'] = 1;
+            $response['data'] = $query;
+            $response['msg'] = 'Reservas pendientes';
+
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    public function ended_reserves(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try {
+            $query = DB::table('reserves')
+                ->select('reserves.*')
+                ->where('reserves.user_id', Auth::id())
+                ->where('matchs.final_time', '<', now())
+                ->get();
+
+            $response['status'] = 1;
+            $response['data'] = $query;
+            $response['msg'] = 'Reservas finalizadas';
+
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
 }

@@ -266,7 +266,7 @@ class ClubsController extends Controller
                 'start_time' => 'required|date_format:H:i:s',
                 'end_time' => 'required|date_format:H:i:s',
                 'img' => 'string|max:255|nullable',
-
+                'description' => 'required|string|max:255',
             ],
             [
                 'name.required' => 'Introduzca un nombre para el evento',
@@ -285,6 +285,7 @@ class ClubsController extends Controller
                 'start_time.date_format' => 'Introduce el formato de la fecha de esta manera: H:i:s',
                 'end_time.required' => 'Introduce fecha a la que acaba el partido',
                 'end_time.date_format' => 'Introduce el formato de la fecha de esta manera: H:i:s',
+                'description.required' => 'Introduzca una Descripción para el Evento'
             ]
         );
 
@@ -309,6 +310,7 @@ class ClubsController extends Controller
                     'end_time' => $request->input('end_time'),
                     'final_time' => $final_time,
                     'img' => $request->input('img'),
+                    'description' => $request->input('description')
                 ]);
 
                 $response['status'] = 1;

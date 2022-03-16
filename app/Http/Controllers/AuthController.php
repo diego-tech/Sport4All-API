@@ -598,14 +598,15 @@ class AuthController extends Controller
         }
     }
 
-    public function pending_events(Request $request)
+    public function pending_events()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
             $query = DB::table('events')
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
-                ->select('events.*')
+                ->join('clubs','events.club_id','=','clubs.id')
+                ->select('events.*', 'events.img as eventImg', 'events.name as eventName', 'clubs.name','clubs.direction')
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();

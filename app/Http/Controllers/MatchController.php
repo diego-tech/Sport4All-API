@@ -94,6 +94,9 @@ class MatchController extends Controller
     public function seeMatches(Request $request)
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
+
+        $matchs = [];
+
         try {
             $arra =Matchs::with('users')->where('day',$request->input('day'))
                         ->orderBy('start_time','asc')
@@ -213,6 +216,33 @@ class MatchController extends Controller
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Partidos finalizados';
+
+
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    public function pending_matches(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try {
+            $query = DB::table('matchs')
+                ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
+                ->join('clubs','matchs.club_id','=','clubs.id')
+                ->join('courts','matchs.court_id','=','courts.id')
+                ->select('matchs.*','clubs.name as clubName','clubs.direction as clubLocation','courts.name','courts.type','courts.sport','courts.surfaces')
+                ->where('match_user.user_id', Auth::id())
+                ->where('matchs.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->get();
+
+            $response['status'] = 1;
+            $response['data'] = $query;
+            $response['msg'] = 'Partidos pendientes';
 
 
             return response()->json($response, 200);
