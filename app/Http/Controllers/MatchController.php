@@ -240,7 +240,7 @@ class MatchController extends Controller
 
             $response['status'] = 1;
             $response['data'] = $query;
-            $response['msg'] = 'Eventos pendientes';
+            $response['msg'] = 'Partidos pendientes';
 
 
             return response()->json($response, 200);

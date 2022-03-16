@@ -47,6 +47,9 @@ Route::post('/matchinscription', [MatchController::class, 'matchInscription'])->
 Route::post('/courtreserve', [CourtsController::class, 'CourtReserve'])->middleware('auth:sanctum');
 Route::get('/endedmatches', [MatchController::class, 'ended_matches'])->middleware('auth:sanctum');
 Route::get('/seematches', [MatchController::class, 'seeMatches'])->middleware('auth:sanctum');
+Route::get('/pendingmatches', [MatchController::class, 'pending_matches'])->middleware('auth:sanctum');
+Route::get('/pendingreserves', [CourtsController::class, 'pending_reserves'])->middleware('auth:sanctum');
+Route::get('/endedreserves', [CourtsController::class, 'ended_reserves'])->middleware('auth:sanctum');
 
 
 
