@@ -18,6 +18,8 @@ class CreateCourtsTable extends Migration
             $table->foreignId('club_id')->constrained()->nullable();
             $table->string('name');
             $table->enum('type',['Indoor','Outdoor']);
+            $table->enum('sport',['Tenis','Padel']);
+            $table->enum('surfaces',['Hierba','Pista Rápida','Tierra Batida','Moqueta','Cesped']);
             $table->double('price');
             $table->timestamps();
         });

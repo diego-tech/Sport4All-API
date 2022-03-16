@@ -18,6 +18,8 @@ class CreateClubsTable extends Migration
             $table->string('name')->unique();
             $table->string('password');
             $table->text('description')->nullable();
+            $table->time('first_hour')->nullable();
+            $table->time('last_hour')->nullable();
             $table->string('web')->nullable();
             $table->string('club_img')->nullable();
             $table->string('club_banner')->nullable();
