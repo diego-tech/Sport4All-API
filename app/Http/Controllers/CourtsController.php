@@ -192,6 +192,7 @@ class CourtsController extends Controller
         
             $courts = Court::with('reserves', 'prices')
                 ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
+                ->leftJoin('matchs', 'courts.id', '=', 'matchs.court_id')
                 ->select('courts.*')
                 ->where('club_id', $club_id)
                 ->where('start_time', '<=', $hour)
