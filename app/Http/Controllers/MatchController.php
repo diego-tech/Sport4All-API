@@ -232,7 +232,8 @@ class MatchController extends Controller
             $query = DB::table('matchs')
                 ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
                 ->joins('clubs','matchs.club_id','=','clubs.id')
-                ->select('matchs.*','clubs.name','clubs.direction')
+                ->join('courts','matchs.court_id','=','courts.id')
+                ->select('matchs.*','clubs.name as clubName','clubs.direction as clubLocation','courts.name','courts.type','courts.sport','courts.surface')
                 ->where('match_user.user_id', Auth::id())
                 ->where('matchs.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
