@@ -347,7 +347,7 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id', 'clubs.direction as clubLocation')
+                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
@@ -598,15 +598,15 @@ class AuthController extends Controller
         }
     }
 
-    public function pending_events(Request $request)
+    public function pending_events()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
             $query = DB::table('events')
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
-                ->joins('clubs','events.club_id','=','clubs.id')
-                ->select('events.*','clubs.name','clubs.direction')
+                ->join('clubs','events.club_id','=','clubs.id')
+                ->select('events.*', 'events.img as eventImg', 'events.name as eventName', 'clubs.name','clubs.direction')
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
@@ -631,7 +631,7 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-            ->select('events.*', 'clubs.name as clubName', 'favourites.club_id', 'clubs.direction as clubLocation')
+                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))

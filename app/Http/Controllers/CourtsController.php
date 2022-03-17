@@ -35,8 +35,8 @@ class CourtsController extends Controller
                 'club_id' => 'required|exists:clubs,id',
                 'name' => 'required|string|max:255',
                 'type' => ['required', Rule::in('Indoor', 'Outdoor')],
-                'sport' => ['required', Rule::in('Padel','Tenis')],
-                'surface' => ['required', Rule::in('Hierba','Pista Rápida','Tierra Batida','Moqueta','Cesped')],
+                'sport' => ['required', Rule::in('Padel', 'Tenis')],
+                'surface' => ['required', Rule::in('Hierba', 'Pista Rápida', 'Tierra Batida', 'Moqueta', 'Cesped')],
             ],
             [
                 'name.required' => 'Introduce nombre de la pista',
@@ -169,7 +169,7 @@ class CourtsController extends Controller
     public function freeCourts(Request $request)
     {
         $response = ['status' => 1, 'data' => [], 'msg' => ''];
-        
+
         $courtsResults = [];
 
         $validatedData = Validator::make($request->all(), [
@@ -187,7 +187,7 @@ class CourtsController extends Controller
             $club_id = $request->input('club_id');
             $day = $request->input('day');
             $hour = $request->input('hour');
-        
+
             $courts1 = Court::with('reserves', 'prices')
                 ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
                 ->select('courts.*')
@@ -195,7 +195,7 @@ class CourtsController extends Controller
                 ->where('start_time', '<=', $hour)
                 ->where('end_time', '>=', $hour)
                 ->where('day', $day);
-            
+
             $courts = Court::with('reserves', 'prices')
                 ->leftJoin('matchs', 'courts.id', '=', 'matchs.court_id')
                 ->select('courts.*')
@@ -210,12 +210,12 @@ class CourtsController extends Controller
 
             $courtsAll = Court::all()->pluck('id')->toArray();
             $results = array_diff($courtsAll, $courts);
-            
+
             foreach ($results as $court) {
                 $court = Court::with('prices')->where('id', $court)->get();
                 $courtsResults[] = $court[0];
             }
-            
+
             $response['msg'] = 'Pistas libres';
             $response['data'] = $courtsResults;
 
@@ -223,14 +223,15 @@ class CourtsController extends Controller
         }
     }
 
-    public function pending_reserves(Request $request){
+    public function pending_reserves(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
             $query = DB::table('reserves')
-                ->join('courts','reserves.court_id','=','courts.id')
-                ->joins('clubs','courts.club_id','=','clubs.id')
-                ->select('reserves.*','clubs.name as clubName','clubs.direction as clubLocation','courts.name','courts.type','courts.sport','courts.surface')
+                ->join('courts', 'reserves.court_id', '=', 'courts.id')
+                ->join('clubs', 'courts.club_id', '=', 'clubs.id')
+                ->select('reserves.*', 'clubs.name as clubName', 'clubs.direction as clubLocation', 'courts.name', 'courts.type', 'courts.sport', 'courts.surfaces')
                 ->where('reserves.user_id', Auth::id())
                 ->where('reserves.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
@@ -249,7 +250,8 @@ class CourtsController extends Controller
         }
     }
 
-    public function ended_reserves(Request $request){
+    public function ended_reserves(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
@@ -273,35 +275,36 @@ class CourtsController extends Controller
         }
     }
 
-    public function qr_validator(Request $request){
+    public function qr_validator(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        try{
-            $queryM = Matchs::join('match_user','matchs.id','=','match_user.match_id')
-                    ->where('QR',$request->input('qr'))
-                    ->where('match_user.user_id', Auth::id());
+        try {
+            $queryM = Matchs::join('match_user', 'matchs.id', '=', 'match_user.match_id')
+                ->where('QR', $request->input('qr'))
+                ->where('match_user.user_id', Auth::id());
             $testM = $queryM->get();
 
-            $queryR = Reserve::where('QR',$request->input('qr'))->where('user_id',Auth::id());
+            $queryR = Reserve::where('QR', $request->input('qr'))->where('user_id', Auth::id());
 
             $testR = $queryR->get();
-            if(!$testM->isEmpty()){
-                $matchQRvalidated = $queryM->where('start_Datetime','<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
-                if(!$matchQRvalidated->isEmpty()){
+            if (!$testM->isEmpty()) {
+                $matchQRvalidated = $queryM->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                if (!$matchQRvalidated->isEmpty()) {
                     $response['msg'] = 'Puerta abierta';
-                    return response()->json($response,200);
+                    return response()->json($response, 200);
                 }
-            }elseif(!$testR->isEmpty()){
-                $reserveQRvalidated = $queryR->where('start_Datetime','<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
-                if(!$reserveQRvalidated->isEmpty()){
+            } elseif (!$testR->isEmpty()) {
+                $reserveQRvalidated = $queryR->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                if (!$reserveQRvalidated->isEmpty()) {
                     $response['msg'] = 'Puerta abierta';
-                    return response()->json($response,200);
+                    return response()->json($response, 200);
                 }
             }
 
             $response['msg'] = 'Horario incorrecto puerta cerrada';
             return response()->json($response, 403);
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             $response['status'] = 0;
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 

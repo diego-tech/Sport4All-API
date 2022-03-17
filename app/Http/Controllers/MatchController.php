@@ -95,6 +95,9 @@ class MatchController extends Controller
     public function seeMatches(Request $request)
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
+
+        $matchs = [];
+
         try {
             $arra =Matchs::with('users')->where('day',$request->input('day'))
                         ->orderBy('start_time','asc')
@@ -231,9 +234,9 @@ class MatchController extends Controller
         try {
             $query = DB::table('matchs')
                 ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
-                ->joins('clubs','matchs.club_id','=','clubs.id')
+                ->join('clubs','matchs.club_id','=','clubs.id')
                 ->join('courts','matchs.court_id','=','courts.id')
-                ->select('matchs.*','clubs.name as clubName','clubs.direction as clubLocation','courts.name','courts.type','courts.sport','courts.surface')
+                ->select('matchs.*','clubs.name as clubName','clubs.direction as clubLocation','courts.name','courts.type','courts.sport','courts.surfaces')
                 ->where('match_user.user_id', Auth::id())
                 ->where('matchs.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
