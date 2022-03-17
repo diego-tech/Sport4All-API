@@ -347,9 +347,15 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
+                    ->select(
+                        'events.*',
+                        'clubs.name as clubName',
+                        'favourites.club_id',
+                        'clubs.direction as clubLocation',
+                        'clubs.id as club_id'
+                    )
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
                     ->where(function ($query) {
                         $query->where('favourites.user_id','!=', Auth::id())
@@ -625,15 +631,21 @@ class AuthController extends Controller
         }
     }
 
-    public function list_events_by_favourites(Request $request)
+    public function list_events_by_favourites()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
             $query = DB::table('events')
-                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
+                    ->select(
+                        'events.*',
+                        'clubs.name as clubName',
+                        'favourites.club_id',
+                        'clubs.direction as clubLocation',
+                        'clubs.id as club_id'
+                    )
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
                     ->where(function ($query) {
                         $query->where('favourites.user_id','=', Auth::id());
