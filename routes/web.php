@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClubsController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\Web\EmailVerificationController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,4 +21,4 @@ Route::get('/', [ClubsController::class, 'showListClubsWeb'])->name('index');
 
 Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verifyEmail'])->name('verification.verify');
 
-Route::match(['get', 'post'], '/modifyPassword', [EmailVerificationController::class, 'webModifyPass'])->name('indexPassword');
+Route::match(['get', 'post'], '/modifyPassword', [ResetPasswordController::class, 'webModifyPass'])->name('indexPassword');
