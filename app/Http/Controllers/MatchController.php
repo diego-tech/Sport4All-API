@@ -113,17 +113,17 @@ class MatchController extends Controller
             $currentTime = null;
            for($i=0; $i < sizeof($arra); $i++){
                if($currentTime == $arra[$i]->start_time){
-                   $matchs[$currentTime][] = $arra[$i];
+                   $matchs['hour'][$arra[$i]->start_time][] = $arra[$i];
                }else{
                    $currentTime = $arra[$i]->start_time;
-                   $matchs[$currentTime][] = $arra[$i];
+                   $matchs['hour'][$arra[$i]->start_time][] = $arra[$i];
                }
             }
 
             // Imágenes de los usuarior inscritos
             // Array dentro de array que muestre el día y la hora del partido
 
-            $response['data'] = $matchs;
+            $response['data'] = array($matchs);
             $response['msg'] = "Partidos";
             return response()->json($response, 200);
         } catch (\Exception $e) {
