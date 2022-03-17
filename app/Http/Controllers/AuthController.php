@@ -573,12 +573,12 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function ended_events(Request $request)
+    public function ended_events()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = DB::table('events')
+            $query = Event::query()
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
                 ->select('events.*')
                 ->where('inscriptions.user_id', Auth::id())
@@ -603,7 +603,7 @@ class AuthController extends Controller
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = DB::table('events')
+            $query = Event::query()
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
                 ->join('clubs','events.club_id','=','clubs.id')
                 ->select('events.*', 'events.img as eventImg', 'events.name as eventName', 'clubs.name','clubs.direction')

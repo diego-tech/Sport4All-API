@@ -223,15 +223,23 @@ class CourtsController extends Controller
         }
     }
 
-    public function pending_reserves(Request $request)
+    public function pending_reserves()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        try {
-            $query = DB::table('reserves')
+        try {   
+            $query = Reserve::query()
                 ->join('courts', 'reserves.court_id', '=', 'courts.id')
                 ->join('clubs', 'courts.club_id', '=', 'clubs.id')
-                ->select('reserves.*', 'clubs.name as clubName', 'clubs.direction as clubLocation', 'courts.name', 'courts.type', 'courts.sport', 'courts.surfaces')
+                ->select(
+                    'reserves.*', 
+                    'clubs.name as clubName', 
+                    'clubs.direction as clubLocation', 
+                    'courts.name', 
+                    'courts.type', 
+                    'courts.sport', 
+                    'courts.surfaces'
+                )
                 ->where('reserves.user_id', Auth::id())
                 ->where('reserves.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
@@ -239,8 +247,6 @@ class CourtsController extends Controller
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Reservas pendientes';
-
-
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
@@ -250,12 +256,12 @@ class CourtsController extends Controller
         }
     }
 
-    public function ended_reserves(Request $request)
+    public function ended_reserves()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = DB::table('reserves')
+            $query = Reserve::query()
                 ->select('reserves.*')
                 ->where('reserves.user_id', Auth::id())
                 ->where('matchs.final_time', '<', now())
