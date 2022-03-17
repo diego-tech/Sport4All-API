@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Helpers\AuxFunctions;
 use App\Models\Matchs;
 use App\Models\MatchUser;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -99,31 +100,41 @@ class MatchController extends Controller
         $matchs = [];
 
         try {
-            $arra =Matchs::with('users')->where('day',$request->input('day'))
-                        ->orderBy('start_time','asc')
-                        ->get();
-            
-           /*$Matchs = DB::table('matchs')
-                        ->groupBy('matchs.start_time')
-                        ->join('match_user','match_user.match_id','matchs.id')
-                        ->join('users','users.id','match_user.user_id')
-                        ->select('matchs.*','users.image')
-                        //->orWhere('day', $request->input('day'))
-                        ->get();*/
-            $currentTime = null;
-           for($i=0; $i < sizeof($arra); $i++){
-               if($currentTime == $arra[$i]->start_time){
-                   $matchs[$currentTime][] = $arra[$i];
-               }else{
-                   $currentTime = $arra[$i]->start_time;
-                   $matchs[$currentTime][] = $arra[$i];
-               }
-            }
+            $arra = Matchs::with('users')->where('day', $request->input('day'))
+                ->get();
+
+            $grouped = $arra->groupBy('start_time')
+                ->map(function ($items, $startTime) {
+                    return [
+                        'start_time' => $startTime,
+                        'items' => $items
+                    ];
+                });
+
+            // return $grouped->values();
+            // // dd($arra);
+
+            // /*$Matchs = DB::table('matchs')
+            //             ->groupBy('matchs.start_time')
+            //             ->join('match_user','match_user.match_id','matchs.id')
+            //             ->join('users','users.id','match_user.user_id')
+            //             ->select('matchs.*','users.image')
+            //             //->orWhere('day', $request->input('day'))
+            //             ->get();*/
+            // $currentTime = null;
+            // for ($i = 0; $i < sizeof($arra); $i++) {
+            //     if ($currentTime == $arra[$i]->start_time) {
+            //         $matchs[$currentTime][] = $arra[$i];
+            //     } else {
+            //         $currentTime = $arra[$i]->start_time;
+            //         $matchs[$currentTime][] = $arra[$i];
+            //     }
+            // }
 
             // Imágenes de los usuarior inscritos
             // Array dentro de array que muestre el día y la hora del partido
 
-            $response['data'] = $matchs;
+            $response['data'] = $grouped->values();
             $response['msg'] = "Partidos";
             return response()->json($response, 200);
         } catch (\Exception $e) {
@@ -228,18 +239,19 @@ class MatchController extends Controller
         }
     }
 
-    public function pending_matches(){
+    public function pending_matches()
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
             $query = Matchs::query()
                 ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
-                ->join('clubs','matchs.club_id','=','clubs.id')
-                ->join('courts','matchs.court_id','=','courts.id')
+                ->join('clubs', 'matchs.club_id', '=', 'clubs.id')
+                ->join('courts', 'matchs.court_id', '=', 'courts.id')
                 ->select(
-                    'matchs.*', 
+                    'matchs.*',
                     'clubs.name as clubName',
-                    'clubs.direction as clubLocation', 
+                    'clubs.direction as clubLocation',
                     'clubs.club_img as clubImg',
                     'courts.name',
                     'courts.type',
