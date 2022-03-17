@@ -52,4 +52,33 @@ class Club extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function setClubImgAttribute($value)
+    {
+        $attribute_name = "club_img";
+        $disk = "public";
+        $destination_path = "";
+
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
+
+    // return $this->attributes[{$attribute_name}]; // uncomment if this is a translatable field
+    }
+
+    public function setClubBannerAttribute($value)
+    {
+        $attribute_name = "club_banner";
+        $disk = "public";
+        $destination_path = "";
+
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
+
+    // return $this->attributes[{$attribute_name}]; // uncomment if this is a translatable field
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting(function($obj) {
+            \Storage::disk('public_folder')->delete($obj->image);
+        });
+    }
 }
