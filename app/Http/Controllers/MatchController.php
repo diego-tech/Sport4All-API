@@ -236,7 +236,16 @@ class MatchController extends Controller
                 ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
                 ->join('clubs','matchs.club_id','=','clubs.id')
                 ->join('courts','matchs.court_id','=','courts.id')
-                ->select('matchs.*','clubs.name as clubName','clubs.direction as clubLocation','courts.name','courts.type','courts.sport','courts.surfaces')
+                ->select(
+                    'matchs.*', 
+                    'clubs.name as clubName',
+                    'clubs.direction as clubLocation', 
+                    'clubs.club_img as clubImg',
+                    'courts.name',
+                    'courts.type',
+                    'courts.sport',
+                    'courts.surfaces'
+                )
                 ->where('match_user.user_id', Auth::id())
                 ->where('matchs.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
