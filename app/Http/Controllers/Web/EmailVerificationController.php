@@ -8,6 +8,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 
 class EmailVerificationController extends Controller
 {
@@ -32,26 +33,51 @@ class EmailVerificationController extends Controller
         return redirect('/');
     }
 
-    public function webModifyPass(Request $request) {
+    public function webModifyPass(Request $req) {
 
-        // Route::match(['get', 'post'],'/indexPassword', function (Request $req) {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        //     if ($req ->isMethod('post')) {
-        //         $password = ($req->input('password'));
-        //         $confirmPassword = ($req->input('confirmPassword'));
-        //     }
-            
-        //     print($password);
-        //     print($confirmPassword);
+        $password = ($req->input('password'));
+        $confirmPassword = ($req->input('confirmPassword'));
 
-        Route::get('/indexPassword', function (Request $req) {
+        $validatedData = Validator::make(
+            $req->all(),
+            [
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
+                'confirmPassword' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
+            ]);
 
-            $password = ($req->input('password'));
-            $confirmPassword = ($req->input('confirmPassword'));
-        
-            return view('indexPassword', ["indexPassword" => $password->format('bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/')]);
-        }) -> name("indexPassword");
+            if ($validatedData->fails()) {
+                $response['status'] = 0;
+                $response['data']['errors'] = $validatedData->errors()->first();
+                $response['msg'] = 'Contraseña No Válida';
+    
+                return response()->json($response, 406);
+            } else {
+                try {
 
-        return view('indexPassword');
+                    if($password != $confirmPassword) {
+
+                        $response['status'] = 0;
+                        $response['data']['errors'] = $validatedData->errors()->first();
+                        $response['msg'] = 'Las contraseñas no coinciden';
+
+                    } else {
+
+                        $password = "OK";
+
+                    }
+
+
+                } catch (\Exception $e) {
+                    $response['status'] = 0;
+                    $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+    
+                    return response()->json($response, 406);
+                }
+
+            }
+    
+        return view('indexPassword', ["password" => $password, "confirmPassword" => $confirmPassword]);
     }
 }

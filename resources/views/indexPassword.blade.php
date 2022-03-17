@@ -17,6 +17,11 @@
             color: #4D648D;
         }
 
+        p {
+            color: #4D648D;
+            text-align: center;
+        }
+
         .mainDiv {
             display: flex;
             min-height: 100%;
@@ -124,7 +129,9 @@
 <body>
     <div class="mainDiv">
         <div class="cardStyle">
-            <form action="" method="POST" name="signupForm" id="signupForm">
+            <form action="" method="GET" name="signupForm" id="signupForm">
+
+                @csrf
 
                 <img src="{{url('img/logoapp.png')}}" id="signupLogo" />
 
@@ -149,7 +156,12 @@
                     </button>
                 </div>
 
+                @if($password != $confirmPassword)
+                <p>Las contraseñas deben coincidir.</p>
+                @endif
+
                 <div>password: {{ $password ?? ''}} confirmPassword: {{ $confirmPassword ?? ''}}</div>
+                
 
 
             </form>
