@@ -27,9 +27,13 @@ class Matchs extends Model
         'start_Datetime',
     ];
 
+    protected $appends = ['pending_type'];
+
     public function users(){
         return $this->belongsToMany(User::class,'match_user','match_id');
     }
 
-
+    public function getPendingTypeAttribute() {
+        return 'match';
+    }
 }

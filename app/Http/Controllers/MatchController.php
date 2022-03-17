@@ -202,12 +202,12 @@ class MatchController extends Controller
      * @return response()->json($response)
      * 
      */
-    public function ended_matches(Request $request)
+    public function ended_matches()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = DB::table('matchs')
+            $query = Matchs::query()
                 ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
                 ->select('matchs.*')
                 ->where('match_user.user_id', Auth::id())
@@ -228,11 +228,11 @@ class MatchController extends Controller
         }
     }
 
-    public function pending_matches(Request $request){
+    public function pending_matches(){
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = DB::table('matchs')
+            $query = Matchs::query()
                 ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
                 ->join('clubs','matchs.club_id','=','clubs.id')
                 ->join('courts','matchs.court_id','=','courts.id')
