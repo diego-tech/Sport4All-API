@@ -37,12 +37,14 @@ class EmailVerificationController extends Controller
 
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
+        $token = $_GET["_token"];
         $password = ($req->input('password'));
         $confirmPassword = ($req->input('confirmPassword'));
 
         $validatedData = Validator::make(
             $req->all(),
             [
+                '_token' => 'required',
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'confirmPassword' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
             ]);
@@ -64,7 +66,7 @@ class EmailVerificationController extends Controller
 
                     } else {
 
-                        $password = "OK";
+                        $password = $token;
 
                     }
 

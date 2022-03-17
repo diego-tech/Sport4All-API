@@ -20,4 +20,4 @@ Route::get('/', [ClubsController::class, 'showListClubsWeb'])->name('index');
 
 Route::get('verify-email/{id}/{hash}', [EmailVerificationController::class, 'verifyEmail'])->name('verification.verify');
 
-Route::get('/modifyPassword', [EmailVerificationController::class, 'webModifyPass'])->name('indexPassword');
+Route::match(['get', 'post'], '/modifyPassword', [EmailVerificationController::class, 'webModifyPass'])->name('indexPassword');
