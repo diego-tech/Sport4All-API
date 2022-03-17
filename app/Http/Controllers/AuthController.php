@@ -347,13 +347,13 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->select('events.*', 'clubs.name', 'favourites.club_id')
+                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
                     ->where(function ($query) {
                         $query->where('favourites.user_id','!=', Auth::id())
-                        ->orWhereNull('favourites.user_id');
+                            ->orWhereNull('favourites.user_id');
                     })
                     ->where('clubs.name','!=','Admin')
                     ->orderBy('favourites.club_id','desc')
@@ -573,12 +573,12 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function ended_events(Request $request)
+    public function ended_events()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = DB::table('events')
+            $query = Event::query()
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
                 ->select('events.*')
                 ->where('inscriptions.user_id', Auth::id())
@@ -598,14 +598,15 @@ class AuthController extends Controller
         }
     }
 
-    public function pending_events(Request $request)
+    public function pending_events()
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = DB::table('events')
+            $query = Event::query()
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
-                ->select('events.*')
+                ->join('clubs','events.club_id','=','clubs.id')
+                ->select('events.*', 'events.img as eventImg', 'events.name as eventName', 'clubs.name','clubs.direction')
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
@@ -630,7 +631,7 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->select('events.*', 'clubs.name', 'favourites.club_id')
+                    ->select('events.*', 'clubs.name as clubName', 'favourites.club_id')
                     ->join('clubs','events.club_id','=','clubs.id')
                     ->leftJoin('favourites','clubs.id','=','favourites.club_id')
                     ->where('events.final_time','>', Carbon::now('Europe/Madrid'))

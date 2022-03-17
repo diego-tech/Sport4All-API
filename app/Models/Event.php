@@ -28,7 +28,10 @@ class Event extends Model
         'end_time',
         'final_time',
         'img',
+        'description'
     ];
+
+    protected $appends = ['pending_type'];
 
     /**
          * The attributes that should be hidden for serialization.
@@ -49,4 +52,7 @@ class Event extends Model
             'email_verified_at' => 'datetime',
         ];
 
+    public function getPendingTypeAttribute() {
+        return 'event';
+    }
 }

@@ -27,8 +27,13 @@ class Reserve extends Model
     ];
 
     protected $table = 'reserves';
+    protected $appends = ['pending_type'];
 
     public function courts(){
         return $this->belongsTo(Court::class,'court_id','id');
+    }
+
+    public function getPendingTypeAttribute() {
+        return 'reserve';
     }
 }
