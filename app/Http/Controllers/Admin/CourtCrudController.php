@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\CourtRequest;
+use App\Models\Court;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -64,6 +65,9 @@ class CourtCrudController extends CrudController
 
         $this->addFields();
         
+        Court::creating(function($entry) {
+            $entry->club_id = backpack_user()->id;
+        });
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -125,10 +129,6 @@ class CourtCrudController extends CrudController
             [
                 'name' => 'surfaces',
                 'label' => 'Tipo de pista',
-            ],
-            [
-                'name' => 'club_id',
-                'label' => 'Club'
             ],
             ]);
     }

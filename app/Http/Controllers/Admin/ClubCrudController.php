@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\ClubRequest;
+use App\Models\Club;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class ClubCrudController
@@ -94,7 +96,6 @@ class ClubCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
         if(backpack_user()->email == 'admin@admin.com'){
         }else{
             $this->crud->addClause('where','id','=', backpack_user()->id);
@@ -102,6 +103,8 @@ class ClubCrudController extends CrudController
             $this->crud->removeButton('create');
             $this->crud->removeButton('delete');
         }
+        $club = Club::find(backpack_user()->id);
+        $this->setupCreateOperation();
     }
 
     private function addColumns(){
@@ -157,7 +160,7 @@ class ClubCrudController extends CrudController
             ],
             [
                 'name' => 'password',
-                'label' => 'Confirmar contraseña o cambiar a una nueva',
+                'label' => 'Contraseña',
             ],
             [
                 'name' => 'description',
