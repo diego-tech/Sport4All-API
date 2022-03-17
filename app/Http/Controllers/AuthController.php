@@ -606,7 +606,7 @@ class AuthController extends Controller
             $query = Event::query()
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
                 ->join('clubs','events.club_id','=','clubs.id')
-                ->select('events.*', 'events.img as eventImg', 'events.name as eventName', 'clubs.name','clubs.direction')
+                ->select('events.*', 'events.img as eventImg', 'events.name as eventName', 'clubs.name', 'clubs.club_img as clubImg' ,'clubs.direction')
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();

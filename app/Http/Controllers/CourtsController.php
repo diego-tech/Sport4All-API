@@ -238,7 +238,8 @@ class CourtsController extends Controller
                     'courts.name', 
                     'courts.type', 
                     'courts.sport', 
-                    'courts.surfaces'
+                    'courts.surfaces',
+                    'clubs.club_img as clubImg'
                 )
                 ->where('reserves.user_id', Auth::id())
                 ->where('reserves.final_time', '>', Carbon::now('Europe/Madrid'))
