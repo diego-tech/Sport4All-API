@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class ClubsController extends Controller
 {
@@ -124,6 +123,8 @@ class ClubsController extends Controller
                 $ClubArray['email'] = $clubs->email;
                 $ClubArray['web'] = $clubs->web;
                 $ClubArray['description'] = $clubs->description;
+                $ClubArray['first_hour'] = $clubs->first_hour;
+                $ClubArray['last_hour'] = $clubs->last_hour;
                 $query = Favourite::where('user_id', Auth::id())->where('club_id', $clubs->id)->value('id');
                 if ($query) {
                     $ClubArray['fav'] = True;

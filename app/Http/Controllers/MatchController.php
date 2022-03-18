@@ -97,8 +97,6 @@ class MatchController extends Controller
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        $matchs = [];
-
         try {
             $arra = Matchs::with('users')->where('day', $request->input('day'))
                 ->get();
