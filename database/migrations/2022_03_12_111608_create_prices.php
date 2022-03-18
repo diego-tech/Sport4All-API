@@ -17,6 +17,7 @@ class CreatePrices extends Migration
             $table->id();
             $table->double('price');
             $table->double('time');
+            $table->foreignId('club_id')->constrained()->nullable();
             $table->timestamps();
         });
     }
