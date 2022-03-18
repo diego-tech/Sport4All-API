@@ -129,38 +129,15 @@
 <body>
     <div class="mainDiv">
         <div class="cardStyle">
-            <form action="" method="GET" name="signupForm" id="signupForm">
-
-                @csrf
 
                 <img src="{{url('img/logoapp.png')}}" id="signupLogo" />
 
                 <h2 class="formTitle">
-                    Restablezca su contraseña
+                    Contraseña restablecida correctamente
                 </h2>
 
-                <div class="inputDiv">
-                    <label class="inputLabel" for="password">Nueva contraseña</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-
-                <div class="inputDiv">
-                    <label class="inputLabel" for="confirmPassword">Confirma la nueva contraseña</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required>
-                </div>
-
-                <div class="buttonWrapper">
-                    <button type="submit" id="submitButton" onclick="webModifyPass()"
-                        class="submitButton pure-button pure-button-primary">
-                        <span>Continuar</span>
-                    </button>
-                </div>
-
-            
-                <p>password: {{$password ?? '' }} confirmPassword: {{$confirmPassword ?? '' }}</p>
-
-
-            </form>
+                <p>Ya puede acceder a su cuenta con la nueva contraseña</p>
+                
         </div>
     </div>
 </body>

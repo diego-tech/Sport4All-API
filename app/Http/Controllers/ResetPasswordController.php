@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Validator;
 class ResetPasswordController extends Controller
 {
 
+    /**
+     * Envío de correo para recuperaciónde contraseña
+     * 
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function forgotPassword(Request $request)
     {
 
@@ -58,11 +65,15 @@ class ResetPasswordController extends Controller
             } 
         }
 
-
         return response()->json($response);
 
     }
 
+    /**
+     * Muestra la vista de creación de nueva contraseña
+     * 
+     * return view()
+     */
     public function showViewPass () {
 
         return view('indexPassword');
@@ -103,8 +114,9 @@ class ResetPasswordController extends Controller
 
                     } else {
 
-                        
+                        // Modificar la contraseña en la base de datos
 
+                        $password = $confirmPassword;
                     }
 
 
@@ -114,10 +126,13 @@ class ResetPasswordController extends Controller
     
                     return response()->json($response, 406);
                 }
-
             }
-    
-        return view('indexPassword', ["password" => $password, "confirmPassword" => $confirmPassword]);
+
+            if ($response['status'] == 1) {
+                return view('succesPassword');
+            } else {
+                return view('indexPassword', ["password" => $password, "confirmPassword" => $confirmPassword]);
+            }
     }
 
 }
