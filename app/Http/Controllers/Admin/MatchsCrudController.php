@@ -85,13 +85,14 @@ class MatchsCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(MatchsRequest::class);
-
+        //dd($this->crud->getRequest()->courts);
         $this->addFields();
         Matchs::creating(function($entry) {
             $entry->club_id = backpack_user()->id;
             $entry->QR = mt_rand(1000, 9999);
             $entry->start_Datetime = $entry->day . " ". $entry->start_time;
             $entry->final_time = $entry->day . " ". $entry->end_time;
+            $entry->court_id = $this->crud->getRequest()->courts;
         });
 
         /**
@@ -99,6 +100,11 @@ class MatchsCrudController extends CrudController
          * - CRUD::field('price')->type('number');
          * - CRUD::addField(['name' => 'price', 'type' => 'number'])); 
          */
+    }
+
+    public function update(MatchsRequest $request)
+    {
+        dd($request->input('court_id'));
     }
 
     /**
@@ -116,9 +122,8 @@ class MatchsCrudController extends CrudController
     private function addColumns(){
         $this->crud->addColumns([
             [
-                'name' => 'court_id',
+                'name' => 'courts',
                 'label' => 'Pista',
-                'type' => 'relationship',
                 'entity'    => 'courts',
                 'model'     => "App\Models\Court",
                 'attribute' => 'name',
@@ -151,7 +156,7 @@ class MatchsCrudController extends CrudController
         $this->crud->addFields([
             [
                 'label'     => "Pistas",
-                'name'      => 'court_id',
+                'name'      => 'courts',
                 'type'      => 'select',
                 'entity'    => 'courts',
                 'model'     => "App\Models\Court",

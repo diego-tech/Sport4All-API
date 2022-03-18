@@ -135,9 +135,9 @@ class ReserveCrudController extends CrudController
     private function addColumns(){
         $this->crud->addColumns([
             [
-                'name' => 'court_id',
+                'name' => 'courts',
                 'label' => 'Pista',
-                'type' => 'relationship',
+                'type'      => 'select',
                 'entity'    => 'courts',
                 'model'     => "App\Models\Court",
                 'attribute' => 'name',

@@ -28,6 +28,8 @@ class Matchs extends Model
         'start_Datetime',
     ];
 
+    protected $guarded = ['id'];
+
     protected $appends = ['pending_type'];
 
     public function users(){
@@ -39,16 +41,12 @@ class Matchs extends Model
     }
 
     public function courts(){
-        return $this->hasOne(Court::class, 'id');
+        return $this->belongsTo('App\Models\Court', 'id');
     }
 
     public function club(){
         return $this->hasOne(Club::class);
     }
 
-    public function setCourtIdAttribute($value)
-    {
-        $court = Court::where('name', $value)->value('id');
-        $this->attributes['court_id'] = $court;
-    }
+    
 }
