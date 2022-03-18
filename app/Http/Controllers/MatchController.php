@@ -98,7 +98,7 @@ class MatchController extends Controller
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $arra = Matchs::with('users')->where('day', $request->input('day'))
+            $arra = Matchs::with('users', 'courts', 'clubs')->where('day', $request->input('day'))
                 ->get();
 
             $grouped = $arra->groupBy('start_time')

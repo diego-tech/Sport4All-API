@@ -29,11 +29,23 @@ class Matchs extends Model
 
     protected $appends = ['pending_type'];
 
-    public function users(){
-        return $this->belongsToMany(User::class,'match_user','match_id');
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'match_user', 'match_id');
     }
 
-    public function getPendingTypeAttribute() {
+    public function courts()
+    {
+        return $this->hasOne(Court::class, 'id');
+    }
+
+    public function clubs()
+    {
+        return $this->hasOne(Club::class, 'id', 'club_id');
+    }
+
+    public function getPendingTypeAttribute()
+    {
         return 'match';
     }
 }
