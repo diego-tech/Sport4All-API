@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reserve extends Model
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasFactory;
 
     /**
@@ -17,6 +18,7 @@ class Reserve extends Model
     protected $fillable = [
         'QR',
         'court_id',
+        'club_id',
         'lights',
         'start_time',
         'end_time',

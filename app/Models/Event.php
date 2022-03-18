@@ -57,4 +57,23 @@ class Event extends Model
         return 'event';
     }
 
+    public function setImgAttribute($value)
+    {
+        $attribute_name = "img";
+        $disk = "public";
+        $destination_path = "";
+
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
+
+    // return $this->attributes[{$attribute_name}]; // uncomment if this is a translatable field
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting(function($obj) {
+            \Storage::disk('public_folder')->delete($obj->image);
+        });
+    }
+
 }

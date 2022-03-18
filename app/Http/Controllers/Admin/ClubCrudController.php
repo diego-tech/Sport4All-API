@@ -121,6 +121,10 @@ class ClubCrudController extends CrudController
                 'label' => 'Descripción'
             ],
             [
+                'name' => 'direction',
+                'label' => 'Dirección'
+            ],
+            [
                 'name' => 'web',
                 'label' => 'Página web',
             ],
@@ -164,6 +168,10 @@ class ClubCrudController extends CrudController
             [
                 'name' => 'description',
                 'label' => 'Descripción'
+            ],
+            [
+                'name' => 'direction',
+                'label' => 'Dirección'
             ],
             [
                 'name' => 'web',

@@ -39,10 +39,16 @@ class Matchs extends Model
     }
 
     public function courts(){
-        return $this->belongsToMany(Court::class);
+        return $this->hasOne(Court::class, 'id');
     }
 
     public function club(){
         return $this->hasOne(Club::class);
+    }
+
+    public function setCourtIdAttribute($value)
+    {
+        $court = Court::where('name', $value)->value('id');
+        $this->attributes['court_id'] = $court;
     }
 }

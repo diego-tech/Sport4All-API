@@ -39,9 +39,9 @@ class EventCrudController extends CrudController
      * @return void
      */
     protected function setupListOperation()
-    {
+    {    
         $this->addColumns();
-        
+
         if(backpack_user()->email == 'admin@admin.com'){
             $this->crud->addColumn(
             [
@@ -52,8 +52,9 @@ class EventCrudController extends CrudController
                 'name' => 'final_time',
                 'label' => 'Datetime final',
             ],
-            'update');
+            );
         }else{
+            $this->addColumns();
             $this->crud->addClause('where','club_id','=', backpack_user()->id);
         }
 
@@ -62,6 +63,25 @@ class EventCrudController extends CrudController
          * - CRUD::column('price')->type('number');
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']); 
          */
+    }
+
+    protected function setupShowOperation()
+    {
+        $this->setupListOperation();
+        if(backpack_user()->email == 'admin@admin.com'){
+            $this->crud->addColumn(
+            [
+                'name' => 'club_id',
+                'label' => 'Club'
+            ],
+            [
+                'name' => 'final_time',
+                'label' => 'Datetime final',
+            ],
+            );
+        }else{
+            $this->crud->addClause('where','club_id','=', backpack_user()->id);
+        }
     }
 
     /**
