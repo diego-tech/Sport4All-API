@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Matchs extends Model
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasFactory;
 
     /**
@@ -35,5 +36,13 @@ class Matchs extends Model
 
     public function getPendingTypeAttribute() {
         return 'match';
+    }
+
+    public function courts(){
+        return $this->belongsToMany(Court::class);
+    }
+
+    public function club(){
+        return $this->hasOne(Club::class);
     }
 }
