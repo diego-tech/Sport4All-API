@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\CourtRequest;
-use App\Models\Court;
+use App\Http\Requests\EventRequest;
+use App\Models\Event;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class CourtCrudController
+ * Class EventCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class CourtCrudController extends CrudController
+class EventCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -27,9 +27,9 @@ class CourtCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Court::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/court');
-        CRUD::setEntityNameStrings('court', 'courts');
+        CRUD::setModel(\App\Models\Event::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/event');
+        CRUD::setEntityNameStrings('event', 'events');
     }
 
     /**
@@ -43,16 +43,18 @@ class CourtCrudController extends CrudController
         $this->addColumns();
         
         if(backpack_user()->email == 'admin@admin.com'){
-            $this->crud->addColumn([
+            $this->crud->addColumn(
+            [
                 'name' => 'club_id',
-                'label' => 'Club',
-                'entity'    => 'club',
-                'model'     => "App\Models\Club",
-                'attribute' => 'name',
-                'pivot'     => true,
-            ], 'update');
+                'label' => 'Club'
+            ],
+            [
+                'name' => 'final_time',
+                'label' => 'Datetime final',
+            ],
+            'update');
         }else{
-            $this->crud->addClause('where','club_id','=', backpack_user()->id);            
+            $this->crud->addClause('where','club_id','=', backpack_user()->id);
         }
 
         /**
@@ -70,12 +72,13 @@ class CourtCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(CourtRequest::class);
+        CRUD::setValidation(EventRequest::class);
 
         $this->addFields();
-        
-        Court::creating(function($entry) {
+
+        Event::creating(function($entry) {
             $entry->club_id = backpack_user()->id;
+            $entry->final_time = $entry->day . " ". $entry->end_time;
         });
 
         /**
@@ -94,6 +97,9 @@ class CourtCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+        Event::updating(function($entry) {
+            $entry->final_time = $entry->day . " ". $entry->end_time;
+        });
     }
 
     private function addColumns(){
@@ -103,16 +109,40 @@ class CourtCrudController extends CrudController
                 'label' => 'Nombre'
             ],
             [
+                'name' => 'visibility',
+                'label' => 'Visibilidad',
+            ],
+            [
+                'name' => 'people_left',
+                'label' => 'Aforo'
+            ],
+            [
                 'name' => 'type',
                 'label' => 'Tipo',
             ],
             [
-                'name' => 'sport',
-                'label' => 'Deporte'
+                'name' => 'description',
+                'label' => 'Descripción',
             ],
             [
-                'name' => 'surfaces',
-                'label' => 'Tipo de pista',
+                'name' => 'price',
+                'label' => 'Precio',
+            ],
+            [
+                'name' => 'img',
+                'label' => 'Imagen',
+            ],
+            [
+                'name' => 'day',
+                'label' => 'Día',
+            ],
+            [
+                'name' => 'start_time',
+                'label' => 'Hora de inicio evento',
+            ],
+            [
+                'name' => 'end_time',
+                'label' => 'Hora de cierre evento',
             ],
         ]);
     }
@@ -121,23 +151,51 @@ class CourtCrudController extends CrudController
         $this->crud->addFields([
             [
                 'name' => 'name',
-                'label' => 'Nombre',
+                'label' => 'Nombre'
+            ],
+            [
+                'name' => 'visibility',
+                'label' => 'Visibilidad',
+                'type' => 'enum',
+            ],
+            [
+                'name' => 'people_left',
+                'label' => 'Aforo'
             ],
             [
                 'name' => 'type',
                 'label' => 'Tipo',
-                'type' => 'enum',
             ],
             [
-                'name' => 'sport',
-                'label' => 'Deporte',
-                'type' => 'enum',
+                'name' => 'description',
+                'label' => 'Descripción',
             ],
             [
-                'name' => 'surfaces',
-                'label' => 'Tipo de pista',
-                'type' => 'enum',
+                'name' => 'price',
+                'label' => 'Precio',
             ],
-            ]);
+            [
+                'name' => 'img',
+                'label' => 'Imagen',
+                'type'      => 'upload',
+                'upload'    => true,
+            ],
+            [
+                'name' => 'day',
+                'label' => 'Día',
+                'type' => 'date',
+            ],
+            [
+                'name' => 'start_time',
+                'label' => 'Hora de inicio evento',
+                'type' => 'time',
+            ],
+            [
+                'name' => 'end_time',
+                'label' => 'Hora de cierre evento',
+                'type' => 'time',
+            ],
+        ]);
     }
+
 }
