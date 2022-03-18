@@ -156,11 +156,7 @@
                     </button>
                 </div>
 
-                @if($password != $confirmPassword)
-                <p>Las contraseñas deben coincidir.</p>
-                @endif
-
-                <div>password: {{ $password ?? ''}} confirmPassword: {{ $confirmPassword ?? ''}}</div>
+            
                 
 
 

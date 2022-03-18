@@ -40,10 +40,7 @@ class ResetPasswordController extends Controller
             try {
                 $user = User::where('email', $email)->first();
 
-                
-
                 if ($user) {
-                    
 
                     $link = "https://www.linkrecoverpassword.com";
 
@@ -51,7 +48,7 @@ class ResetPasswordController extends Controller
 
                     $response['msg'] = "An email to reset your password has been sent.";
                 } else {
-                    $response['msg'] = 'Hola';
+                
                     $response['msg'] = "User not found";
                 }
             } catch (\Exception $e){
@@ -66,19 +63,25 @@ class ResetPasswordController extends Controller
 
     }
 
+    public function showViewPass () {
+
+        return view('indexPassword');
+
+    }
+
     
     public function webModifyPass(Request $req) {
 
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        $token = $_GET["_token"];
+        // $this->user;
+
         $password = ($req->input('password'));
         $confirmPassword = ($req->input('confirmPassword'));
 
         $validatedData = Validator::make(
             $req->all(),
             [
-                '_token' => 'required',
                 'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
                 'confirmPassword' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
             ]);
@@ -100,7 +103,7 @@ class ResetPasswordController extends Controller
 
                     } else {
 
-                        $password = $token;
+                        
 
                     }
 
