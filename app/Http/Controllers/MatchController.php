@@ -111,29 +111,6 @@ class MatchController extends Controller
                     ];
                 });
 
-            // return $grouped->values();
-            // // dd($arra);
-
-            // /*$Matchs = DB::table('matchs')
-            //             ->groupBy('matchs.start_time')
-            //             ->join('match_user','match_user.match_id','matchs.id')
-            //             ->join('users','users.id','match_user.user_id')
-            //             ->select('matchs.*','users.image')
-            //             //->orWhere('day', $request->input('day'))
-            //             ->get();*/
-            // $currentTime = null;
-            // for ($i = 0; $i < sizeof($arra); $i++) {
-            //     if ($currentTime == $arra[$i]->start_time) {
-            //         $matchs[$currentTime][] = $arra[$i];
-            //     } else {
-            //         $currentTime = $arra[$i]->start_time;
-            //         $matchs[$currentTime][] = $arra[$i];
-            //     }
-            // }
-
-            // Imágenes de los usuarior inscritos
-            // Array dentro de array que muestre el día y la hora del partido
-
             $response['data'] = $grouped->values();
             $response['msg'] = "Partidos";
             return response()->json($response, 200);
