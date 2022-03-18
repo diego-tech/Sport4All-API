@@ -42,6 +42,14 @@ class CourtCrudController extends CrudController
     {
         $this->addColumns();
         if(backpack_user()->email == 'admin@admin.com'){
+            $this->crud->addColumn([
+                'name' => 'club_id',
+                'label' => 'Club',
+                'entity'    => 'club',
+                'model'     => "App\Models\Club",
+                'attribute' => 'name',
+                'pivot'     => true,
+            ], 'update');
         }else{
             $this->crud->addClause('where','club_id','=', backpack_user()->id);            
         }
@@ -105,10 +113,6 @@ class CourtCrudController extends CrudController
                 'name' => 'surfaces',
                 'label' => 'Tipo de pista',
             ],
-            [
-                'name' => 'club_id',
-                'label' => 'Club'
-            ],
         ]);
     }
 
@@ -121,14 +125,17 @@ class CourtCrudController extends CrudController
             [
                 'name' => 'type',
                 'label' => 'Tipo',
+                'type' => 'enum',
             ],
             [
                 'name' => 'sport',
-                'label' => 'Deporte'
+                'label' => 'Deporte',
+                'type' => 'enum',
             ],
             [
                 'name' => 'surfaces',
                 'label' => 'Tipo de pista',
+                'type' => 'enum',
             ],
             ]);
     }

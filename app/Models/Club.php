@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class Club extends Authenticatable
 {
@@ -80,5 +81,18 @@ class Club extends Authenticatable
         static::deleting(function($obj) {
             \Storage::disk('public_folder')->delete($obj->image);
         });
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        if($value == null){
+            backpack_user()->password = $this->attributes['password'];
+        }else{
+            $this->attributes['password'] = Hash::make($value);
+        }
+    }
+
+    public function courts() {
+        return $this->hasMany(Court::class);
     }
 }

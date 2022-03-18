@@ -103,7 +103,6 @@ class ClubCrudController extends CrudController
             $this->crud->removeButton('create');
             $this->crud->removeButton('delete');
         }
-        $club = Club::find(backpack_user()->id);
         $this->setupCreateOperation();
     }
 
