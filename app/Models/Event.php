@@ -9,6 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Event extends Model
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasApiTokens, HasFactory, Notifiable;
     
     /**
@@ -55,4 +56,5 @@ class Event extends Model
     public function getPendingTypeAttribute() {
         return 'event';
     }
+
 }
