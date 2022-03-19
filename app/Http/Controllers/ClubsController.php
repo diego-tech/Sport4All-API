@@ -38,6 +38,8 @@ class ClubsController extends Controller
                 'web' => 'required|string|max:255',
                 'tlf' => 'required|string|regex:/[0-9]{9}/',
                 'email' => 'bail|required|string|email|max:255|unique:clubs',
+                'first_hour' => 'required|date_format:H:i:s',
+                'last_hour' => 'required|date_format:H:i:s',
             ],
             [
                 'name.required' => 'Introduzca un nombre para el club',

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Court extends Model
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasFactory;
 
      /**
@@ -31,5 +32,10 @@ class Court extends Model
 
     public function reserves() {
         return $this->hasMany(Reserve::class);
+    }
+
+    public function club()
+    {
+        return $this->hasOne(Club::class,'id');
     }
 }

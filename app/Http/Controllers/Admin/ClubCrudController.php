@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\ClubRequest;
+use App\Models\Club;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class ClubCrudController
@@ -42,7 +44,7 @@ class ClubCrudController extends CrudController
         $this->addColumns();
         
 
-        if(backpack_user()->name == 'Admin'){
+        if(backpack_user()->email == 'admin@admin.com'){
         }else{
             $this->crud->addClause('where','id','=', backpack_user()->id);
             $this->crud->removeButton('create');
@@ -71,7 +73,17 @@ class ClubCrudController extends CrudController
 
         $this->addFields();
         
-        if(backpack_user()->name == 'Admin'){
+        if(backpack_user()->email == 'admin@admin.com'){
+            $this->crud->addFields([
+                [
+                    'name' => 'name',
+                    'label' => 'Nombre',
+                ],
+                [
+                    'name' => 'password',
+                    'label' => 'Contraseña',
+                ],
+            ]);
         }else{
             $this->crud->addClause('where','id','=', backpack_user()->id);
             $this->crud->denyAccess('create');
@@ -94,14 +106,14 @@ class ClubCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->setupCreateOperation();
-        if(backpack_user()->name == 'Admin'){
+        if(backpack_user()->email == 'admin@admin.com'){
         }else{
             $this->crud->addClause('where','id','=', backpack_user()->id);
             $this->crud->denyAccess('create');
             $this->crud->removeButton('create');
             $this->crud->removeButton('delete');
         }
+        $this->setupCreateOperation();
     }
 
     private function addColumns(){
@@ -119,6 +131,10 @@ class ClubCrudController extends CrudController
                 'label' => 'Descripción'
             ],
             [
+                'name' => 'direction',
+                'label' => 'Dirección'
+            ],
+            [
                 'name' => 'web',
                 'label' => 'Página web',
             ],
@@ -133,6 +149,14 @@ class ClubCrudController extends CrudController
             [
                 'name' => 'club_banner',
                 'label' => 'Banner'
+            ],
+            [
+                'name' => 'first_hour',
+                'label' => 'Horario apertura',
+            ],
+            [
+                'name' => 'last_hour',
+                'label' => 'Horario cierre',
             ]
         ]);
     }
@@ -140,20 +164,16 @@ class ClubCrudController extends CrudController
     private function addFields(){
         $this->crud->addFields([
             [
-                'name' => 'name',
-                'label' => 'Nombre',
-            ],
-            [
                 'name' => 'email',
                 'label' => 'Email',
             ],
             [
-                'name' => 'password',
-                'label' => 'Contraseña'
-            ],
-            [
                 'name' => 'description',
                 'label' => 'Descripción'
+            ],
+            [
+                'name' => 'direction',
+                'label' => 'Dirección'
             ],
             [
                 'name' => 'web',
@@ -164,12 +184,26 @@ class ClubCrudController extends CrudController
                 'label' => 'Teléfono'
             ],
             [
-                'name' => 'club_img',
-                'label' => 'Logo'
+                'name'      => 'club_img',
+                'label'     => 'Logo',
+                'type'      => 'upload',
+                'upload'    => true,
             ],
             [
                 'name' => 'club_banner',
-                'label' => 'Banner'
+                'label' => 'Banner',
+                'type'      => 'upload',
+                'upload'    => true,
+            ],
+            [
+                'name' => 'first_hour',
+                'label' => 'Horario apertura',
+                'type' => 'time',
+            ],
+            [
+                'name' => 'last_hour',
+                'label' => 'Horario cierre',
+                'type' => 'time',
             ]
             ]);
     }

@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ClubRequest extends FormRequest
+class PriceRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,22 +25,7 @@ class ClubRequest extends FormRequest
     public function rules()
     {
         return [
-             'name' => 'nullable|min:5|max:255',
-             'email' => [
-                'nullable',
-                'email',
-                'unique:clubs,email,' . $this->id
-
-             ],
-             'password' => 'nullable|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
-             'description' => 'nullable|string',
-             'first_hour' => 'nullable|date_format:H:i',
-             'last_hour' => 'nullable|date_format:H:i',
-             'web' => 'nullable|string|max:255',
-             'tlf' => 'nullable|string|regex:/[0-9]{9}/',
-             'club_img' => 'nullable|image',
-             'club_banner' => 'nullable|image',
-             
+            // 'name' => 'required|min:5|max:255'
         ];
     }
 

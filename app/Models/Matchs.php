@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Matchs extends Model
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasFactory;
 
     /**
@@ -26,6 +27,8 @@ class Matchs extends Model
         'final_time',
         'start_Datetime',
     ];
+
+    protected $guarded = ['id'];
 
     protected $appends = ['pending_type'];
 
@@ -48,4 +51,14 @@ class Matchs extends Model
     {
         return 'match';
     }
+
+    public function courts(){
+        return $this->belongsTo('App\Models\Court', 'id');
+    }
+
+    public function club(){
+        return $this->hasOne(Club::class);
+    }
+
+    
 }

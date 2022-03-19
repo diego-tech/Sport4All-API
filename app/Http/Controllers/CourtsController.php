@@ -94,10 +94,11 @@ class CourtsController extends Controller
             $request->all(),
             [
                 'court_id' => 'required|exists:courts,id',
+                'club_id' => 'required|exists:clubs,id',
                 'lights' => 'required|boolean',
                 'day' => 'required|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
-                'time' => ['required', Rule::in(['60', '90', '120'])],
+                'time' => ['required'],
             ],
             [
                 'court_id.required' => 'Introduce una pista',
@@ -127,6 +128,7 @@ class CourtsController extends Controller
                     'QR' => strval($QR),
                     'user_id' => Auth::id(),
                     'court_id' => $request->input('court_id'),
+                    'club_id' => $request->input('club_id'),
                     'lights' => $request->input('lights'),
                     'start_time' => $request->input('start_time'),
                     'end_time' => $parsedEndTime,
