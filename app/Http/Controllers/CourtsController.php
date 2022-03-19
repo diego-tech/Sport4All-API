@@ -227,17 +227,17 @@ class CourtsController extends Controller
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        try {   
+        try {
             $query = Reserve::query()
                 ->join('courts', 'reserves.court_id', '=', 'courts.id')
                 ->join('clubs', 'courts.club_id', '=', 'clubs.id')
                 ->select(
-                    'reserves.*', 
-                    'clubs.name as clubName', 
-                    'clubs.direction as clubLocation', 
-                    'courts.name', 
-                    'courts.type', 
-                    'courts.sport', 
+                    'reserves.*',
+                    'clubs.name as clubName',
+                    'clubs.direction as clubLocation',
+                    'courts.name',
+                    'courts.type',
+                    'courts.sport',
                     'courts.surfaces',
                     'clubs.club_img as clubImg'
                 )
@@ -263,9 +263,20 @@ class CourtsController extends Controller
 
         try {
             $query = Reserve::query()
-                ->select('reserves.*')
+                ->join('courts', 'reserves.court_id', '=', 'courts.id')
+                ->join('clubs', 'courts.club_id', '=', 'clubs.id')
+                ->select(
+                    'reserves.*',
+                    'clubs.name as clubName',
+                    'clubs.direction as clubLocation',
+                    'courts.name',
+                    'courts.type',
+                    'courts.sport',
+                    'courts.surfaces',
+                    'clubs.club_img as clubImg'
+                )
                 ->where('reserves.user_id', Auth::id())
-                ->where('matchs.final_time', '<', now())
+                ->where('reserves.final_time', '<', now())
                 ->get();
 
             $response['status'] = 1;

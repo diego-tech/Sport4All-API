@@ -347,24 +347,24 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->join('clubs','events.club_id','=','clubs.id')
-                    ->leftJoin('favourites','clubs.id','=','favourites.club_id')
-                    ->select(
-                        'events.*',
-                        'clubs.name as clubName',
-                        'favourites.club_id',
-                        'clubs.direction as clubLocation',
-                        'clubs.id as club_id'
-                    )
-                    ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
-                    ->where(function ($query) {
-                        $query->where('favourites.user_id','!=', Auth::id())
-                            ->orWhereNull('favourites.user_id');
-                    })
-                    ->where('clubs.name','!=','Admin')
-                    ->orderBy('favourites.club_id','desc')
-                    ->orderBy('events.final_time','asc')
-                    ->get();
+                ->join('clubs', 'events.club_id', '=', 'clubs.id')
+                ->leftJoin('favourites', 'clubs.id', '=', 'favourites.club_id')
+                ->select(
+                    'events.*',
+                    'clubs.name as clubName',
+                    'favourites.club_id',
+                    'clubs.direction as clubLocation',
+                    'clubs.id as club_id'
+                )
+                ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->where(function ($query) {
+                    $query->where('favourites.user_id', '!=', Auth::id())
+                        ->orWhereNull('favourites.user_id');
+                })
+                ->where('clubs.name', '!=', 'Admin')
+                ->orderBy('favourites.club_id', 'desc')
+                ->orderBy('events.final_time', 'asc')
+                ->get();
 
             $response['status'] = 1;
             $response['data'] = $query;
@@ -469,7 +469,7 @@ class AuthController extends Controller
 
                 $finalResults = DB::table('clubs')
                     ->select('clubs.*')
-                    ->where('clubs.name','!=','Admin')
+                    ->where('clubs.name', '!=', 'Admin')
                     ->where('clubs.name', 'like', '%' . $query . '%')
                     ->orWhere('clubs.direction', 'like', '%' . $query . '%')
                     ->get();
@@ -586,7 +586,15 @@ class AuthController extends Controller
         try {
             $query = Event::query()
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
-                ->select('events.*')
+                ->join('clubs', 'events.club_id', '=', 'clubs.id')
+                ->select(
+                    'events.*',
+                    'events.img as eventImg',
+                    'events.name as eventName',
+                    'clubs.name',
+                    'clubs.club_img as clubImg',
+                    'clubs.direction'
+                )
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '<', Carbon::now('Europe/Madrid'))
                 ->get();
@@ -611,8 +619,15 @@ class AuthController extends Controller
         try {
             $query = Event::query()
                 ->join('inscriptions', 'events.id', '=', 'inscriptions.event_id')
-                ->join('clubs','events.club_id','=','clubs.id')
-                ->select('events.*', 'events.img as eventImg', 'events.name as eventName', 'clubs.name', 'clubs.club_img as clubImg' ,'clubs.direction')
+                ->join('clubs', 'events.club_id', '=', 'clubs.id')
+                ->select(
+                    'events.*',
+                    'events.img as eventImg',
+                    'events.name as eventName',
+                    'clubs.name',
+                    'clubs.club_img as clubImg',
+                    'clubs.direction'
+                )
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
                 ->get();
@@ -637,23 +652,23 @@ class AuthController extends Controller
 
         try {
             $query = DB::table('events')
-                    ->join('clubs','events.club_id','=','clubs.id')
-                    ->leftJoin('favourites','clubs.id','=','favourites.club_id')
-                    ->select(
-                        'events.*',
-                        'clubs.name as clubName',
-                        'favourites.club_id',
-                        'clubs.direction as clubLocation',
-                        'clubs.id as club_id'
-                    )
-                    ->where('events.final_time','>', Carbon::now('Europe/Madrid'))
-                    ->where(function ($query) {
-                        $query->where('favourites.user_id','=', Auth::id());
-                    })
-                    ->where('clubs.name','!=','Admin')
-                    ->orderBy('favourites.club_id','desc')
-                    ->orderBy('events.final_time','asc')
-                    ->get();
+                ->join('clubs', 'events.club_id', '=', 'clubs.id')
+                ->leftJoin('favourites', 'clubs.id', '=', 'favourites.club_id')
+                ->select(
+                    'events.*',
+                    'clubs.name as clubName',
+                    'favourites.club_id',
+                    'clubs.direction as clubLocation',
+                    'clubs.id as club_id'
+                )
+                ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
+                ->where(function ($query) {
+                    $query->where('favourites.user_id', '=', Auth::id());
+                })
+                ->where('clubs.name', '!=', 'Admin')
+                ->orderBy('favourites.club_id', 'desc')
+                ->orderBy('events.final_time', 'asc')
+                ->get();
 
             $response['status'] = 1;
             $response['data'] = $query;
