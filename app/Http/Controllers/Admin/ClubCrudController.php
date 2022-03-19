@@ -74,6 +74,16 @@ class ClubCrudController extends CrudController
         $this->addFields();
         
         if(backpack_user()->email == 'admin@admin.com'){
+            $this->crud->addFields([
+                [
+                    'name' => 'name',
+                    'label' => 'Nombre',
+                ],
+                [
+                    'name' => 'password',
+                    'label' => 'Contraseña',
+                ],
+            ]);
         }else{
             $this->crud->addClause('where','id','=', backpack_user()->id);
             $this->crud->denyAccess('create');
@@ -154,16 +164,8 @@ class ClubCrudController extends CrudController
     private function addFields(){
         $this->crud->addFields([
             [
-                'name' => 'name',
-                'label' => 'Nombre',
-            ],
-            [
                 'name' => 'email',
                 'label' => 'Email',
-            ],
-            [
-                'name' => 'password',
-                'label' => 'Contraseña',
             ],
             [
                 'name' => 'description',

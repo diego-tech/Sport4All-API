@@ -75,6 +75,37 @@ class MatchsCrudController extends CrudController
          * - CRUD::addColumn(['name' => 'price', 'type' => 'number']); 
          */
     }
+    
+    protected function setupShowOperation()
+    {
+        $this->setupListOperation();
+        if(backpack_user()->email == 'admin@admin.com'){
+            $this->crud->addColumn(
+                [
+                    'name' => 'club_id',
+                    'label' => 'Club',
+                    'entity' => 'club',
+                    'model' => "App\Models\Club",
+                    'attribute' => 'name',
+                    'pivot' => true,
+                ],
+                [
+                    'name' => 'QR',
+                    'label' => 'Codigo QR',
+                ],
+                [
+                    'name' => 'final_time',
+                    'label' => 'Datetima Finala',
+                ],
+                [
+                    'name' => 'start_Datetime',
+                    'label' => 'Datetime Inicio',
+                ],
+            );
+        }else{
+            $this->crud->addClause('where','club_id','=', backpack_user()->id);
+        }
+    }
 
     /**
      * Define what happens when the Create operation is loaded.
@@ -85,14 +116,14 @@ class MatchsCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(MatchsRequest::class);
-        //dd($this->crud->getRequest()->courts);
+        //dd($this->crud->getRequest()->court_id);
         $this->addFields();
         Matchs::creating(function($entry) {
             $entry->club_id = backpack_user()->id;
             $entry->QR = mt_rand(1000, 9999);
             $entry->start_Datetime = $entry->day . " ". $entry->start_time;
             $entry->final_time = $entry->day . " ". $entry->end_time;
-            $entry->court_id = $this->crud->getRequest()->courts;
+            $entry->court_id = $this->crud->getRequest()->court_id;
         });
 
         /**
@@ -101,12 +132,6 @@ class MatchsCrudController extends CrudController
          * - CRUD::addField(['name' => 'price', 'type' => 'number'])); 
          */
     }
-
-    public function update(MatchsRequest $request)
-    {
-        dd($request->input('court_id'));
-    }
-
     /**
      * Define what happens when the Update operation is loaded.
      * 
@@ -122,12 +147,9 @@ class MatchsCrudController extends CrudController
     private function addColumns(){
         $this->crud->addColumns([
             [
-                'name' => 'courts',
+                'name' => 'court_id',
                 'label' => 'Pista',
-                'entity'    => 'courts',
-                'model'     => "App\Models\Court",
-                'attribute' => 'name',
-                'pivot'     => true,
+                
             ],
             [
                 'name' => 'lights',
@@ -156,7 +178,7 @@ class MatchsCrudController extends CrudController
         $this->crud->addFields([
             [
                 'label'     => "Pistas",
-                'name'      => 'courts',
+                'name'      => 'court_id',
                 'type'      => 'select',
                 'entity'    => 'courts',
                 'model'     => "App\Models\Court",

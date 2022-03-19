@@ -94,6 +94,12 @@ class CourtCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+        if(backpack_user()->email == 'admin@admin.com'){
+        }else{
+            $this->crud->addClause('where','club_id','=', backpack_user()->id);
+            
+            //dd($this->crud->getRequest());    
+        }
     }
 
     private function addColumns(){
