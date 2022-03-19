@@ -124,7 +124,7 @@ class CourtsController extends Controller
                 $start_time = $request->input('day') . " " . $request->input('start_time');
                 $QR = mt_rand(1000, 9999);
                 $Reserve = Reserve::create([
-                    'QR' => $QR,
+                    'QR' => strval($QR),
                     'user_id' => Auth::id(),
                     'court_id' => $request->input('court_id'),
                     'lights' => $request->input('lights'),
