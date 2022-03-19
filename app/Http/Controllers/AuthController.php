@@ -452,7 +452,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Buscar Clubs por Nombre
+     * Buscar Clubs
      * 
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
@@ -512,6 +512,39 @@ class AuthController extends Controller
     }
 
     /**
+     * Buscar Eventos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
+    public function searchEvents(Request $request) {
+        $response = ["status" => 1, "data" => [], "msg" => ""];
+
+        $query = $request->input('name');
+
+        try {
+            if ($query) {
+                $eventsArray = [];
+
+                $finalResults = DB::table('events')
+                    ->join('events.club_id', 'clubs', 'id')
+                    ->select()
+                    ->where('clubs.name', '!=', 'Admin')
+                    ->where('clubs.name', 'like', '%' . $query . '%')
+                    ->orWhere('clubs.direction', 'like', '%' . $query . '%')
+                    ->orWhere('events.name', 'like', '%' . $query . '%')
+                    ->get();
+            }
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+
+    /**
      * Inscribirse en Evento
      * 
      * @param \Illuminate\Http\Request $request
@@ -553,15 +586,18 @@ class AuthController extends Controller
                         $inscription->save();
 
                         $response['msg'] = "Inscripción realizada";
-
                         $response['data'] = $inscription;
                         return response()->json($response, 200);
                     } else {
-                        $response['msg'] = "Ya estás inscrito a este evento";
+                        $response['status'] = 0;
+                        $response['data'][''] = "";
+                        $response['msg'] = "Ya está inscrito";
                         return response()->json($response, 406);
                     }
                 }
             } else {
+                $response['status'] = 0;
+                $response['data'][''] = "";
                 $response['msg'] = "El evento no existe";
                 return response()->json($response, 404);
             }
@@ -626,7 +662,7 @@ class AuthController extends Controller
                     'events.name as eventName',
                     'clubs.name',
                     'clubs.club_img as clubImg',
-                    'clubs.direction'
+                    'clubs.direction as clubLocation'
                 )
                 ->where('inscriptions.user_id', Auth::id())
                 ->where('events.final_time', '>', Carbon::now('Europe/Madrid'))
