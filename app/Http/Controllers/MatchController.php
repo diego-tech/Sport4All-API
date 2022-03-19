@@ -98,7 +98,7 @@ class MatchController extends Controller
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $arra = Matchs::with('users', 'courts', 'clubs')
+            $arra = Matchs::with('users', 'matchCourts', 'clubs')
                 ->where('day', $request->input('day'))
                 ->get();
 
@@ -154,10 +154,12 @@ class MatchController extends Controller
             try {
                 if ($count == 4) {
                     $response['status'] = 0;
+                    $response['data']['errors'] = "";
                     $response['msg'] = 'El partido ya esta completo';
                     return response()->json($response, 406);
                 } elseif (!$usercheck->isEmpty()) {
                     $response['status'] = 0;
+                    $response['data']['errors'] = "";
                     $response['msg'] = 'No te puedes inscribir 2 veces al mismo partido';
                     return response()->json($response, 406);
                 } else {

@@ -98,7 +98,7 @@ class CourtsController extends Controller
                 'lights' => 'required|boolean',
                 'day' => 'required|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
-                'time' => ['required'],
+                'time' => ['required']
             ],
             [
                 'court_id.required' => 'Introduce una pista',

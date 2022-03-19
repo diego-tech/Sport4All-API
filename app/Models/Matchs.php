@@ -37,7 +37,7 @@ class Matchs extends Model
         return $this->belongsToMany(User::class, 'match_user', 'match_id');
     }
 
-    public function courts()
+    public function matchCourts()
     {
         return $this->hasOne(Court::class, 'id');
     }
@@ -59,6 +59,4 @@ class Matchs extends Model
     public function club(){
         return $this->hasOne(Club::class);
     }
-
-    
 }

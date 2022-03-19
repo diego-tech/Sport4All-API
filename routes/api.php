@@ -38,7 +38,7 @@ Route::get('/endedevents', [AuthController::class, 'ended_events'])->middleware(
 //Rutas favoritos
 Route::get('/listfavs', [AuthController::class, 'listfavs'])->middleware('auth:sanctum');
 Route::delete('/deletefav', [AuthController::class, 'delete_favs'])->middleware('auth:sanctum');
-Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->middleware('auth:sanctum'); // El user tendrá que estar logeado para poder añadir clubes favoritos
+Route::post('/registerfavclub', [ClubsController::class, 'registerFavClub'])->middleware('auth:sanctum');
 
 
 //Reservas y partidos
