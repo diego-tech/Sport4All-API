@@ -309,19 +309,28 @@ class CourtsController extends Controller
 
             $testR = $queryR->get();
             if (!$testM->isEmpty()) {
-                $matchQRvalidated = $queryM->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                $matchQRvalidated = $queryM
+                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
+                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->get();
                 if (!$matchQRvalidated->isEmpty()) {
+                    $response['status'] = 1;
                     $response['msg'] = 'Puerta abierta';
                     return response()->json($response, 200);
                 }
             } elseif (!$testR->isEmpty()) {
-                $reserveQRvalidated = $queryR->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                $reserveQRvalidated = $queryR
+                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
+                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->get();
                 if (!$reserveQRvalidated->isEmpty()) {
+                    $response['status'] = 1;
                     $response['msg'] = 'Puerta abierta';
                     return response()->json($response, 200);
                 }
             }
 
+            $response['status'] = 0;
             $response['msg'] = 'Horario incorrecto puerta cerrada';
             return response()->json($response, 403);
         } catch (\Exception $e) {
