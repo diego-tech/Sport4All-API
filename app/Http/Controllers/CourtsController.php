@@ -2,19 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Helpers\AuxFunctions;
 use App\Models\Court;
-use App\Models\Court_Price;
 use App\Models\Matchs;
-use App\Models\Price;
 use App\Models\Reserve;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use PDO;
 
 class CourtsController extends Controller
 {

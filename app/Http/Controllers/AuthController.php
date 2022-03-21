@@ -9,6 +9,7 @@ use App\Models\Club;
 use App\Models\Event;
 use App\Models\Favourite;
 use App\Models\Inscription;
+use App\Models\Reserve;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -429,9 +430,16 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Quitar de Favoritos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function delete_favs(Request $request)
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
+
         $userId = Auth::id();
 
         try {
