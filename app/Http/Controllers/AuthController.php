@@ -9,6 +9,7 @@ use App\Models\Club;
 use App\Models\Event;
 use App\Models\Favourite;
 use App\Models\Inscription;
+use App\Models\Reserve;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -429,9 +430,16 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Quitar de Favoritos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function delete_favs(Request $request)
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
+
         $userId = Auth::id();
 
         try {
@@ -517,7 +525,8 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return response()->json($response)
      */
-    public function searchEvents(Request $request) {
+    public function searchEvents(Request $request)
+    {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $query = $request->input('name');
@@ -554,7 +563,7 @@ class AuthController extends Controller
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        // Recibes el id del evento al que te quieres inscribir
+        // Recibes el id del evento al que te quieres inscribir 
         $eventId = $request->input('id');
 
         // Id del usuario que se va a inscribir al evento

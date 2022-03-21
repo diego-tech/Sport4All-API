@@ -2,19 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Helpers\AuxFunctions;
 use App\Models\Court;
-use App\Models\Court_Price;
 use App\Models\Matchs;
-use App\Models\Price;
 use App\Models\Reserve;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use PDO;
 
 class CourtsController extends Controller
 {
@@ -98,7 +93,7 @@ class CourtsController extends Controller
                 'lights' => 'required|boolean',
                 'day' => 'required|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
-                'time' => ['required']
+                'time' => 'required',
             ],
             [
                 'court_id.required' => 'Introduce una pista',
@@ -137,20 +132,8 @@ class CourtsController extends Controller
                     'start_Datetime' => $start_time,
                 ]);
 
-                $court = Court::find($request->input('court_id'));
-
                 $response['status'] = 1;
                 $response['data'] = $Reserve;
-                if ($request->input('time') == '60') {
-                    $price = $court->price;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                } elseif ($request->input('time') == '90') {
-                    $price = $court->price * 1.5;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                } else {
-                    $price = $court->price * 2;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                }
 
                 return response()->json($response, 200);
             } catch (\Exception $e) {
@@ -278,13 +261,12 @@ class CourtsController extends Controller
                     'clubs.club_img as clubImg'
                 )
                 ->where('reserves.user_id', Auth::id())
-                ->where('reserves.final_time', '<', now())
+                ->where('reserves.final_time', '<', Carbon::now('Europe/Madrid'))
                 ->get();
 
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Reservas finalizadas';
-
 
             return response()->json($response, 200);
         } catch (\Exception $e) {
