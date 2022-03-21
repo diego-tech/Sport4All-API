@@ -11,7 +11,6 @@
     <link rel="icon" href="{{url('img/logoapp.png') }}">
 
     <style>
-
         body {
             background-color: #D0E1F9;
             color: #4D648D;
@@ -150,20 +149,13 @@
                 </div>
 
                 <div class="buttonWrapper">
-                    <button type="submit" id="submitButton" onclick="webModifyPass()"
-                        class="submitButton pure-button pure-button-primary">
+                    <button type="submit" id="submitButton" class="submitButton pure-button pure-button-primary">
                         <span>Continuar</span>
                     </button>
                 </div>
-
-            
-                <p>password: {{$password ?? '' }} confirmPassword: {{$confirmPassword ?? '' }}</p>
-
-
             </form>
         </div>
     </div>
 </body>
 
 </html>
-

@@ -17,8 +17,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -192,24 +194,20 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         try {
-            if ($user) {
-                $password = "";
-                do {
-                    $password = Str::random(8);
-                } while (!preg_match($pass_pattern, $password)); //hacer para que se envie por correo??
-                $user->password = Hash::make($password);
-                $user->save();
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
 
-                $response['status'] = 1;
-                $response['msg'] = "Contraseña: " . $password;
-
-                return response()->json($response, 200);
-            } else {
-                $response['status'] = 0;
-                $response['msg'] = "No se encuentra el usuario en el sistema";
-
-                return response()->json($response, 404);
+            if ($status == Password::RESET_LINK_SENT) {
+                return [
+                    'status' => __($status)
+                ];
             }
+
+            throw ValidationException::withMessages([
+                'email' => trans($status),
+            ]);
+
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
             $response['status'] = 0;
