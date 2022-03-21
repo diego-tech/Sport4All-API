@@ -98,7 +98,7 @@ class CourtsController extends Controller
                 'lights' => 'required|boolean',
                 'day' => 'required|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
-                'time' => ['required']
+                'time' => 'required',
             ],
             [
                 'court_id.required' => 'Introduce una pista',
@@ -137,20 +137,8 @@ class CourtsController extends Controller
                     'start_Datetime' => $start_time,
                 ]);
 
-                $court = Court::find($request->input('court_id'));
-
                 $response['status'] = 1;
                 $response['data'] = $Reserve;
-                if ($request->input('time') == '60') {
-                    $price = $court->price;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                } elseif ($request->input('time') == '90') {
-                    $price = $court->price * 1.5;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                } else {
-                    $price = $court->price * 2;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                }
 
                 return response()->json($response, 200);
             } catch (\Exception $e) {
