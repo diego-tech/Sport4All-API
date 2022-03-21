@@ -266,13 +266,12 @@ class CourtsController extends Controller
                     'clubs.club_img as clubImg'
                 )
                 ->where('reserves.user_id', Auth::id())
-                ->where('reserves.final_time', '<', now())
+                ->where('reserves.final_time', '<', Carbon::now('Europe/Madrid'))
                 ->get();
 
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Reservas finalizadas';
-
 
             return response()->json($response, 200);
         } catch (\Exception $e) {
