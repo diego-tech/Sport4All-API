@@ -190,7 +190,7 @@ class CourtsController extends Controller
             $day = $request->input('day');
             $hour = $request->input('hour');
 
-            $courts1 = Court::with('reserves', 'prices')
+            $courts1 = Court::with('reserves', 'Courtprices')
                 ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
                 ->select('courts.*')
                 ->where('courts.club_id', $club_id)
@@ -198,7 +198,7 @@ class CourtsController extends Controller
                 ->where('end_time', '>=', $hour)
                 ->where('day', $day);
 
-            $courts = Court::with('reserves', 'prices')
+            $courts = Court::with('reserves', 'Courtprices')
                 ->leftJoin('matchs', 'courts.id', '=', 'matchs.court_id')
                 ->select('courts.*')
                 ->union($courts1)
@@ -214,7 +214,7 @@ class CourtsController extends Controller
             $results = array_diff($courtsAll, $courts);
 
             foreach ($results as $court) {
-                $court = Court::with('prices')->where('id', $court)->get();
+                $court = Court::with('Courtprices')->where('id', $court)->get();
                 $courtsResults[] = $court[0];
             }
 

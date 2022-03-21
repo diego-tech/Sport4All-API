@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\PriceRequest;
-use App\Models\Price;
+use App\Http\Requests\ClubsServicesRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class PriceCrudController
+ * Class ClubsServicesCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class PriceCrudController extends CrudController
+class ClubsServicesCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -27,9 +26,9 @@ class PriceCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Price::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/price');
-        CRUD::setEntityNameStrings('price', 'prices');
+        CRUD::setModel(\App\Models\ClubsServices::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/clubs-services');
+        CRUD::setEntityNameStrings('clubs services', 'clubs services');
     }
 
     /**
@@ -40,21 +39,7 @@ class PriceCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        $this->addColumns();
-        if(backpack_user()->email == 'admin@admin.com'){
-            $this->crud->addColumn([
-                [
-                    'name' => 'club_id',
-                    'label' => 'Club',
-                    'entity' => 'club',
-                    'model' => "App\Models\Club",
-                    'attribute' => 'name',
-                    'pivot' => true,
-                ],
-            ], 'update');
-        }else{
-            $this->crud->addClause('where','club_id','=', backpack_user()->id);            
-        }
+       $this->addColumns();
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -71,12 +56,18 @@ class PriceCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(PriceRequest::class);
+        CRUD::setValidation(ClubsServicesRequest::class);
 
         $this->addFields();
-        Price::creating(function($entry) {
-            $entry->club_id = backpack_user()->id;
-        });
+
+        if(backpack_user()->email == 'admin@admin.com'){
+        }else{
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
+            $this->crud->removeButton('search');
+            
+        }
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -94,42 +85,36 @@ class PriceCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
-        if(backpack_user()->email == 'admin@admin.com'){
-        }elseif(backpack_user()->id == $this->crud->getRequest()->id){
-            $this->crud->addClause('where','id','=', backpack_user()->id);
-        }else{
-            $this->crud->denyAccess('create');
-            $this->crud->denyAccess('update');
-            $this->crud->removeButton('create');
-            $this->crud->removeButton('delete');
-        }
     }
 
-    private function addColumns(){
+    private function addColumns()
+    {
         $this->crud->addColumns([
             [
-                'name' => 'price',
-                'label' => 'Precio',
+                'label'     => "Servicios",
+                'type'      => 'select',
+                'name'      => 'services', // the method that defines the relationship in your Model
+                'entity'    => 'services', // the method that defines the relationship in your Model
+                'model'     => "App\Models\Service", // foreign key model
+                'attribute' => 'name', // foreign key attribute that is shown to user
+                'pivot'     => true, // on create&update, do you need to add/delete pivot table entries?
             ],
-            [
-                'name' => 'time',
-                'label' => 'Tiempo (en minutos)',
-                'type' => 'numeric'
-            ]
+ 
         ]);
     }
 
-    private function addFields(){
+    private function addFields()
+    {
         $this->crud->addFields([
             [
-                'name' => 'price',
-                'label' => 'Precio',
+                'label'     => "Servicios",
+                'type'      => 'select',
+                'name'      => 'services', // the method that defines the relationship in your Model
+                'entity'    => 'services', // the method that defines the relationship in your Model
+                'model'     => "App\Models\Service", // foreign key model
+                'attribute' => 'name', // foreign key attribute that is shown to user
+                'pivot'     => true, // on create&update, do you need to add/delete pivot table entries?
             ],
-            [
-                'name' => 'time',
-                'label' => 'Tiempo (en minutos)',
-                'type' => 'number'
-            ]
         ]);
     }
 }

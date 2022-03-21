@@ -6,3 +6,6 @@
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('event') }}'><i class='nav-icon la la-question'></i> Eventos</a></li>
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('reserve') }}'><i class='nav-icon la la-question'></i> Reservas</a></li>
 <li class='nav-item'><a class='nav-link' href='{{ backpack_url('price') }}'><i class='nav-icon la la-question'></i> Precios</a></li>
+
+<li class='nav-item'><a class='nav-link' href='{{ backpack_url('court-price') }}'><i class='nav-icon la la-question'></i>Añadir precios</a></li>
+<li class='nav-item'><a class='nav-link' href='{{ backpack_url('clubs-services') }}'><i class='nav-icon la la-question'></i>Añadir servicios</a></li>

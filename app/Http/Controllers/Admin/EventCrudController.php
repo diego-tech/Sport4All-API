@@ -117,9 +117,19 @@ class EventCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+        if(backpack_user()->email == 'admin@admin.com'){
+        }elseif(backpack_user()->id == $this->crud->getRequest()->id){
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+        }else{
+            $this->crud->denyAccess('create');
+            $this->crud->denyAccess('update');
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
+        }
         Event::updating(function($entry) {
             $entry->final_time = $entry->day . " ". $entry->end_time;
         });
+
     }
 
     private function addColumns(){

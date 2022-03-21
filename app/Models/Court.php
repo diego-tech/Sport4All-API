@@ -26,7 +26,7 @@ class Court extends Model
 
     protected $table="courts";
 
-    public function prices() {
+    public function Courtprices() {
         return $this->belongsToMany(Price::class, 'court_prices', 'court_id');
     }
 
@@ -38,4 +38,6 @@ class Court extends Model
     {
         return $this->hasOne(Club::class,'id');
     }
+
+
 }
