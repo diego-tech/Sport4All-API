@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use Closure;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class CheckIfEmaiIsValidated
@@ -25,8 +26,10 @@ class CheckIfEmaiIsValidated
         if ($user->hasVerifiedEmail()) {
             return $next($request);
         } else {
+            event(new Registered($user));
+
             $response['status'] = 0;
-            $response['msg'] = "Correo Electrónico no Validado";
+            $response['msg'] = "Valide Su Correo Electrónico";
 
             return response()->json($response, 406);
         }

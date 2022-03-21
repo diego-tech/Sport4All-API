@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Club;
 use App\Models\Court;
 use App\Models\Matchs;
 use App\Models\Reserve;
@@ -247,11 +248,11 @@ class CourtsController extends Controller
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = Reserve::query()
-                ->join('courts', 'reserves.court_id', '=', 'courts.id')
+            $query = Reserve::join('courts', 'reserves.court_id', '=', 'courts.id')
                 ->join('clubs', 'courts.club_id', '=', 'clubs.id')
                 ->select(
                     'reserves.*',
+                    'clubs.*',
                     'clubs.name as clubName',
                     'clubs.direction as clubLocation',
                     'courts.name',
@@ -259,7 +260,7 @@ class CourtsController extends Controller
                     'courts.sport',
                     'courts.surfaces',
                     'clubs.club_img as clubImg'
-                )
+                )   
                 ->where('reserves.user_id', Auth::id())
                 ->where('reserves.final_time', '<', Carbon::now('Europe/Madrid'))
                 ->get();
