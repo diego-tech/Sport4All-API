@@ -98,7 +98,7 @@ class CourtsController extends Controller
                 'lights' => 'required|boolean',
                 'day' => 'required|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
-                'time' => ['required'],
+                'time' => ['required']
             ],
             [
                 'court_id.required' => 'Introduce una pista',
@@ -125,7 +125,7 @@ class CourtsController extends Controller
                 $start_time = $request->input('day') . " " . $request->input('start_time');
                 $QR = mt_rand(1000, 9999);
                 $Reserve = Reserve::create([
-                    'QR' => $QR,
+                    'QR' => strval($QR),
                     'user_id' => Auth::id(),
                     'court_id' => $request->input('court_id'),
                     'club_id' => $request->input('club_id'),
@@ -229,17 +229,17 @@ class CourtsController extends Controller
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        try {   
+        try {
             $query = Reserve::query()
                 ->join('courts', 'reserves.court_id', '=', 'courts.id')
                 ->join('clubs', 'courts.club_id', '=', 'clubs.id')
                 ->select(
-                    'reserves.*', 
-                    'clubs.name as clubName', 
-                    'clubs.direction as clubLocation', 
-                    'courts.name', 
-                    'courts.type', 
-                    'courts.sport', 
+                    'reserves.*',
+                    'clubs.name as clubName',
+                    'clubs.direction as clubLocation',
+                    'courts.name',
+                    'courts.type',
+                    'courts.sport',
                     'courts.surfaces',
                     'clubs.club_img as clubImg'
                 )
@@ -265,9 +265,20 @@ class CourtsController extends Controller
 
         try {
             $query = Reserve::query()
-                ->select('reserves.*')
+                ->join('courts', 'reserves.court_id', '=', 'courts.id')
+                ->join('clubs', 'courts.club_id', '=', 'clubs.id')
+                ->select(
+                    'reserves.*',
+                    'clubs.name as clubName',
+                    'clubs.direction as clubLocation',
+                    'courts.name',
+                    'courts.type',
+                    'courts.sport',
+                    'courts.surfaces',
+                    'clubs.club_img as clubImg'
+                )
                 ->where('reserves.user_id', Auth::id())
-                ->where('matchs.final_time', '<', now())
+                ->where('reserves.final_time', '<', now())
                 ->get();
 
             $response['status'] = 1;
@@ -298,19 +309,28 @@ class CourtsController extends Controller
 
             $testR = $queryR->get();
             if (!$testM->isEmpty()) {
-                $matchQRvalidated = $queryM->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                $matchQRvalidated = $queryM
+                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
+                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->get();
                 if (!$matchQRvalidated->isEmpty()) {
+                    $response['status'] = 1;
                     $response['msg'] = 'Puerta abierta';
                     return response()->json($response, 200);
                 }
             } elseif (!$testR->isEmpty()) {
-                $reserveQRvalidated = $queryR->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))->where('final_time', '>=', Carbon::now('Europe/Madrid'))->get();
+                $reserveQRvalidated = $queryR
+                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
+                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->get();
                 if (!$reserveQRvalidated->isEmpty()) {
+                    $response['status'] = 1;
                     $response['msg'] = 'Puerta abierta';
                     return response()->json($response, 200);
                 }
             }
 
+            $response['status'] = 0;
             $response['msg'] = 'Horario incorrecto puerta cerrada';
             return response()->json($response, 403);
         } catch (\Exception $e) {

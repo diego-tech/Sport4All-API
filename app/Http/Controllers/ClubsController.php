@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class ClubsController extends Controller
 {
@@ -112,8 +111,8 @@ class ClubsController extends Controller
     public function listClubs()
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
-        try{
-            $query = Club::all()->where('name','!=','Admin');
+        try {
+            $query = Club::all()->where('name', '!=', 'Admin');
             $clubs_array = [];
 
             foreach ($query as $clubs) {
@@ -126,6 +125,8 @@ class ClubsController extends Controller
                 $ClubArray['email'] = $clubs->email;
                 $ClubArray['web'] = $clubs->web;
                 $ClubArray['description'] = $clubs->description;
+                $ClubArray['first_hour'] = $clubs->first_hour;
+                $ClubArray['last_hour'] = $clubs->last_hour;
                 $query = Favourite::where('user_id', Auth::id())->where('club_id', $clubs->id)->value('id');
                 if ($query) {
                     $ClubArray['fav'] = True;
@@ -153,7 +154,7 @@ class ClubsController extends Controller
 
     public function showListClubsWeb()
     {
-        $query = Club::all()->where('name','!=','Admin');
+        $query = Club::all()->where('name', '!=', 'Admin');
         $clubs_array = [];
 
         foreach ($query as $clubs) {
@@ -345,7 +346,7 @@ class ClubsController extends Controller
             $query = DB::table('favourites')
                 ->select(DB::raw("COUNT('favourites.club_id') as Total, favourites.club_id"))
                 ->leftJoin('clubs', 'favourites.club_id', '=', 'clubs.id')
-                ->where('name','!=','Admin')
+                ->where('name', '!=', 'Admin')
                 ->groupBy('favourites.club_id')
                 ->orderBy('Total', 'desc')
                 ->get();

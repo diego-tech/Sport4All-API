@@ -97,10 +97,9 @@ class MatchController extends Controller
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
-        $matchs = [];
-
         try {
-            $arra = Matchs::with('users')->where('day', $request->input('day'))
+            $arra = Matchs::with('users', 'matchCourts', 'clubs')
+                ->where('day', $request->input('day'))
                 ->get();
 
             $grouped = $arra->groupBy('start_time')
@@ -110,29 +109,6 @@ class MatchController extends Controller
                         'items' => $items
                     ];
                 });
-
-            // return $grouped->values();
-            // // dd($arra);
-
-            // /*$Matchs = DB::table('matchs')
-            //             ->groupBy('matchs.start_time')
-            //             ->join('match_user','match_user.match_id','matchs.id')
-            //             ->join('users','users.id','match_user.user_id')
-            //             ->select('matchs.*','users.image')
-            //             //->orWhere('day', $request->input('day'))
-            //             ->get();*/
-            // $currentTime = null;
-            // for ($i = 0; $i < sizeof($arra); $i++) {
-            //     if ($currentTime == $arra[$i]->start_time) {
-            //         $matchs[$currentTime][] = $arra[$i];
-            //     } else {
-            //         $currentTime = $arra[$i]->start_time;
-            //         $matchs[$currentTime][] = $arra[$i];
-            //     }
-            // }
-
-            // Imágenes de los usuarior inscritos
-            // Array dentro de array que muestre el día y la hora del partido
 
             $response['data'] = $grouped->values();
             $response['msg'] = "Partidos";
@@ -178,10 +154,12 @@ class MatchController extends Controller
             try {
                 if ($count == 4) {
                     $response['status'] = 0;
+                    $response['data']['errors'] = "";
                     $response['msg'] = 'El partido ya esta completo';
                     return response()->json($response, 406);
                 } elseif (!$usercheck->isEmpty()) {
                     $response['status'] = 0;
+                    $response['data']['errors'] = "";
                     $response['msg'] = 'No te puedes inscribir 2 veces al mismo partido';
                     return response()->json($response, 406);
                 } else {
@@ -220,7 +198,18 @@ class MatchController extends Controller
         try {
             $query = Matchs::query()
                 ->join('match_user', 'matchs.id', '=', 'match_user.match_id')
-                ->select('matchs.*')
+                ->join('clubs', 'matchs.club_id', '=', 'clubs.id')
+                ->join('courts', 'matchs.court_id', '=', 'courts.id')
+                ->select(
+                    'matchs.*',
+                    'clubs.name as clubName',
+                    'clubs.direction as clubLocation',
+                    'clubs.club_img as clubImg',
+                    'courts.name',
+                    'courts.type',
+                    'courts.sport',
+                    'courts.surfaces'
+                )
                 ->where('match_user.user_id', Auth::id())
                 ->where('matchs.final_time', '<', now())
                 ->get();
