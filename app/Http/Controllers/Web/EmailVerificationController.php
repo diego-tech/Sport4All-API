@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 
 class EmailVerificationController extends Controller
 {
@@ -30,4 +32,5 @@ class EmailVerificationController extends Controller
 
         return redirect('/');
     }
+
 }

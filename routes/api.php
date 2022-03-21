@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClubsController;
 use App\Http\Controllers\CourtsController;
 use App\Http\Controllers\MatchController;
+use App\Http\Controllers\ResetPasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,6 +28,9 @@ Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('a
 Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('auth:sanctum');
 Route::post('/getUploadImage', [AuthController::class, 'getUploadImage']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+// Recuperación de contraseña
+Route::get('/forgotPassword', [ResetPasswordController::class, 'forgotPassword']); // Envío de email para recuperar contraseña
 
 //Rutas de eventos
 Route::get('/listevents', [AuthController::class, 'listevents'])->middleware('auth:sanctum');
