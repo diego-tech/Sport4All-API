@@ -126,15 +126,6 @@ class CourtCrudController extends CrudController
                 'name' => 'surfaces',
                 'label' => 'Tipo de pista',
             ],
-            [
-                'label'     => "Precio",
-                'type'      => 'select',
-                'name'      => 'prices', // the method that defines the relationship in your Model
-                'entity'    => 'prices', // the method that defines the relationship in your Model
-                'model'     => "App\Models\Price", // foreign key model
-                'attribute' => 'prices', // foreign key attribute that is shown to user
-                'pivot'     => true, // on create&update, do you need to add/delete pivot table entries?
-            ]
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\ClubsServicesRequest;
+use App\Models\ClubsServices;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -41,6 +42,11 @@ class ClubsServicesCrudController extends CrudController
     {
        $this->addColumns();
 
+       if(backpack_user()->email == 'admin@admin.com'){
+       }else{
+           $this->crud->addClause('where','club_id','=', backpack_user()->id);
+        }
+
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
@@ -62,12 +68,12 @@ class ClubsServicesCrudController extends CrudController
 
         if(backpack_user()->email == 'admin@admin.com'){
         }else{
-            $this->crud->addClause('where','id','=', backpack_user()->id);
-            $this->crud->removeButton('create');
-            $this->crud->removeButton('delete');
-            $this->crud->removeButton('search');
-            
+            $this->crud->addClause('where','club_id','=', backpack_user()->id);            
         }
+        ClubsServices::creating(function($entry) {
+            $entry->club_id = backpack_user()->id;
+            $entry->service_id = $this->crud->getRequest()->services;
+        });
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

@@ -31,7 +31,7 @@ class ClubsServices extends Model
     */
 
     public function services() {
-        return $this->hasMany(Price::class,'id');
+        return $this->hasMany(Service::class,'id');
     }
     /*
     |--------------------------------------------------------------------------
