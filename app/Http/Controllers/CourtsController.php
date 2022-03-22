@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\AuxFunctions;
 use App\Models\Club;
 use App\Models\Court;
 use App\Models\Favourite;
