@@ -25,7 +25,7 @@ class ClubsServicesRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'service_id' => 'nullable|min:5|max:255'
         ];
     }
 

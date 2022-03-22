@@ -71,8 +71,13 @@ class ClubsServicesCrudController extends CrudController
             $this->crud->addClause('where','club_id','=', backpack_user()->id);            
         }
         ClubsServices::creating(function($entry) {
-            $entry->club_id = backpack_user()->id;
-            $entry->service_id = $this->crud->getRequest()->services;
+            $service = ClubsServices::where('service_id' ,$this->crud->getRequest()->services)->first();
+            if(!$service){
+                $entry->service_id = $this->crud->getRequest()->services;
+                $entry->club_id = backpack_user()->id;
+            }else{
+                return redirect('clubs-services');
+            }
         });
 
         /**
