@@ -9,7 +9,6 @@ use App\Models\Club;
 use App\Models\Event;
 use App\Models\Favourite;
 use App\Models\Inscription;
-use App\Models\Reserve;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -90,6 +89,7 @@ class AuthController extends Controller
                 return response()->json($response, 200);
             } catch (\Exception $e) {
                 $response['status'] = 0;
+                $response['data']['errors'] = "";
                 $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
                 return response()->json($response, 406);
@@ -133,6 +133,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -141,7 +142,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
+        $response = ["status" => 1, "msg" => ""];
         try {
             $request->user()->currentAccessToken()->delete();
             $response['msg'] = 'Sesion cerrada correctamente';
@@ -171,6 +172,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['data']['errors'] = "";
             $response['status'] = 0;
 
             return response()->json($response, 406);
@@ -281,6 +283,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['data']['errors'] = "";
             $response['status'] = 0;
 
             return response()->json($response, 406);
@@ -330,6 +333,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['data']['errors'] = "";
             $response['status'] = 0;
 
             return response()->json($response, 406);
@@ -374,6 +378,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -423,7 +428,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
-            $response['data'] = "";
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -508,50 +513,19 @@ class AuthController extends Controller
                 $response['msg'] = "Resultados de la búsqueda:";
                 return response()->json($response, 200);
             } else {
+                $response['status'] = 1;
+                $response['data']['errors'] = "";
                 $response['msg'] = "Introduzca un término a buscar";
                 return response()->json($response);
             }
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
         }
     }
-
-    /**
-     * Buscar Eventos
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return response()->json($response)
-     */
-    public function searchEvents(Request $request)
-    {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
-
-        $query = $request->input('name');
-
-        try {
-            if ($query) {
-                $eventsArray = [];
-
-                $finalResults = DB::table('events')
-                    ->join('events.club_id', 'clubs', 'id')
-                    ->select()
-                    ->where('clubs.name', '!=', 'Admin')
-                    ->where('clubs.name', 'like', '%' . $query . '%')
-                    ->orWhere('clubs.direction', 'like', '%' . $query . '%')
-                    ->orWhere('events.name', 'like', '%' . $query . '%')
-                    ->get();
-            }
-        } catch (\Exception $e) {
-            $response['status'] = 0;
-            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
-
-            return response()->json($response, 406);
-        }
-    }
-
 
     /**
      * Inscribirse en Evento
@@ -599,19 +573,20 @@ class AuthController extends Controller
                         return response()->json($response, 200);
                     } else {
                         $response['status'] = 0;
-                        $response['data'][''] = "";
+                        $response['data']['errors'] = "";
                         $response['msg'] = "Ya está inscrito";
                         return response()->json($response, 406);
                     }
                 }
             } else {
                 $response['status'] = 0;
-                $response['data'][''] = "";
+                $response['data']['errors'] = "";
                 $response['msg'] = "El evento no existe";
                 return response()->json($response, 404);
             }
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -651,6 +626,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -681,10 +657,10 @@ class AuthController extends Controller
             $response['data'] = $query;
             $response['msg'] = 'Eventos pendientes';
 
-
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -722,6 +698,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
