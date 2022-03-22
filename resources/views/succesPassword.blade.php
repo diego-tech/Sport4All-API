@@ -137,7 +137,6 @@
                 </h2>
 
                 <p>Ya puede acceder a su cuenta con la nueva contraseña</p>
-                
         </div>
     </div>
 </body>

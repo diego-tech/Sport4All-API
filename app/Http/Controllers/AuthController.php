@@ -9,7 +9,6 @@ use App\Models\Club;
 use App\Models\Event;
 use App\Models\Favourite;
 use App\Models\Inscription;
-use App\Models\Reserve;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -19,7 +18,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -58,7 +56,7 @@ class AuthController extends Controller
             $request->all(),
             [
                 'email' => 'bail|required|string|email|max:255|unique:users',
-                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}/',
             ],
             [
                 'email.required' => 'Introduce un email correcto',
@@ -188,11 +186,7 @@ class AuthController extends Controller
     public function recoverPass(Request $request)
     {
         $response = ["status" => 1, "msg" => ""];
-
-        $pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
-
-        $user = User::where('email', $request->email)->first();
-
+        
         try {
             $status = Password::sendResetLink(
                 $request->only('email')
@@ -298,7 +292,7 @@ class AuthController extends Controller
         $validatedData = Validator::make(
             $request->all(),
             [
-                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}/'
             ],
             [
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',

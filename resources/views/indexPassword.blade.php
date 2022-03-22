@@ -113,6 +113,10 @@
             color: #666666;
         }
 
+        .alert {
+            color: red;
+        }
+
         @keyframes spin {
             0% {
                 transform: rotate(0deg);
@@ -128,24 +132,29 @@
 <body>
     <div class="mainDiv">
         <div class="cardStyle">
-            <form action="" method="GET" name="signupForm" id="signupForm">
-
+            <form action="/resetPassword" method="POST" name="signupForm" id="signupForm">
                 @csrf
-
                 <img src="{{url('img/logoapp.png')}}" id="signupLogo" />
+
+                <input type="hidden" name="token" value="{{ $token }}">
 
                 <h2 class="formTitle">
                     Restablezca su contraseña
                 </h2>
 
                 <div class="inputDiv">
-                    <label class="inputLabel" for="password">Nueva contraseña</label>
+                    <label class="inputLabel" for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="inputDiv">
+                    <label class="inputLabel" for="password">Nueva contraseña *</label>
                     <input type="password" id="password" name="password" required>
                 </div>
 
                 <div class="inputDiv">
-                    <label class="inputLabel" for="confirmPassword">Confirma la nueva contraseña</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <label class="inputLabel" for="password_confirmation">Confirma la nueva contraseña *</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" required>
                 </div>
 
                 <div class="buttonWrapper">
@@ -154,6 +163,16 @@
                     </button>
                 </div>
             </form>
+
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
         </div>
     </div>
 </body>
