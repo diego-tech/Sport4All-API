@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\AuxFunctions;
+use App\Models\Club;
 use App\Models\Court;
+use App\Models\Favourite;
 use App\Models\Matchs;
 use App\Models\Reserve;
 use Carbon\Carbon;
@@ -263,7 +266,7 @@ class CourtsController extends Controller
                 ->where('reserves.user_id', Auth::id())
                 ->where('reserves.final_time', '<', Carbon::now('Europe/Madrid'))
                 ->get();
-
+                
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Reservas finalizadas';
@@ -315,6 +318,49 @@ class CourtsController extends Controller
             $response['status'] = 0;
             $response['msg'] = 'Horario incorrecto puerta cerrada';
             return response()->json($response, 403);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    public function get_club_info_ended_events(Request $request){
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try {
+            $query = Club::find($request->input('id'));
+
+            $clubs_array = [];
+
+            foreach ($query as $clubs) {
+                $ClubArray['id'] = $clubs->id;
+                $ClubArray['name'] = $clubs->name;
+                $ClubArray['club_img'] = $clubs->club_img;
+                $ClubArray['club_banner'] = $clubs->club_banner;
+                $ClubArray['direction'] = $clubs->direction;
+                $ClubArray['tlf'] = $clubs->tlf;
+                $ClubArray['email'] = $clubs->email;
+                $ClubArray['web'] = $clubs->web;
+                $ClubArray['description'] = $clubs->description;
+                $ClubArray['first_hour'] = $clubs->first_hour;
+                $ClubArray['last_hour'] = $clubs->last_hour;
+                $query = Favourite::where('user_id', Auth::id())->where('club_id', $clubs->id)->value('id');
+                if ($query) {
+                    $ClubArray['fav'] = True;
+                } else {
+                    $ClubArray['fav'] = False;
+                }
+                $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
+
+                $clubs_array[] = $ClubArray;
+            }
+
+            $response['status'] = 1;
+            $response['data'] = $clubs_array;
+            $response['msg'] = "Todos los Clubes";
+            return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);

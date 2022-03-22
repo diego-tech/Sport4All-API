@@ -53,6 +53,7 @@ Route::get('/seematches', [MatchController::class, 'seeMatches'])->middleware('a
 Route::get('/pendingmatches', [MatchController::class, 'pending_matches'])->middleware('auth:sanctum');
 Route::get('/pendingreserves', [CourtsController::class, 'pending_reserves'])->middleware('auth:sanctum');
 Route::get('/endedreserves', [CourtsController::class, 'ended_reserves'])->middleware('auth:sanctum');
+Route::get('/endedinfoclub', [CourtsController::class, 'get_club_info_ended_events'])->middleware('auth:sanctum');
 
 //QR
 Route::get('/qrvalidation', [CourtsController::class, 'qr_validator'])->middleware('auth:sanctum');
