@@ -266,7 +266,7 @@ class CourtsController extends Controller
                 ->where('reserves.user_id', Auth::id())
                 ->where('reserves.final_time', '<', Carbon::now('Europe/Madrid'))
                 ->get();
-                
+
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Reservas finalizadas';
@@ -326,39 +326,34 @@ class CourtsController extends Controller
         }
     }
 
-    public function get_club_info_ended_events(Request $request){
+    public function get_club_info_ended_events(Request $request)
+    {
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
             $query = Club::find($request->input('id'));
-
-            $clubs_array = [];
-
-            foreach ($query as $clubs) {
-                $ClubArray['id'] = $clubs->id;
-                $ClubArray['name'] = $clubs->name;
-                $ClubArray['club_img'] = $clubs->club_img;
-                $ClubArray['club_banner'] = $clubs->club_banner;
-                $ClubArray['direction'] = $clubs->direction;
-                $ClubArray['tlf'] = $clubs->tlf;
-                $ClubArray['email'] = $clubs->email;
-                $ClubArray['web'] = $clubs->web;
-                $ClubArray['description'] = $clubs->description;
-                $ClubArray['first_hour'] = $clubs->first_hour;
-                $ClubArray['last_hour'] = $clubs->last_hour;
-                $query = Favourite::where('user_id', Auth::id())->where('club_id', $clubs->id)->value('id');
-                if ($query) {
-                    $ClubArray['fav'] = True;
-                } else {
-                    $ClubArray['fav'] = False;
-                }
-                $ClubArray['services'] = AuxFunctions::Get_services_from_club($clubs->id);
-
-                $clubs_array[] = $ClubArray;
+            
+            $ClubArray['id'] = $query->id;
+            $ClubArray['name'] = $query->name;
+            $ClubArray['club_img'] = $query->club_img;
+            $ClubArray['club_banner'] = $query->club_banner;
+            $ClubArray['direction'] = $query->direction;
+            $ClubArray['tlf'] = $query->tlf;
+            $ClubArray['email'] = $query->email;
+            $ClubArray['web'] = $query->web;
+            $ClubArray['description'] = $query->description;
+            $ClubArray['first_hour'] = $query->first_hour;
+            $ClubArray['last_hour'] = $query->last_hour;
+            $queryFav = Favourite::where('user_id', Auth::id())->where('club_id', $query->id)->value('id');
+            if ($queryFav) {
+                $ClubArray['fav'] = True;
+            } else {
+                $ClubArray['fav'] = False;
             }
+            $ClubArray['services'] = AuxFunctions::Get_services_from_club($query->id);
 
             $response['status'] = 1;
-            $response['data'] = $clubs_array;
+            $response['data'] = $ClubArray;
             $response['msg'] = "Todos los Clubes";
             return response()->json($response, 200);
         } catch (\Exception $e) {
