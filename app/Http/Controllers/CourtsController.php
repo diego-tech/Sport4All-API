@@ -290,11 +290,14 @@ class CourtsController extends Controller
 
             $queryR = Reserve::where('QR', $request->input('qr'))->where('user_id', Auth::id());
 
+            $substractMinutes = Carbon::now('Europe/Madrid')->subMinutes(10);
+            $addMinutes = Carbon::now('Europe/Madrid')->addMinutes(10);
+
             $testR = $queryR->get();
             if (!$testM->isEmpty()) {
                 $matchQRvalidated = $queryM
-                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
-                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->where('start_Datetime', '<=', $substractMinutes)
+                    ->where('final_time', '>=', $addMinutes)
                     ->get();
                 if (!$matchQRvalidated->isEmpty()) {
                     $response['status'] = 1;
@@ -303,8 +306,8 @@ class CourtsController extends Controller
                 }
             } elseif (!$testR->isEmpty()) {
                 $reserveQRvalidated = $queryR
-                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
-                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->where('start_Datetime', '<=', $substractMinutes)
+                    ->where('final_time', '>=', $addMinutes)
                     ->get();
                 if (!$reserveQRvalidated->isEmpty()) {
                     $response['status'] = 1;
