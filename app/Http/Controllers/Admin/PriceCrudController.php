@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\PriceRequest;
+use App\Models\Price;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -39,12 +40,21 @@ class PriceCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('id');
-        CRUD::column('price');
-        CRUD::column('time');
-        CRUD::column('club_id');
-        CRUD::column('created_at');
-        CRUD::column('updated_at');
+        $this->addColumns();
+        if(backpack_user()->email == 'admin@admin.com'){
+            $this->crud->addColumn([
+                [
+                    'name' => 'club_id',
+                    'label' => 'Club',
+                    'entity' => 'club',
+                    'model' => "App\Models\Club",
+                    'attribute' => 'name',
+                    'pivot' => true,
+                ],
+            ], 'update');
+        }else{
+            $this->crud->addClause('where','club_id','=', backpack_user()->id);            
+        }
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -63,12 +73,10 @@ class PriceCrudController extends CrudController
     {
         CRUD::setValidation(PriceRequest::class);
 
-        CRUD::field('id');
-        CRUD::field('price');
-        CRUD::field('time');
-        CRUD::field('club_id');
-        CRUD::field('created_at');
-        CRUD::field('updated_at');
+        $this->addFields();
+        Price::creating(function($entry) {
+            $entry->club_id = backpack_user()->id;
+        });
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:
@@ -86,5 +94,42 @@ class PriceCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+        if(backpack_user()->email == 'admin@admin.com'){
+        }elseif(backpack_user()->id == $this->crud->getRequest()->id){
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+        }else{
+            $this->crud->denyAccess('create');
+            $this->crud->denyAccess('update');
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
+        }
+    }
+
+    private function addColumns(){
+        $this->crud->addColumns([
+            [
+                'name' => 'price',
+                'label' => 'Precio',
+            ],
+            [
+                'name' => 'time',
+                'label' => 'Tiempo (en minutos)',
+                'type' => 'numeric'
+            ]
+        ]);
+    }
+
+    private function addFields(){
+        $this->crud->addFields([
+            [
+                'name' => 'price',
+                'label' => 'Precio',
+            ],
+            [
+                'name' => 'time',
+                'label' => 'Tiempo (en minutos)',
+                'type' => 'number'
+            ]
+        ]);
     }
 }

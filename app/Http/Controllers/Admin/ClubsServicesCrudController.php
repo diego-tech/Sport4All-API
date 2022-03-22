@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\CourtRequest;
-use App\Models\Court;
+use App\Http\Requests\ClubsServicesRequest;
+use App\Models\ClubsServices;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
- * Class CourtCrudController
+ * Class ClubsServicesCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class CourtCrudController extends CrudController
+class ClubsServicesCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
@@ -27,9 +27,9 @@ class CourtCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Court::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/court');
-        CRUD::setEntityNameStrings('court', 'courts');
+        CRUD::setModel(\App\Models\ClubsServices::class);
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/clubs-services');
+        CRUD::setEntityNameStrings('clubs services', 'clubs services');
     }
 
     /**
@@ -40,19 +40,11 @@ class CourtCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        $this->addColumns();
+       $this->addColumns();
 
-        if (backpack_user()->email == 'admin@admin.com') {
-            $this->crud->addColumn([
-                'name' => 'club_id',
-                'label' => 'Club',
-                'entity'    => 'club',
-                'model'     => "App\Models\Club",
-                'attribute' => 'name',
-                'pivot'     => true,
-            ], 'update');
-        } else {
-            $this->crud->addClause('where', 'club_id', '=', backpack_user()->id);
+       if(backpack_user()->email == 'admin@admin.com'){
+       }else{
+           $this->crud->addClause('where','club_id','=', backpack_user()->id);
         }
 
         /**
@@ -70,12 +62,22 @@ class CourtCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(CourtRequest::class);
+        CRUD::setValidation(ClubsServicesRequest::class);
 
         $this->addFields();
 
-        Court::creating(function ($entry) {
-            $entry->club_id = backpack_user()->id;
+        if(backpack_user()->email == 'admin@admin.com'){
+        }else{
+            $this->crud->addClause('where','club_id','=', backpack_user()->id);            
+        }
+        ClubsServices::creating(function($entry) {
+            $service = ClubsServices::where('service_id' ,$this->crud->getRequest()->services)->first();
+            if(!$service){
+                $entry->service_id = $this->crud->getRequest()->services;
+                $entry->club_id = backpack_user()->id;
+            }else{
+                return redirect('clubs-services');
+            }
         });
 
         /**
@@ -94,38 +96,21 @@ class CourtCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
-        if (backpack_user()->email == 'admin@admin.com') {
-        } elseif (backpack_user()->id == $this->crud->getRequest()->id) {
-            $this->crud->addClause('where', 'id', '=', backpack_user()->id);
-        } else {
-            $this->crud->denyAccess('create');
-            $this->crud->denyAccess('update');
-            $this->crud->removeButton('create');
-            $this->crud->removeButton('delete');
-        }
-
-        //dd($this->crud->getRequest());    
     }
 
     private function addColumns()
     {
         $this->crud->addColumns([
             [
-                'name' => 'name',
-                'label' => 'Nombre'
+                'label'     => "Servicios",
+                'type'      => 'select',
+                'name'      => 'services', // the method that defines the relationship in your Model
+                'entity'    => 'services', // the method that defines the relationship in your Model
+                'model'     => "App\Models\Service", // foreign key model
+                'attribute' => 'name', // foreign key attribute that is shown to user
+                'pivot'     => true, // on create&update, do you need to add/delete pivot table entries?
             ],
-            [
-                'name' => 'type',
-                'label' => 'Tipo',
-            ],
-            [
-                'name' => 'sport',
-                'label' => 'Deporte'
-            ],
-            [
-                'name' => 'surfaces',
-                'label' => 'Tipo de pista',
-            ],
+ 
         ]);
     }
 
@@ -133,23 +118,13 @@ class CourtCrudController extends CrudController
     {
         $this->crud->addFields([
             [
-                'name' => 'name',
-                'label' => 'Nombre',
-            ],
-            [
-                'name' => 'type',
-                'label' => 'Tipo',
-                'type' => 'enum',
-            ],
-            [
-                'name' => 'sport',
-                'label' => 'Deporte',
-                'type' => 'enum',
-            ],
-            [
-                'name' => 'surfaces',
-                'label' => 'Tipo de pista',
-                'type' => 'enum',
+                'label'     => "Servicios",
+                'type'      => 'select',
+                'name'      => 'services', // the method that defines the relationship in your Model
+                'entity'    => 'services', // the method that defines the relationship in your Model
+                'model'     => "App\Models\Service", // foreign key model
+                'attribute' => 'name', // foreign key attribute that is shown to user
+                'pivot'     => true, // on create&update, do you need to add/delete pivot table entries?
             ],
         ]);
     }
