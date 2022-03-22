@@ -196,9 +196,10 @@ class AuthController extends Controller
             );
 
             if ($status == Password::RESET_LINK_SENT) {
-                return [
-                    'status' => __($status)
-                ];
+                $response['status'] = 1;
+                $response['msg'] = "Compruebe su bandeja de entrada";
+                
+                return response()->json($response, 200);
             }
 
             throw ValidationException::withMessages([
