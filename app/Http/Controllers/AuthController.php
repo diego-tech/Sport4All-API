@@ -520,40 +520,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Buscar Eventos
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return response()->json($response)
-     */
-    public function searchEvents(Request $request)
-    {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
-
-        $query = $request->input('name');
-
-        try {
-            if ($query) {
-                $eventsArray = [];
-
-                $finalResults = DB::table('events')
-                    ->join('events.club_id', 'clubs', 'id')
-                    ->select()
-                    ->where('clubs.name', '!=', 'Admin')
-                    ->where('clubs.name', 'like', '%' . $query . '%')
-                    ->orWhere('clubs.direction', 'like', '%' . $query . '%')
-                    ->orWhere('events.name', 'like', '%' . $query . '%')
-                    ->get();
-            }
-        } catch (\Exception $e) {
-            $response['status'] = 0;
-            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
-
-            return response()->json($response, 406);
-        }
-    }
-
-
-    /**
      * Inscribirse en Evento
      * 
      * @param \Illuminate\Http\Request $request
