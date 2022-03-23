@@ -34,8 +34,14 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (\Illuminate\Auth\AuthenticationException $e, $request) {
+            $response = ["status" => 1, "msg" => ""];
+            if ($request->is('api/*')) {
+                $response['status'] = 3;
+                $response['msg'] = 'Error de autenticación';
+    
+                return response()->json($response, 401);
+            }
         });
     }
 }
