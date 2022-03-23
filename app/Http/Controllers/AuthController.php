@@ -34,18 +34,26 @@ class AuthController extends Controller
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        $now = Carbon::now();
-        $fileName = Storage::putFile("", $request->file('fileName'));
+        try {
+            $fileName = Storage::putFile("", $request->file('fileName'));
 
-        $userImage = User::where('id', Auth::id())->value('image');
+            $userImage = User::where('id', Auth::id())->value('image');
 
-        Storage::delete($userImage);
+            if ($userImage) {
+                Storage::delete($userImage);
+            }
 
-        $response['status'] = 1;
-        $response['data']['errors'] = "";
-        $response["msg"] = $fileName;
+            $response['status'] = 1;
+            $response['data']['errors'] = "";
+            $response["msg"] = $fileName;
 
-        return response()->json($response);
+            return response()->json($response, 200);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
     }
 
     /**
@@ -87,14 +95,14 @@ class AuthController extends Controller
                     'password' => Hash::make($request->input('password')),
                 ]);
 
-                
+
                 $response['status'] = 1;
                 $response['data'] = $user;
                 $response['data']['errors'] = "";
                 $response['msg'] = 'Usuario Registrado Correctamente';
 
                 event(new Registered($user));
-                
+
                 return response()->json($response, 200);
             } catch (\Exception $e) {
                 $response['status'] = 0;
@@ -198,7 +206,7 @@ class AuthController extends Controller
     public function recoverPass(Request $request)
     {
         $response = ["status" => 1, "msg" => ""];
-        
+
         try {
             $status = Password::sendResetLink(
                 $request->only('email')
@@ -207,14 +215,13 @@ class AuthController extends Controller
             if ($status == Password::RESET_LINK_SENT) {
                 $response['status'] = 1;
                 $response['msg'] = "Compruebe su bandeja de entrada";
-                
+
                 return response()->json($response, 200);
             }
 
             throw ValidationException::withMessages([
                 'email' => trans($status),
             ]);
-
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
             $response['status'] = 0;
