@@ -81,12 +81,14 @@ class AuthController extends Controller
                     'password' => Hash::make($request->input('password')),
                 ]);
 
-                event(new Registered($user));
-
+                
                 $response['status'] = 1;
                 $response['data'] = $user;
+                $response['data']['errors'] = "";
                 $response['msg'] = 'Usuario Registrado Correctamente';
 
+                event(new Registered($user));
+                
                 return response()->json($response, 200);
             } catch (\Exception $e) {
                 $response['status'] = 0;
@@ -127,6 +129,7 @@ class AuthController extends Controller
                     $response['status'] = 1;
                     $response['data'] = $user;
                     $response['data']['token'] = $token;
+                    $response['data']['errors'] = "";
                     $response['msg'] = "Sesión Iniciada Correctamente";
 
                     return response()->json($response, 200);
