@@ -8,8 +8,9 @@
     <title>Sports4All</title>
 
     <!-- Links -->
-    <link rel="icon" href="{{url('img/WhiteLogo.png') }}">
-    <link rel="stylesheet" href="{{url('css/app.css')}}" />
+    <link rel="icon" href="{{url('img/logoapp.png') }}">
+    <link rel="stylesheet" href="{{url('css/main.css')}}" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 </head>
 
 <body class="is-preload">
@@ -39,7 +40,7 @@
 
         <div class="box alt container">
             <section class="feature left">
-                <a href="" class="image icon solid fa-mobile-alt"><img src="{{url('img/pic01.jpg')}}" alt="" /></a>
+                <a href="" class="image icon solid fa-mobile-alt"> <img src="img/pic01.jpg" alt="" /></a>
                 <div class="content">
                     <h3>Reservar es fácil</h3>
                     <p>
@@ -84,35 +85,23 @@
                             <tr>
                                 <th>Club</th>
                                 <th>Descripción</th>
-                                <th>Valoración media</th>
+                                <th>Dirección</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach($clubs as $club)
                             <tr>
                                 <td>
-                                    Club deportivo <br />
-                                    Juan Lucas
+                                    {{$club['name']}}
                                 </td>
-                                <td>Es el club deportivo de pádel de Juan Lucas</td>
-                                <td>7/10</td>
-                            </tr>
-                            <tr>
-                                <td>Asociación deportiva Vallecas</td>
+                                <td>{{$club['description']}}</td>
                                 <td>
-                                    Club deportivo con pistas de pádel y tenis disponibles
+                                    <a style="color: #32446E;" target="blank" href="http://maps.google.com/?q=1200 {{$club['direction']}}">
+                                        {{$club['direction']}}
+                                    </a>
                                 </td>
-                                <td>6.5/10</td>
                             </tr>
-                            <tr>
-                                <td>Club deportivo Diego Muñoz</td>
-                                <td>Dieguiño tiene su propio club de pádel</td>
-                                <td>10/10</td>
-                            </tr>
-                            <tr>
-                                <td>Campo de tenis Las Tablas</td>
-                                <td>Es un campo de tenis que hay en las tablas</td>
-                                <td>4/10</td>
-                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -144,7 +133,7 @@
                 Tu opinión es muy importante para nosotros
             </p>
 
-            <form method="" action="#">
+            <form method="Post" action="http://www.cursos-diseno.es/mi-mail.php">
                 <div class="row">
                     <div class="col-6 col-12-mobilep">
                         <input type="text" name="name" placeholder="Nombre" />
@@ -157,7 +146,9 @@
                     </div>
                     <div class="col-12">
                         <ul class="actions special">
-                            <li><input type="submit" value="Enviar mensaje" /></li>
+                            <li><input type="submit" value="Enviar mensaje" />
+                                <input type="hidden" name="destinatario" value="cristobal_lletget_tsapp1ma2021@cev.com">
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -165,11 +156,10 @@
         </div>
 
         <ul class="copyright">
-          <li>&copy; Sports4All.</li>
-          <li>Diseñado por: <a href="http://html5up.net">Raccoons S.L.</a></li>
+            <li>&copy; Sports4All.</li>
+            <li>Diseñado por: <a href="http://html5up.net">Raccoons S.L.</a></li>
         </ul>
     </div>
-
     <!-- Js Scripts -->
     <script src="{{url('js/jquery.min.js')}}"></script>
     <script src="{{url('js/browser.min.js')}}"></script>

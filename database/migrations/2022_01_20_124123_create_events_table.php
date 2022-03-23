@@ -20,7 +20,13 @@ class CreateEventsTable extends Migration
             $table->enum('visibility', ['Publico', 'Privado', 'Oculto']);
             $table->integer('people_left');
             $table->string('type');
+            $table->text('description');
             $table->double('price');
+            $table->string('img');
+            $table->date('day');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->dateTime('final_time');
             $table->timestamps();
         });
     }

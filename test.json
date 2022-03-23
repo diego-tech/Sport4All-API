@@ -1,0 +1,66 @@
+{
+    "status": 1,
+    "msg": "Partidos",
+    "data": [
+        {
+            "start_time": "13:00:00",
+            "items": [
+                {
+                    "id": 1,
+                    "QR": "4819",
+                    "club_id": 3,
+                    "court_id": 2,
+                    "price_people": 10,
+                    "lights": 1,
+                    "day": "2022-03-17",
+                    "start_time": "13:00:00",
+                    "end_time": "14:00:00",
+                    "final_time": "2022-03-17 14:00:00",
+                    "start_Datetime": "2022-03-17 13:00:00",
+                    "created_at": "2022-03-16T18:13:22.000000Z",
+                    "updated_at": "2022-03-16T18:13:22.000000Z",
+                    "pending_type": "match",
+                    "users": [
+                        {
+                            "id": 1,
+                            "name": null,
+                            "surname": null,
+                            "email": "diego171200@gmail.com",
+                            "email_verified_at": "2022-03-16T18:10:47.000000Z",
+                            "image": null,
+                            "genre": null,
+                            "created_at": "2022-03-16T18:10:36.000000Z",
+                            "updated_at": "2022-03-16T18:10:47.000000Z",
+                            "pivot": {
+                                "match_id": 1,
+                                "user_id": 1
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "start_time": "14:00:00",
+            "items": [
+                {
+                    "id": 2,
+                    "QR": "3522",
+                    "club_id": 2,
+                    "court_id": 2,
+                    "price_people": 10,
+                    "lights": 1,
+                    "day": "2022-03-17",
+                    "start_time": "14:00:00",
+                    "end_time": "15:00:00",
+                    "final_time": "2022-03-17 15:00:00",
+                    "start_Datetime": "2022-03-17 14:00:00",
+                    "created_at": "2022-03-17T11:57:12.000000Z",
+                    "updated_at": "2022-03-17T11:57:12.000000Z",
+                    "pending_type": "match",
+                    "users": []
+                }
+            ]
+        }
+    ]
+}

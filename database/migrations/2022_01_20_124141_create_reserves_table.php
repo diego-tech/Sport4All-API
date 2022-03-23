@@ -18,10 +18,13 @@ class CreateReservesTable extends Migration
             $table->string('QR')->nullable();
             $table->foreignId('user_id')->constrained()->nullable();
             $table->foreignId('court_id')->constrained()->nullable();
+            $table->foreignId('club_id')->constrained()->nullable();
             $table->boolean('lights');
             $table->date('day');
             $table->time('start_time');
             $table->time('end_time');
+            $table->dateTime('final_time');
+            $table->dateTime('start_Datetime');
             $table->timestamps();
         });
     }

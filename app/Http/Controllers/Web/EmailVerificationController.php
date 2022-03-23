@@ -30,4 +30,5 @@ class EmailVerificationController extends Controller
 
         return redirect('/');
     }
+
 }

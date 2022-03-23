@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
-class Club extends Model
+class Club extends Authenticatable
 {
+    use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -21,8 +24,14 @@ class Club extends Model
         'club_img',
         'club_banner',
         'direction',
+        'password',
+        'description',
         'tlf',
-        'email'
+        'email',
+        'password',
+        'web',
+        'first_hour',
+        'last_hour',
     ];
 
     /**
@@ -43,4 +52,47 @@ class Club extends Model
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function setClubImgAttribute($value)
+    {
+        $attribute_name = "club_img";
+        $disk = "public";
+        $destination_path = "";
+
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
+
+    // return $this->attributes[{$attribute_name}]; // uncomment if this is a translatable field
+    }
+
+    public function setClubBannerAttribute($value)
+    {
+        $attribute_name = "club_banner";
+        $disk = "public";
+        $destination_path = "";
+
+        $this->uploadFileToDisk($value, $attribute_name, $disk, $destination_path);
+
+    // return $this->attributes[{$attribute_name}]; // uncomment if this is a translatable field
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+        static::deleting(function($obj) {
+            \Storage::disk('public_folder')->delete($obj->image);
+        });
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        if($value == null){
+            backpack_user()->password = $this->attributes['password'];
+        }else{
+            $this->attributes['password'] = Hash::make($value);
+        }
+    }
+
+    public function courts() {
+        return $this->hasMany(Court::class);
+    }
 }
