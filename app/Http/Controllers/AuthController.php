@@ -322,7 +322,7 @@ class AuthController extends Controller
         try {
             if ($validatedData->fails()) {
                 $response['status'] = 0;
-                $response['data']['errors'] = $validatedData->errors()->all();
+                $response['data']['errors'] = $validatedData->errors()->first();
                 $response['msg'] = "Ha Ocurrido un Error";
 
                 return response()->json($response, 406);
