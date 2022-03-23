@@ -43,7 +43,7 @@ class AuthController extends Controller
 
         $response['status'] = 1;
         $response['data']['errors'] = "";
-        $response["msg"] = $now->toDateString() . $fileName;
+        $response["msg"] = $fileName;
 
         return response()->json($response);
     }
