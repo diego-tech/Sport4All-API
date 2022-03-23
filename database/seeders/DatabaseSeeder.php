@@ -36,13 +36,13 @@ class DatabaseSeeder extends Seeder
 
         DB::table('clubs')->insert([
             "name" => 'Admin',
-            "password" => Hash::make('Administrador1*'),
+            "password" => Hash::make('Z6N|pM+V:cXL!0U}q7KS'),
             "email" => 'admin@admin.com'
         ]);
 
         DB::table('users')->insert([
             "name" => 'Admin',
-            "password" => Hash::make('Administrador1*'),
+            "password" => Hash::make('Z6N|pM+V:cXL!0U}q7KS'),
             "email" => 'admin@admin.com'
         ]);
     }
