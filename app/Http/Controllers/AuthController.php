@@ -12,6 +12,7 @@ use App\Models\Inscription;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -33,11 +34,16 @@ class AuthController extends Controller
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
+        $now = Carbon::now();
         $fileName = Storage::putFile("", $request->file('fileName'));
+
+        $userImage = User::where('id', Auth::id())->value('image');
+
+        Storage::delete($userImage);
 
         $response['status'] = 1;
         $response['data']['errors'] = "";
-        $response["msg"] = $fileName;
+        $response["msg"] = $now->toDateString() . $fileName;
 
         return response()->json($response);
     }

@@ -26,7 +26,7 @@ Route::get('/userinfo', [AuthController::class, 'infouser'])->middleware('auth:s
 Route::post('/recoverpass', [AuthController::class, 'recoverPass']);
 Route::post('/usermodify', [AuthController::class, 'modifyUser'])->middleware('auth:sanctum');
 Route::post('/passmodify', [AuthController::class, 'modifyPass'])->middleware('auth:sanctum');
-Route::post('/getUploadImage', [AuthController::class, 'getUploadImage']);
+Route::post('/getUploadImage', [AuthController::class, 'getUploadImage'])->middleware('auth:sanctum');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 // Recuperación de contraseña
