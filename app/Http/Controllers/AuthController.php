@@ -32,7 +32,7 @@ class AuthController extends Controller
      */
     public function getUploadImage(Request $request)
     {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
+        $response = ["status" => 1, "msg" => ""];
 
         try {
             $fileName = Storage::putFile("", $request->file('fileName'));
