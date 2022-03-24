@@ -2773,7 +2773,6 @@ input, select, textarea {
 			border-radius: 100%;
 			color: #ffffff;
 			cursor: default;
-			display: inline-block;
 			font-size: 2.25em;
 			height: 2.35em;
 			line-height: 2.35em;
@@ -3181,7 +3180,7 @@ input, select, textarea {
 		/* Header */
 
 			#header {
-				background-image: url("images-css/bottom-1280.svg")/*, url("images/overlay.png"), url("../../images/header.jpg")*/;
+				background-image: url("images-css/bottom-1280.svg"), url("images/overlay.png"), /*url("../../images/header.jpg")*/;
 				background-size: 1280px 184px,						auto,							cover;
 				background-color: #D0E1F9;
 				padding: 3em 0 7em 0;
@@ -3238,6 +3237,7 @@ input, select, textarea {
 	@media screen and (max-width: 480px) {
 
 		/* Section/Article */
+
 
 			header.major {
 				padding-left: 1em;
