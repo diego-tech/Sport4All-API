@@ -18,20 +18,29 @@ class CheckIfEmaiIsValidated
      */
     public function handle(Request $request, Closure $next)
     {
-        $response = ["status" => 1, "msg" => ""];
+        $response = ["status" => 1, "data" => [], "msg" => ""];
 
         $userEmail = $request->only('email');
         $user = User::where('email', $userEmail)->first();
 
-        if ($user->hasVerifiedEmail()) {
-            return $next($request);
+        if ($user) {
+            if ($user->hasVerifiedEmail()) {
+                return $next($request);
+            } else {
+                event(new Registered($user));
+    
+                $response['status'] = 0;
+                $response['data']['errors'] = "";
+                $response['msg'] = "Valide Su Correo Electrónico";
+    
+                return response()->json($response, 406);
+            }
         } else {
-            event(new Registered($user));
-
             $response['status'] = 0;
-            $response['msg'] = "Valide Su Correo Electrónico";
+            $response['data']['errors'] = "";
+            $response['msg'] = "No existe este usuario";
 
             return response()->json($response, 406);
-        }
+        }        
     }
 }
