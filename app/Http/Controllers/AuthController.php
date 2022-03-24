@@ -452,7 +452,7 @@ class AuthController extends Controller
      */
     public function delete_favs(Request $request)
     {
-        $response = ["status" => 1, "msg" => "", "data" => []];
+        $response = ["status" => 1, "msg" => ""];
 
         $userId = Auth::id();
 
@@ -461,12 +461,10 @@ class AuthController extends Controller
             $clubFav->delete();
             $response['msg'] = 'Club elimiado de favoritos';
             $response['status'] = 1;
-            $response['data']['errors'] = "";
 
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
-            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
