@@ -363,7 +363,12 @@ class ClubsController extends Controller
                 $ClubArray['email'] = Club::where('clubs.id', $bestRated->club_id)->value('email');
                 $ClubArray['first_hour'] = Club::where('clubs.id', $bestRated->club_id)->value('first_hour');
                 $ClubArray['last_hour'] = Club::where('clubs.id', $bestRated->club_id)->value('last_hour');
-                $ClubArray['fav'] = True;
+                $query = Favourite::where('user_id', Auth::id())->where('club_id', $bestRated->club_id)->value('id');
+                if ($query) {
+                    $ClubArray['fav'] = True;
+                } else {
+                    $ClubArray['fav'] = False;
+                }
                 $ClubArray['services'] = AuxFunctions::Get_services_from_club($bestRated->club_id);
 
                 $bestArray[] = $ClubArray;
