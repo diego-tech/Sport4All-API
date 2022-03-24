@@ -116,7 +116,7 @@ class MatchsCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(MatchsRequest::class);
-        //dd($this->crud->getRequest()->court_id);
+        dd($this->crud->getRequest());
         $this->addFields();
         Matchs::creating(function($entry) {
             $entry->club_id = backpack_user()->id;
@@ -141,14 +141,27 @@ class MatchsCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
-        $this->addFields();
+        if(backpack_user()->email == 'admin@admin.com'){
+        }elseif(backpack_user()->id == $this->crud->getRequest()->id){
+            $this->crud->addClause('where','id','=', backpack_user()->id);
+        }else{
+            $this->crud->denyAccess('create');
+            $this->crud->denyAccess('update');
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
+        }
     }
 
     private function addColumns(){
         $this->crud->addColumns([
             [
-                'name' => 'court_id',
-                'label' => 'Pista',
+                'label'     => "Pistas",
+                'name'      => 'court_id',
+                'type'      => 'select',
+                'entity'    => 'courts',
+                'model'     => "App\Models\Court",
+                'attribute' => 'name',
+                'pivot'     => true, 
                 
             ],
             [
@@ -183,7 +196,10 @@ class MatchsCrudController extends CrudController
                 'entity'    => 'courts',
                 'model'     => "App\Models\Court",
                 'attribute' => 'name',
-                'pivot'     => true, 
+                'pivot'     => true,
+                'options'   => (function ($query) {
+                    return $query->where('club_id', backpack_user()->id)->get();
+                }), 
             ],
             [
                 'name' => 'lights',

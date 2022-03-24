@@ -3,18 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Helpers\AuxFunctions;
+use App\Models\Club;
 use App\Models\Court;
-use App\Models\Court_Price;
+use App\Models\Favourite;
 use App\Models\Matchs;
-use App\Models\Price;
 use App\Models\Reserve;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use PDO;
 
 class CourtsController extends Controller
 {
@@ -73,6 +71,7 @@ class CourtsController extends Controller
                 return response()->json($response, 200);
             } catch (\Exception $e) {
                 $response['status'] = 0;
+                $response['data']['errors'] = "";
                 $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
                 return response()->json($response, 406);
@@ -98,7 +97,7 @@ class CourtsController extends Controller
                 'lights' => 'required|boolean',
                 'day' => 'required|date_format:Y-m-d',
                 'start_time' => 'required|date_format:H:i:s',
-                'time' => ['required']
+                'time' => 'required',
             ],
             [
                 'court_id.required' => 'Introduce una pista',
@@ -137,20 +136,8 @@ class CourtsController extends Controller
                     'start_Datetime' => $start_time,
                 ]);
 
-                $court = Court::find($request->input('court_id'));
-
                 $response['status'] = 1;
                 $response['data'] = $Reserve;
-                if ($request->input('time') == '60') {
-                    $price = $court->price;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                } elseif ($request->input('time') == '90') {
-                    $price = $court->price * 1.5;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                } else {
-                    $price = $court->price * 2;
-                    $response['msg'] = 'Reserva creada Correctamente, precio de la pista: ' . $price . '€';
-                }
 
                 return response()->json($response, 200);
             } catch (\Exception $e) {
@@ -190,7 +177,7 @@ class CourtsController extends Controller
             $day = $request->input('day');
             $hour = $request->input('hour');
 
-            $courts1 = Court::with('reserves', 'prices')
+            $courts1 = Court::with('reserves', 'Courtprices')
                 ->leftJoin('reserves', 'courts.id', '=', 'reserves.court_id')
                 ->select('courts.*')
                 ->where('courts.club_id', $club_id)
@@ -198,7 +185,7 @@ class CourtsController extends Controller
                 ->where('end_time', '>=', $hour)
                 ->where('day', $day);
 
-            $courts = Court::with('reserves', 'prices')
+            $courts = Court::with('reserves', 'Courtprices')
                 ->leftJoin('matchs', 'courts.id', '=', 'matchs.court_id')
                 ->select('courts.*')
                 ->union($courts1)
@@ -214,7 +201,7 @@ class CourtsController extends Controller
             $results = array_diff($courtsAll, $courts);
 
             foreach ($results as $court) {
-                $court = Court::with('prices')->where('id', $court)->get();
+                $court = Court::with('Courtprices')->where('id', $court)->get();
                 $courtsResults[] = $court[0];
             }
 
@@ -264,11 +251,11 @@ class CourtsController extends Controller
         $response = ["status" => 1, "msg" => "", "data" => []];
 
         try {
-            $query = Reserve::query()
-                ->join('courts', 'reserves.court_id', '=', 'courts.id')
+            $query = Reserve::join('courts', 'reserves.court_id', '=', 'courts.id')
                 ->join('clubs', 'courts.club_id', '=', 'clubs.id')
                 ->select(
                     'reserves.*',
+                    'clubs.*',
                     'clubs.name as clubName',
                     'clubs.direction as clubLocation',
                     'courts.name',
@@ -276,15 +263,14 @@ class CourtsController extends Controller
                     'courts.sport',
                     'courts.surfaces',
                     'clubs.club_img as clubImg'
-                )
+                )   
                 ->where('reserves.user_id', Auth::id())
-                ->where('reserves.final_time', '<', now())
+                ->where('reserves.final_time', '<', Carbon::now('Europe/Madrid'))
                 ->get();
 
             $response['status'] = 1;
             $response['data'] = $query;
             $response['msg'] = 'Reservas finalizadas';
-
 
             return response()->json($response, 200);
         } catch (\Exception $e) {
@@ -307,11 +293,14 @@ class CourtsController extends Controller
 
             $queryR = Reserve::where('QR', $request->input('qr'))->where('user_id', Auth::id());
 
+            $substractMinutes = Carbon::now('Europe/Madrid')->subMinutes(10);
+            $addMinutes = Carbon::now('Europe/Madrid')->addMinutes(10);
+
             $testR = $queryR->get();
             if (!$testM->isEmpty()) {
                 $matchQRvalidated = $queryM
-                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
-                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->where('start_Datetime', '<=', $substractMinutes)
+                    ->where('final_time', '>=', $addMinutes)
                     ->get();
                 if (!$matchQRvalidated->isEmpty()) {
                     $response['status'] = 1;
@@ -320,8 +309,8 @@ class CourtsController extends Controller
                 }
             } elseif (!$testR->isEmpty()) {
                 $reserveQRvalidated = $queryR
-                    ->where('start_Datetime', '<=', Carbon::now('Europe/Madrid'))
-                    ->where('final_time', '>=', Carbon::now('Europe/Madrid'))
+                    ->where('start_Datetime', '<=', $substractMinutes)
+                    ->where('final_time', '>=', $addMinutes)
                     ->get();
                 if (!$reserveQRvalidated->isEmpty()) {
                     $response['status'] = 1;
@@ -333,6 +322,44 @@ class CourtsController extends Controller
             $response['status'] = 0;
             $response['msg'] = 'Horario incorrecto puerta cerrada';
             return response()->json($response, 403);
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    }
+
+    public function get_club_info_ended_events(Request $request)
+    {
+        $response = ["status" => 1, "msg" => "", "data" => []];
+
+        try {
+            $query = Club::find($request->input('id'));
+            
+            $ClubArray['id'] = $query->id;
+            $ClubArray['name'] = $query->name;
+            $ClubArray['club_img'] = $query->club_img;
+            $ClubArray['club_banner'] = $query->club_banner;
+            $ClubArray['direction'] = $query->direction;
+            $ClubArray['tlf'] = $query->tlf;
+            $ClubArray['email'] = $query->email;
+            $ClubArray['web'] = $query->web;
+            $ClubArray['description'] = $query->description;
+            $ClubArray['first_hour'] = $query->first_hour;
+            $ClubArray['last_hour'] = $query->last_hour;
+            $queryFav = Favourite::where('user_id', Auth::id())->where('club_id', $query->id)->value('id');
+            if ($queryFav) {
+                $ClubArray['fav'] = True;
+            } else {
+                $ClubArray['fav'] = False;
+            }
+            $ClubArray['services'] = AuxFunctions::Get_services_from_club($query->id);
+
+            $response['status'] = 1;
+            $response['data'] = $ClubArray;
+            $response['msg'] = "Todos los Clubes";
+            return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);

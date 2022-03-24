@@ -16,8 +16,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -55,7 +56,7 @@ class AuthController extends Controller
             $request->all(),
             [
                 'email' => 'bail|required|string|email|max:255|unique:users',
-                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/',
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}/',
             ],
             [
                 'email.required' => 'Introduce un email correcto',
@@ -80,15 +81,18 @@ class AuthController extends Controller
                     'password' => Hash::make($request->input('password')),
                 ]);
 
-                event(new Registered($user));
-
+                
                 $response['status'] = 1;
                 $response['data'] = $user;
+                $response['data']['errors'] = "";
                 $response['msg'] = 'Usuario Registrado Correctamente';
 
+                event(new Registered($user));
+                
                 return response()->json($response, 200);
             } catch (\Exception $e) {
                 $response['status'] = 0;
+                $response['data']['errors'] = "";
                 $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
                 return response()->json($response, 406);
@@ -125,6 +129,7 @@ class AuthController extends Controller
                     $response['status'] = 1;
                     $response['data'] = $user;
                     $response['data']['token'] = $token;
+                    $response['data']['errors'] = "";
                     $response['msg'] = "Sesión Iniciada Correctamente";
 
                     return response()->json($response, 200);
@@ -132,6 +137,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -140,7 +146,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
+        $response = ["status" => 1, "msg" => ""];
         try {
             $request->user()->currentAccessToken()->delete();
             $response['msg'] = 'Sesion cerrada correctamente';
@@ -170,6 +176,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['data']['errors'] = "";
             $response['status'] = 0;
 
             return response()->json($response, 406);
@@ -185,30 +192,23 @@ class AuthController extends Controller
     public function recoverPass(Request $request)
     {
         $response = ["status" => 1, "msg" => ""];
-
-        $pass_pattern = "/^\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])\S*$/";
-
-        $user = User::where('email', $request->email)->first();
-
+        
         try {
-            if ($user) {
-                $password = "";
-                do {
-                    $password = Str::random(8);
-                } while (!preg_match($pass_pattern, $password)); //hacer para que se envie por correo??
-                $user->password = Hash::make($password);
-                $user->save();
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
 
+            if ($status == Password::RESET_LINK_SENT) {
                 $response['status'] = 1;
-                $response['msg'] = "Contraseña: " . $password;
-
+                $response['msg'] = "Compruebe su bandeja de entrada";
+                
                 return response()->json($response, 200);
-            } else {
-                $response['status'] = 0;
-                $response['msg'] = "No se encuentra el usuario en el sistema";
-
-                return response()->json($response, 404);
             }
+
+            throw ValidationException::withMessages([
+                'email' => trans($status),
+            ]);
+
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
             $response['status'] = 0;
@@ -280,6 +280,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['data']['errors'] = "";
             $response['status'] = 0;
 
             return response()->json($response, 406);
@@ -299,7 +300,7 @@ class AuthController extends Controller
         $validatedData = Validator::make(
             $request->all(),
             [
-                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{6,}/'
+                'password' => 'bail|required|string|regex:/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}/'
             ],
             [
                 'password.required' => 'Introduce una contraseña correcta debe tener minimo 8 caracteres 1 letra, una mayuscula y un caracter especial',
@@ -329,6 +330,7 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+            $response['data']['errors'] = "";
             $response['status'] = 0;
 
             return response()->json($response, 406);
@@ -373,6 +375,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -422,16 +425,23 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
-            $response['data'] = "";
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
         }
     }
 
+    /**
+     * Quitar de Favoritos
+     * 
+     * @param \Illuminate\Http\Request $request
+     * @return response()->json($response)
+     */
     public function delete_favs(Request $request)
     {
         $response = ["status" => 1, "msg" => "", "data" => []];
+
         $userId = Auth::id();
 
         try {
@@ -500,49 +510,19 @@ class AuthController extends Controller
                 $response['msg'] = "Resultados de la búsqueda:";
                 return response()->json($response, 200);
             } else {
+                $response['status'] = 1;
+                $response['data']['errors'] = "";
                 $response['msg'] = "Introduzca un término a buscar";
                 return response()->json($response);
             }
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
         }
     }
-
-    /**
-     * Buscar Eventos
-     * 
-     * @param \Illuminate\Http\Request $request
-     * @return response()->json($response)
-     */
-    public function searchEvents(Request $request) {
-        $response = ["status" => 1, "data" => [], "msg" => ""];
-
-        $query = $request->input('name');
-
-        try {
-            if ($query) {
-                $eventsArray = [];
-
-                $finalResults = DB::table('events')
-                    ->join('events.club_id', 'clubs', 'id')
-                    ->select()
-                    ->where('clubs.name', '!=', 'Admin')
-                    ->where('clubs.name', 'like', '%' . $query . '%')
-                    ->orWhere('clubs.direction', 'like', '%' . $query . '%')
-                    ->orWhere('events.name', 'like', '%' . $query . '%')
-                    ->get();
-            }
-        } catch (\Exception $e) {
-            $response['status'] = 0;
-            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
-
-            return response()->json($response, 406);
-        }
-    }
-
 
     /**
      * Inscribirse en Evento
@@ -554,7 +534,7 @@ class AuthController extends Controller
     {
         $response = ["status" => 1, "data" => [], "msg" => ""];
 
-        // Recibes el id del evento al que te quieres inscribir
+        // Recibes el id del evento al que te quieres inscribir 
         $eventId = $request->input('id');
 
         // Id del usuario que se va a inscribir al evento
@@ -590,19 +570,20 @@ class AuthController extends Controller
                         return response()->json($response, 200);
                     } else {
                         $response['status'] = 0;
-                        $response['data'][''] = "";
+                        $response['data']['errors'] = "";
                         $response['msg'] = "Ya está inscrito";
                         return response()->json($response, 406);
                     }
                 }
             } else {
                 $response['status'] = 0;
-                $response['data'][''] = "";
+                $response['data']['errors'] = "";
                 $response['msg'] = "El evento no existe";
                 return response()->json($response, 404);
             }
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -642,6 +623,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -672,10 +654,10 @@ class AuthController extends Controller
             $response['data'] = $query;
             $response['msg'] = 'Eventos pendientes';
 
-
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);
@@ -713,6 +695,7 @@ class AuthController extends Controller
             return response()->json($response, 200);
         } catch (\Exception $e) {
             $response['status'] = 0;
+            $response['data']['errors'] = "";
             $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
 
             return response()->json($response, 406);

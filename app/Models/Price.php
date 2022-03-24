@@ -9,4 +9,10 @@ class Price extends Model
 {
     use \Backpack\CRUD\app\Models\Traits\CrudTrait;
     use HasFactory;
+
+    protected $fillable = [
+        'club_id',
+        'price',
+        'time',
+    ];
 }

@@ -106,14 +106,21 @@ class ClubCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
+        //dd($this->crud->getRequest()->id);
+        $this->setupCreateOperation();
         if(backpack_user()->email == 'admin@admin.com'){
-        }else{
+        }elseif(backpack_user()->id == $this->crud->getRequest()->id){
             $this->crud->addClause('where','id','=', backpack_user()->id);
             $this->crud->denyAccess('create');
             $this->crud->removeButton('create');
             $this->crud->removeButton('delete');
+        }else{
+            $this->crud->denyAccess('create');
+            $this->crud->denyAccess('update');
+            $this->crud->removeButton('create');
+            $this->crud->removeButton('delete');
         }
-        $this->setupCreateOperation();
+        
     }
 
     private function addColumns(){

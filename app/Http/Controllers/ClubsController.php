@@ -361,6 +361,8 @@ class ClubsController extends Controller
                 $ClubArray['description'] = Club::where('clubs.id', $bestRated->club_id)->value('description');
                 $ClubArray['tlf'] = Club::where('clubs.id', $bestRated->club_id)->value('tlf');
                 $ClubArray['email'] = Club::where('clubs.id', $bestRated->club_id)->value('email');
+                $ClubArray['first_hour'] = Club::where('clubs.id', $bestRated->club_id)->value('first_hour');
+                $ClubArray['last_hour'] = Club::where('clubs.id', $bestRated->club_id)->value('last_hour');
                 $ClubArray['fav'] = True;
                 $ClubArray['services'] = AuxFunctions::Get_services_from_club($bestRated->club_id);
 
