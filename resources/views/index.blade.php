@@ -133,7 +133,7 @@
                 Tu opinión es muy importante para nosotros
             </p>
 
-            <form method="Post" action="http://www.cursos-diseno.es/mi-mail.php">
+            <form method="POST" action="http://www.cursos-diseno.es/mi-mail.php">
                 <div class="row">
                     <div class="col-6 col-12-mobilep">
                         <input type="text" name="name" placeholder="Nombre" />
@@ -157,7 +157,7 @@
 
         <ul class="copyright">
             <li>&copy; Sports4All.</li>
-            <li>Diseñado por: <a href="http://html5up.net">Raccoons S.L.</a></li>
+            <li>Diseñado por: <a href="">Raccoons S.L.</a></li>
         </ul>
     </div>
     <!-- Js Scripts -->

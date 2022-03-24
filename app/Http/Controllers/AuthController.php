@@ -12,7 +12,6 @@ use App\Models\Inscription;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -171,6 +170,7 @@ class AuthController extends Controller
             return response()->json($response, 406);
         }
     }
+
     /**
      * Información del Usuario
      * 
@@ -393,6 +393,28 @@ class AuthController extends Controller
             return response()->json($response, 406);
         }
     }
+
+    public function checkIfHasCorrectToken() {
+        $response = ["status" => 1, "msg" => ""];
+
+        try {
+            $user = User::find(Auth::id());
+
+            if ($user) {
+                $response['status'] = 1;
+                $response['msg'] = "Tiene Token";
+            } else {
+                $response['status'] = 0;
+                $response['msg'] = "No Tiene Token";
+            }
+        } catch (\Exception $e) {
+            $response['status'] = 0;
+            $response['data']['errors'] = "";
+            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
+
+            return response()->json($response, 406);
+        }
+    } 
 
     /**
      * Listar Clubs Favoritos
