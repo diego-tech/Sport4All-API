@@ -16,7 +16,7 @@
 <body class="is-preload">
     <!-- Header -->
     <div id="header">
-        <span class="logo icon"> <img src="{{url('img/logoapp.png')}}" /></span>
+        <span class="logo icon"> <img id="logoapp" src="{{url('img/logoapp.png')}}" /></span>
         <h1>Bienvenido a Sports4All</h1>
         <p>
             ¡Somos una aplicación preparada para organizar tus partidos!

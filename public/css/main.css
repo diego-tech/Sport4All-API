@@ -2768,23 +2768,24 @@ input, select, textarea {
 			color: #544d55;
 		}
 
-		#header .logo {
+		#header.logo {
 			/*  background: #4eb980; */
 			border-radius: 100%;
 			color: #ffffff;
 			cursor: default;
 			font-size: 2.25em;
-			height: 2.35em;
-			line-height: 2.35em;
 			margin: 0 0 0.75em 0;
 			text-align: center;
-			width: 2.35em;
 		}
 
 			#header .logo.fa-paper-plane-o:before {
 				left: -0.075em;
 				position: relative;
 			}
+
+		#logoapp {
+			width: 100px;
+		}
 
 		#header h1 {
 			font-size: 2.5em;
@@ -3080,6 +3081,10 @@ input, select, textarea {
 				font-size: 12pt;
 			}
 
+			#logoapp {
+				width: 80px;
+			}
+
 	}
 
 /* Narrower */
@@ -3207,6 +3212,10 @@ input, select, textarea {
 					font-size: 1em;
 				}
 
+			#logoapp {
+				width: 60px;
+			}
+
 		/* Footer */
 
 			#footer {
@@ -3308,4 +3317,7 @@ input, select, textarea {
 					display: none;
 				}
 
+			#logoapp {
+				width: 60px;
+			}
 	}
