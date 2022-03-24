@@ -85,7 +85,7 @@
     <div class="mainDiv">
         <div class="cardStyle">
             
-                <img src="./images/logoapp.png" id="signupLogo" />
+                <img src="{{url('img/logoapp.png') }}" id="signupLogo" />
 
                 <h2 class="formTitle">
                     Email Verificado

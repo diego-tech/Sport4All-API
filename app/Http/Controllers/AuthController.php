@@ -394,28 +394,6 @@ class AuthController extends Controller
         }
     }
 
-    public function checkIfHasCorrectToken() {
-        $response = ["status" => 1, "msg" => ""];
-
-        try {
-            $user = User::find(Auth::id());
-
-            if ($user) {
-                $response['status'] = 1;
-                $response['msg'] = "Tiene Token";
-            } else {
-                $response['status'] = 0;
-                $response['msg'] = "No Tiene Token";
-            }
-        } catch (\Exception $e) {
-            $response['status'] = 0;
-            $response['data']['errors'] = "";
-            $response['msg'] = (env('APP_DEBUG') == "true" ? $e->getMessage() : $this->error);
-
-            return response()->json($response, 406);
-        }
-    } 
-
     /**
      * Listar Clubs Favoritos
      * 

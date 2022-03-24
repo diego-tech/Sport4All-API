@@ -28,7 +28,6 @@ class EmailVerificationController extends Controller
         if ($user->markEmailAsVerified())
             event(new Verified($user));
 
-        return redirect('/');
+        return redirect('/succesEmail');
     }
-
 }
