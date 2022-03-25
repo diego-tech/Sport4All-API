@@ -283,7 +283,7 @@ class CourtsController extends Controller
 
     public function qr_validator(Request $request)
     {
-        $response = ["status" => 1, "msg" => "", "data" => []];
+        $response = ["status" => 1, "msg" => ""];
 
         try {
             $queryM = Matchs::join('match_user', 'matchs.id', '=', 'match_user.match_id')
