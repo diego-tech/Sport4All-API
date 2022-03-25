@@ -56,7 +56,7 @@ Route::get('/endedreserves', [CourtsController::class, 'ended_reserves'])->middl
 Route::get('/endedinfoclub', [CourtsController::class, 'get_club_info_ended_events'])->middleware('auth:sanctum');
 
 //QR
-Route::get('/qrvalidation', [CourtsController::class, 'qr_validator'])->middleware('auth:sanctum');
+Route::post('/qrvalidation', [CourtsController::class, 'qr_validator']);
 
 
 // Rutas Clubes
