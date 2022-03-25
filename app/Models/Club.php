@@ -79,7 +79,7 @@ class Club extends Authenticatable
     {
         parent::boot();
         static::deleting(function($obj) {
-            \Storage::disk('public_folder')->delete($obj->image);
+            \Storage::disk('public')->delete($obj->image);
         });
     }
 
