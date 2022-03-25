@@ -93,18 +93,17 @@ class CourtCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
+        $court = Court::where('id', $this->crud->getRequest()->id)->value('club_id');
+
         $this->setupCreateOperation();
         if (backpack_user()->email == 'admin@admin.com') {
-        } elseif (backpack_user()->id == $this->crud->getRequest()->id) {
-            $this->crud->addClause('where', 'id', '=', backpack_user()->id);
+        } elseif (backpack_user()->id == $court) {
         } else {
             $this->crud->denyAccess('create');
             $this->crud->denyAccess('update');
             $this->crud->removeButton('create');
             $this->crud->removeButton('delete');
         }
-
-        //dd($this->crud->getRequest());    
     }
 
     private function addColumns()

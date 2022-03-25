@@ -106,7 +106,6 @@ class ClubCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        //dd($this->crud->getRequest()->id);
         $this->setupCreateOperation();
         if(backpack_user()->email == 'admin@admin.com'){
         }elseif(backpack_user()->id == $this->crud->getRequest()->id){

@@ -60,7 +60,6 @@ class CourtPriceCrudController extends CrudController
         CRUD::setValidation(CourtPriceRequest::class);
 
         $this->addFields();
-        //dd($this->crud->getRequest());
         CourtPrice::creating(function($entry) {
             $entry->court_id = $this->crud->getRequest()->courts;
             $entry->price_id = $this->crud->getRequest()->prices;

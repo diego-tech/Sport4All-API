@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\MatchsRequest;
-use App\Models\Court;
 use App\Models\Matchs;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
@@ -116,7 +115,6 @@ class MatchsCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(MatchsRequest::class);
-        dd($this->crud->getRequest());
         $this->addFields();
         Matchs::creating(function($entry) {
             $entry->club_id = backpack_user()->id;
@@ -140,10 +138,10 @@ class MatchsCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
+        $court = Matchs::where('id', $this->crud->getRequest()->id)->value('club_id');
         $this->setupCreateOperation();
         if(backpack_user()->email == 'admin@admin.com'){
-        }elseif(backpack_user()->id == $this->crud->getRequest()->id){
-            $this->crud->addClause('where','id','=', backpack_user()->id);
+        }elseif(backpack_user()->id == $court){
         }else{
             $this->crud->denyAccess('create');
             $this->crud->denyAccess('update');
