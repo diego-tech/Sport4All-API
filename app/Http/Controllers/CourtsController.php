@@ -201,8 +201,14 @@ class CourtsController extends Controller
             $results = array_diff($courtsAll, $courts);
 
             foreach ($results as $court) {
-                $court = Court::with('Courtprices')->where('id', $court)->get();
-                $courtsResults[] = $court[0];
+                $court = Court::with('Courtprices')
+                        ->where('id', $court)
+                        ->where('club_id', $club_id)
+                        ->first();
+
+                if ($court) {
+                    $courtsResults[] = $court;
+                }
             }
 
             $response['msg'] = 'Pistas libres';
